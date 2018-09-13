@@ -9,6 +9,7 @@ import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes
+import Tuple
 
 
 main =
@@ -22,16 +23,36 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
+    let
+        points =
+            List.map (\d -> Point2d.fromCoordinates ( toFloat d.t, toFloat d.v )) flags.data
+    in
     ( { flags = flags
       , level = 0
+      , pointData = points
+      , scaledPoints = scaleXY points
       }
     , Cmd.none
     )
 
 
+scaleXY points =
+    let
+        sx =
+            0.5
+
+        sy =
+            0.25
+    in
+    List.map (\p -> Point2d.fromCoordinates ( sx * Point2d.xCoordinate p, sy * Point2d.yCoordinate p ))
+        points
+
+
 type alias Model =
     { flags : Flags
     , level : Int
+    , pointData : List Point2d
+    , scaledPoints : List Point2d
     }
 
 
