@@ -28,22 +28,35 @@ type alias Model =
     { flags : Flags
     , level : Int
     , data : List Datum
-    , chartBoundingBox : Maybe BoundingBox2d
+    , points : List Point2d
+    , chartBoundingBox : List Point2d
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
+    let
+        data =
+            readData flags
+
+        points =
+            toPoints data
+
+        chartBoundingBox =
+            BoundingBox2d.containingPoints points
+    in
     ( { flags = flags
       , level = 0
-      , data = readData flags
-      , chartBoundingBox = pointify (readData flags)
+      , data = data
+      , points = points
+      , chartBoundingBox = chartBoundingBox
       }
     , Cmd.none
     )
 
 
-pointify data =
+toPoints : List { time : Float, value : Float } -> List Point2d
+toPoints data =
     let
         points =
             List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
