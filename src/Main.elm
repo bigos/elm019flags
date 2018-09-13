@@ -1,4 +1,4 @@
-module Main exposing (Flags, Msg(..), main, update, view)
+module Main exposing (Flags, Model, Msg(..), init, main, update, view)
 
 import Browser
 import Html exposing (Html, button, div, text)
@@ -23,6 +23,41 @@ init flags =
     )
 
 
+type alias ChartRecord =
+    { on : String
+    , comment : String
+    , by : String
+    }
+
+
+type alias Stats =
+    { nominal : Float
+    , mean : Float
+    , deviation : Float
+    }
+
+
+type alias Flags =
+    { acqnominal : Float
+    , analyteid : Int
+    , chart_type : String
+    , date_from : String
+    , date_to : String
+    , pdf : Bool
+    , stats : Stats
+    , maintenance_logs : List ChartRecord
+    , reviews : List ChartRecord
+    , qcresults : List RawCid
+    }
+
+
+type alias RawCid =
+    { id : Int
+    , c : Float
+    , d : String
+    }
+
+
 type alias Model =
     { flags : Flags
     , level : Int
@@ -32,12 +67,6 @@ type alias Model =
 type Msg
     = Increment
     | Decrement
-
-
-type alias Flags =
-    { num : Int
-    , str : String
-    }
 
 
 update msg model =
