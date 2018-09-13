@@ -10,6 +10,7 @@ import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 import Triangle2d exposing (Triangle2d)
+import Tuple
 
 
 main =
@@ -108,44 +109,54 @@ vertices =
     ]
 
 
-stamp =
+rcc =
+    [ ( 0, 0 ), ( 50, 0 ), ( 50, 50 ), ( 0, 50 ) ]
+
+
+rect cc =
+    List.map (\c -> Point2d.fromCoordinates c) cc
+
+
+stamp col cc =
     Svg.polygon2d
-        [ Attributes.fill "yellow"
+        [ Attributes.fill col
         , Attributes.stroke "blue"
         , Attributes.strokeWidth "2"
         ]
-        (Polygon2d.singleLoop vertices)
+        (Polygon2d.singleLoop (rect cc))
 
 
-frames =
-    [ Frame2d.atPoint
-        (Point2d.fromCoordinates ( 0, 0 ))
-    , Frame2d.atPoint
-        (Point2d.fromCoordinates ( 100, 100 ))
-    , Frame2d.atPoint
-        (Point2d.fromCoordinates ( -100, 200 ))
+frameChart =
+    Frame2d.atPoint
+        (Point2d.fromCoordinates ( 100, 300 ))
         |> Frame2d.reverseY
-    , Frame2d.atPoint
-        (Point2d.fromCoordinates ( 400, 100 ))
-        |> Frame2d.rotateBy (degrees 20)
 
-    -- , Frame2d.atPoint
-    --     (Point2d.fromCoordinates ( 25, 150 ))
-    -- , Frame2d.atPoint
-    --     (Point2d.fromCoordinates ( 100, 100 ))
-    --     |> Frame2d.rotateBy (degrees 20)
-    -- , Frame2d.atPoint
-    --     (Point2d.fromCoordinates ( 150, 150 ))
-    --     |> Frame2d.rotateBy (degrees -30)
-    ]
+
+frameAxisX =
+    Frame2d.atPoint
+        (Point2d.fromCoordinates ( 100, 350 ))
+        |> Frame2d.reverseY
+
+
+frameAxisY =
+    Frame2d.atPoint
+        (Point2d.fromCoordinates ( 50, 300 ))
+        |> Frame2d.reverseY
+
+
+frameLegend =
+    Frame2d.atPoint
+        (Point2d.fromCoordinates ( 300, 100 ))
+        |> Frame2d.reverseY
 
 
 placed =
     Svg.g []
-        (frames
-            |> List.map
-                (\frame -> Svg.placeIn frame stamp)
-        )
+        [ Svg.placeIn frameChart (stamp "yellow" rcc)
+        , Svg.placeIn frameAxisX (stamp "blue" rcc)
+        , Svg.placeIn frameAxisY (stamp "green" rcc)
+        , Svg.placeIn frameLegend (stamp "red" rcc)
+        ]
 
 
 view model =
@@ -153,8 +164,8 @@ view model =
         [ div []
             [ Svg.svg
                 [ width "420"
-                , height "220"
-                , viewBox "0 0 620 620"
+                , height "420"
+                , viewBox "0 0 420 420"
                 , style "border: solid red 1px;"
                 ]
                 [ placed ]
