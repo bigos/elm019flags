@@ -1,8 +1,13 @@
 module Main exposing (Flags, Model, Msg(..), init, main, update, view)
 
 import Browser
+import Geometry.Svg as Svg
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import Point2d exposing (Point2d)
+import Svg exposing (Svg)
+import Svg.Attributes as Attributes exposing (..)
+import Triangle2d exposing (Triangle2d)
 
 
 main =
@@ -78,9 +83,34 @@ update msg model =
             ( { model | level = model.level - 1 }, Cmd.none )
 
 
+triangle : Svg Msg
+triangle =
+    Svg.triangle2d
+        [ Attributes.stroke "blue"
+        , Attributes.strokeWidth "10"
+        , Attributes.strokeLinejoin "round"
+        , Attributes.fill "orange"
+        ]
+        (Triangle2d.fromVertices
+            ( Point2d.fromCoordinates ( 5, 5 )
+            , Point2d.fromCoordinates ( 5, 50 )
+            , Point2d.fromCoordinates ( 100, 100 )
+            )
+        )
+
+
 view model =
     div []
-        [ button [ onClick Decrement ] [ text "-" ]
+        [ div []
+            [ Svg.svg
+                [ width "120"
+                , height "120"
+                , viewBox "0 0 120 120"
+                ]
+                [ triangle ]
+            ]
+        , button [ onClick Decrement ] [ text "-" ]
         , div [] [ text (String.fromInt model.level) ]
         , button [ onClick Increment ] [ text "+" ]
+        , div [] [ text "We have lift off" ]
         ]
