@@ -5,6 +5,7 @@ import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import ISO8601
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
@@ -26,9 +27,14 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { flags = flags
       , level = 0
+      , chartExtremes = findChartExtremes flags
       }
     , Cmd.none
     )
+
+
+type alias ChartExtremes =
+    { minDate : Int, maxDate : Int, minValue : Float, maxValue : Float }
 
 
 type alias ChartRecord =
@@ -69,6 +75,7 @@ type alias RawCid =
 type alias Model =
     { flags : Flags
     , level : Int
+    , chartExtremes : ChartExtremes
     }
 
 
@@ -84,6 +91,15 @@ update msg model =
 
         Decrement ->
             ( { model | level = model.level - 1 }, Cmd.none )
+
+
+timify d =
+    case ISO8601.fromString d of
+        Ok nd ->
+            ISO8601.toTime nd
+
+        Err _ ->
+            timify "1970-01-01T00:00:00Z"
 
 
 triangle : Svg Msg
@@ -157,6 +173,32 @@ placed =
         , Svg.placeIn frameAxisY (stamp "green" rcc)
         , Svg.placeIn frameLegend (stamp "red" rcc)
         ]
+
+
+dateExtreme flags f =
+    case f (List.map (\r -> timify r.d) flags.qcresults) of
+        Just n ->
+            n
+
+        Nothing ->
+            0
+
+
+valExtreme flags f =
+    case f (List.map (\r -> r.c) flags.qcresults) of
+        Just n ->
+            n
+
+        Nothing ->
+            0
+
+
+findChartExtremes flags =
+    { minDate = dateExtreme flags List.minimum
+    , maxDate = dateExtreme flags List.maximum
+    , minValue = valExtreme flags List.minimum
+    , maxValue = valExtreme flags List.maximum
+    }
 
 
 view model =
