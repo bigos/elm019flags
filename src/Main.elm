@@ -1,5 +1,6 @@
 module Main exposing (Flags, Model, Msg(..), init, main, update, view)
 
+import BoundingBox2d exposing (BoundingBox2d)
 import Browser
 import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
@@ -23,14 +24,37 @@ main =
         }
 
 
+type alias Model =
+    { flags : Flags
+    , level : Int
+    , data : List Datum
+    , chartBoundingBox : Maybe BoundingBox2d
+    }
+
+
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { flags = flags
       , level = 0
-      , chartExtremes = findChartExtremes flags
+      , data = readData flags
+      , chartBoundingBox = pointify (readData flags)
       }
     , Cmd.none
     )
+
+
+pointify data =
+    let
+        points =
+            List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+    in
+    BoundingBox2d.containingPoints points
+
+
+type alias Datum =
+    { time : Float
+    , value : Float
+    }
 
 
 type alias ChartExtremes =
@@ -69,13 +93,6 @@ type alias RawCid =
     { id : Int
     , c : Float
     , d : String
-    }
-
-
-type alias Model =
-    { flags : Flags
-    , level : Int
-    , chartExtremes : ChartExtremes
     }
 
 
@@ -201,6 +218,15 @@ findChartExtremes flags =
     }
 
 
+readData flags =
+    let
+        qcr =
+            List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
+    in
+    -- at the moment we read only the first 5 results for easy debugging
+    List.take 5 qcr
+
+
 view model =
     div []
         [ div []
@@ -216,4 +242,5 @@ view model =
         , div [] [ text (String.fromInt model.level) ]
         , button [ onClick Increment ] [ text "+" ]
         , div [] [ text "We have lift off" ]
+        , div [] [ text (Debug.toString model.data) ]
         ]
