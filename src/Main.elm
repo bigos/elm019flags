@@ -37,7 +37,12 @@ type Msg
 type alias Flags =
     { num : Int
     , str : String
+    , data : List Datum
     }
+
+
+type alias Datum =
+    { t : Int, v : Int }
 
 
 update msg model =

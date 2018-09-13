@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Main</title>
-  <script src="main.js"></script>
+  <script src="chart.js"></script>
 </head>
 
 <body>
@@ -11,7 +11,19 @@
   <script>
    var app = Elm.Main.init({
      node: document.getElementById('elm'),
-     flags: {num:1, str:"hello elm"}
+     flags: {
+       num:1,
+       str:"hello elm",
+       data: [
+         {t:1000, v:1000},
+         {t:2000, v:2000},
+         {t:3000, v:3000},
+         {t:4000, v:4000},
+         {t:5000, v:3000},
+         {t:6000, v:2000},
+         {t:7000, v:1000}
+       ]
+     }
    });
   </script>
 </body>
