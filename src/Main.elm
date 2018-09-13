@@ -44,16 +44,16 @@ init flags =
 scaleXY points =
     let
         sx =
-            0.5
+            0.005
 
         ox =
-            10.0
+            150.0
 
         sy =
-            0.25
+            0.008
 
         oy =
-            20.0
+            10.0
     in
     List.map
         (\p ->
@@ -98,27 +98,32 @@ update msg model =
             ( { model | level = model.level - 1 }, Cmd.none )
 
 
-vertices =
-    [ Point2d.fromCoordinates ( 5, 5 )
-    , Point2d.fromCoordinates ( 20, 5 )
-    , Point2d.fromCoordinates ( 5, 20 )
-    ]
+vertices model =
+    model.scaledPoints
 
 
-stamp =
+
+-- vertices =
+--     [ Point2d.fromCoordinates ( 5, 5 )
+--     , Point2d.fromCoordinates ( 20, 5 )
+--     , Point2d.fromCoordinates ( 5, 20 )
+--     ]
+
+
+stamp model =
     Svg.polygon2d
         [ Attributes.fill "orange"
         , Attributes.stroke "blue"
         , Attributes.strokeWidth "2"
         ]
-        (Polygon2d.singleLoop vertices)
+        (Polygon2d.singleLoop (vertices model))
 
 
 frames =
     [ Frame2d.atPoint
         (Point2d.fromCoordinates ( 25, 25 ))
     , Frame2d.atPoint
-        (Point2d.fromCoordinates ( 100, 25 ))
+        (Point2d.fromCoordinates ( 100, 250 ))
         |> Frame2d.reverseY
     , Frame2d.atPoint
         (Point2d.fromCoordinates ( 175, 25 ))
@@ -145,7 +150,7 @@ view model =
                     []
                     (frames
                         |> List.map
-                            (\frame -> Svg.placeIn frame stamp)
+                            (\frame -> Svg.placeIn frame (stamp model))
                     )
                 ]
             ]
