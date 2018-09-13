@@ -81,6 +81,7 @@ frames =
         (Point2d.fromCoordinates ( 25, 25 ))
     , Frame2d.atPoint
         (Point2d.fromCoordinates ( 100, 25 ))
+        |> Frame2d.reverseY
     , Frame2d.atPoint
         (Point2d.fromCoordinates ( 175, 25 ))
         |> Frame2d.rotateBy (degrees 20)
