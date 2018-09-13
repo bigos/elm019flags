@@ -36,15 +36,32 @@ init flags =
     )
 
 
+
+-- we need to properly calculate scale and offset from bounding box
+-- https://package.elm-lang.org/packages/ianmackenzie/elm-geometry/latest/BoundingBox2d
+
+
 scaleXY points =
     let
         sx =
             0.5
 
+        ox =
+            10.0
+
         sy =
             0.25
+
+        oy =
+            20.0
     in
-    List.map (\p -> Point2d.fromCoordinates ( sx * Point2d.xCoordinate p, sy * Point2d.yCoordinate p ))
+    List.map
+        (\p ->
+            Point2d.fromCoordinates
+                ( ox + sx * Point2d.xCoordinate p
+                , oy + sy * Point2d.yCoordinate p
+                )
+        )
         points
 
 
