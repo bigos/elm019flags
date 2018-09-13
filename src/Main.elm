@@ -57,10 +57,6 @@ type alias Datum =
     }
 
 
-type alias ChartExtremes =
-    { minDate : Int, maxDate : Int, minValue : Float, maxValue : Float }
-
-
 type alias ChartRecord =
     { on : String
     , comment : String
@@ -243,4 +239,5 @@ view model =
         , button [ onClick Increment ] [ text "+" ]
         , div [] [ text "We have lift off" ]
         , div [] [ text (Debug.toString model.data) ]
+        , div [ style "height:5em;" ] []
         ]
