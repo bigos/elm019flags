@@ -103,9 +103,8 @@ triangle =
 
 vertices =
     [ Point2d.fromCoordinates ( 0, 0 )
-    , Point2d.fromCoordinates ( 50, 0 )
-    , Point2d.fromCoordinates ( 50, 50 )
-    , Point2d.fromCoordinates ( 0, 50 )
+    , Point2d.fromCoordinates ( 100, 0 )
+    , Point2d.fromCoordinates ( 0, 100 )
     ]
 
 
@@ -125,10 +124,11 @@ frames =
         (Point2d.fromCoordinates ( 100, 100 ))
     , Frame2d.atPoint
         (Point2d.fromCoordinates ( -100, 200 ))
+        |> Frame2d.reverseY
+    , Frame2d.atPoint
+        (Point2d.fromCoordinates ( 400, 100 ))
+        |> Frame2d.rotateBy (degrees 20)
 
-    -- , Frame2d.atPoint
-    --     (Point2d.fromCoordinates ( 175, 25 ))
-    --     |> Frame2d.rotateBy (degrees 20)
     -- , Frame2d.atPoint
     --     (Point2d.fromCoordinates ( 25, 150 ))
     -- , Frame2d.atPoint
