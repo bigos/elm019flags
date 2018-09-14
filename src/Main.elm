@@ -69,13 +69,13 @@ justin v fn =
 scaleXY points boundingBox =
     let
         dx =
-            200.0
+            40000.0
 
         dy =
-            200.0
+            1000.0
 
         sx =
-            dx / justin boundingBox BoundingBox2d.maxX * 300
+            dx / justin boundingBox BoundingBox2d.maxX
 
         ox =
             0
@@ -84,7 +84,7 @@ scaleXY points boundingBox =
                     BoundingBox2d.minX
 
         sy =
-            dy / justin boundingBox BoundingBox2d.maxY * 3
+            dy / justin boundingBox BoundingBox2d.maxY
 
         oy =
             0
