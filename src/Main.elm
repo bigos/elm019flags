@@ -29,7 +29,8 @@ type alias Model =
     , level : Int
     , data : List Datum
     , points : List Point2d
-    , chartBoundingBox : List Point2d
+    , chartBoundingBox : Maybe BoundingBox2d
+    , scaledPoints : List Point2d
     }
 
 
@@ -50,18 +51,73 @@ init flags =
       , data = data
       , points = points
       , chartBoundingBox = chartBoundingBox
+      , scaledPoints = scaleXY points chartBoundingBox
       }
     , Cmd.none
     )
 
 
-toPoints : List { time : Float, value : Float } -> List Point2d
-toPoints data =
+justin v fn =
+    case v of
+        Nothing ->
+            0
+
+        Just n ->
+            fn n
+
+
+scaleXY points boundingBox =
     let
-        points =
-            List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+        dx =
+            300.0
+
+        dy =
+            200.0
+
+        sx =
+            dx / justin boundingBox BoundingBox2d.maxX
+
+        ox =
+            0
+                - justin
+                    boundingBox
+                    BoundingBox2d.minX
+
+        sy =
+            dy / justin boundingBox BoundingBox2d.maxY
+
+        oy =
+            0
+                - justin boundingBox
+                    BoundingBox2d.minY
     in
-    BoundingBox2d.containingPoints points
+    Debug.log
+        ("scaling and offset values "
+            ++ Debug.toString [ sx, ox, sy, oy ]
+            ++ "\nbounding box "
+            ++ Debug.toString boundingBox
+            ++ "\nminx of bounding box "
+            ++ Debug.toString
+                (case boundingBox of
+                    Nothing ->
+                        0
+
+                    Just n ->
+                        BoundingBox2d.minX n
+                )
+        )
+        List.map
+        (\p ->
+            Point2d.fromCoordinates
+                ( sx * (ox + Point2d.xCoordinate p)
+                , sy * (oy + Point2d.yCoordinate p)
+                )
+        )
+        points
+
+
+toPoints data =
+    List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
 
 
 type alias Datum =
