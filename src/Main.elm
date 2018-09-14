@@ -51,13 +51,13 @@ init flags =
       , data = data
       , points = points
       , chartBoundingBox = chartBoundingBox
-      , scaledPoints = scaleXY points chartBoundingBox
+      , scaledPoints = scaleXY flags points chartBoundingBox
       }
     , Cmd.none
     )
 
 
-justin v fn =
+justValFn v fn =
     case v of
         Nothing ->
             0
@@ -66,51 +66,40 @@ justin v fn =
             fn n
 
 
-scaleXY points boundingBox =
+scaleXY flags points boundingBox =
     let
+        -- sizes x & y of the view area
         dx =
-            40000.0
+            300.0
 
         dy =
-            1000.0
+            200.0
 
-        sx =
-            dx / justin boundingBox BoundingBox2d.maxX
+        -- distances x & y before scaling
+        distX =
+            timify flags.date_to - timify flags.date_from
 
-        ox =
-            0
-                - justin
-                    boundingBox
-                    BoundingBox2d.minX
+        distY =
+            justValFn boundingBox BoundingBox2d.maxY - justValFn boundingBox BoundingBox2d.minY
 
-        sy =
-            dy / justin boundingBox BoundingBox2d.maxY
+        -- scale and offset
+        scaleX =
+            dx / toFloat distX
 
-        oy =
-            0
-                - justin boundingBox
-                    BoundingBox2d.minY
+        offsetX =
+            0 - justValFn boundingBox BoundingBox2d.minX
+
+        scaleY =
+            dy / distY
+
+        offsetY =
+            0 - justValFn boundingBox BoundingBox2d.minY
     in
-    Debug.log
-        ("scaling and offset values "
-            ++ Debug.toString [ sx, ox, sy, oy ]
-            ++ "\n bounding box "
-            ++ Debug.toString boundingBox
-            ++ "\n minx of bounding box "
-            ++ Debug.toString
-                (case boundingBox of
-                    Nothing ->
-                        0
-
-                    Just n ->
-                        BoundingBox2d.minX n
-                )
-        )
-        List.map
+    List.map
         (\p ->
             Point2d.fromCoordinates
-                ( sx * (ox + Point2d.xCoordinate p)
-                , sy * (oy + Point2d.yCoordinate p)
+                ( scaleX * (offsetX + Point2d.xCoordinate p)
+                , scaleY * (offsetY + Point2d.yCoordinate p)
                 )
         )
         points
@@ -268,13 +257,7 @@ placed model =
 
 
 readData flags =
-    let
-        qcr =
-            List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
-    in
-    -- at the moment we read only the first 5 results for easy debugging
-    -- List.take 5 qcr
-    qcr
+    List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
 
 
 view model =
