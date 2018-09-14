@@ -262,11 +262,10 @@ readData flags =
 
 view model =
     div []
-        [ div []
+        [ div [ style "margin: auto ; width:600px" ]
             [ Svg.svg
-                [ width "420"
-                , height "420"
-                , viewBox "0 0 420 420"
+                [ height "400"
+                , viewBox "0 0 600 400"
                 , style "border: solid red 1px;"
                 ]
                 [ placed model ]
