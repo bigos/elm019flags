@@ -253,12 +253,21 @@ dat point =
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
         ]
-        (Polygon2d.singleLoop (dataPoint ( Point2d.xCoordinate point, Point2d.yCoordinate point )))
+        (Polygon2d.singleLoop
+            (dataPoint
+                point
+            )
+        )
 
 
 dataPoint cc =
     -- draw tilted square around cc coordinates
     let
+        cp =
+            ( Point2d.xCoordinate cc
+            , Point2d.yCoordinate cc
+            )
+
         factor =
             3.1
 
@@ -274,8 +283,8 @@ dataPoint cc =
         pc =
             List.map
                 (\nc ->
-                    ( Tuple.first cc - Tuple.first nc
-                    , Tuple.second cc - Tuple.second nc
+                    ( Tuple.first cp - Tuple.first nc
+                    , Tuple.second cp - Tuple.second nc
                     )
                 )
                 pcx
@@ -283,8 +292,8 @@ dataPoint cc =
     List.map
         (\c ->
             Point2d.fromCoordinates
-                ( Tuple.first cc + Tuple.first c
-                , Tuple.second cc + Tuple.second c
+                ( Tuple.first cp + Tuple.first c
+                , Tuple.second cp + Tuple.second c
                 )
         )
         pc
