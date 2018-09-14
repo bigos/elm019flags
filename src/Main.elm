@@ -7,6 +7,7 @@ import Geometry.Svg as Svg
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
 import ISO8601
+import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
@@ -30,7 +31,20 @@ type alias Model =
     , data : List Datum
     , points : List Point2d
     , chartBoundingBox : Maybe BoundingBox2d
+    , chartScalings : ChartScalings
     , scaledPoints : List Point2d
+    }
+
+
+type alias ChartScalings =
+    { sizeX : Float
+    , sizeY : Float
+    , distX : Float
+    , distY : Float
+    , scaleX : Float
+    , scaleY : Float
+    , offsetX : Float
+    , offsetY : Float
     }
 
 
@@ -52,6 +66,7 @@ init flags =
       , points = points
       , chartBoundingBox = chartBoundingBox
       , scaledPoints = scaleXY flags points chartBoundingBox
+      , chartScalings = setChartScalings flags points chartBoundingBox
       }
     , Cmd.none
     )
@@ -66,7 +81,7 @@ justValFn v fn =
             fn n
 
 
-scaleXY flags points boundingBox =
+setChartScalings flags points boundingBox =
     let
         -- sizes x & y of the view area
         dx =
@@ -77,14 +92,14 @@ scaleXY flags points boundingBox =
 
         -- distances x & y before scaling
         distX =
-            timify flags.date_to - timify flags.date_from
+            toFloat (timify flags.date_to - timify flags.date_from)
 
         distY =
             justValFn boundingBox BoundingBox2d.maxY - justValFn boundingBox BoundingBox2d.minY
 
         -- scale and offset
         scaleX =
-            dx / toFloat distX
+            dx / distX
 
         offsetX =
             0 - justValFn boundingBox BoundingBox2d.minX
@@ -95,11 +110,27 @@ scaleXY flags points boundingBox =
         offsetY =
             0 - justValFn boundingBox BoundingBox2d.minY
     in
+    { sizeX = dx
+    , sizeY = dy
+    , distX = distX
+    , distY = distY
+    , scaleX = scaleX
+    , scaleY = scaleY
+    , offsetX = offsetX
+    , offsetY = offsetY
+    }
+
+
+scaleXY flags points boundingBox =
+    let
+        cs =
+            setChartScalings flags points boundingBox
+    in
     List.map
         (\p ->
             Point2d.fromCoordinates
-                ( scaleX * (offsetX + Point2d.xCoordinate p)
-                , scaleY * (offsetY + Point2d.yCoordinate p)
+                ( cs.scaleX * (cs.offsetX + Point2d.xCoordinate p)
+                , cs.scaleY * (cs.offsetY + Point2d.yCoordinate p)
                 )
         )
         points
@@ -213,6 +244,18 @@ stamp col cc =
         (Polygon2d.singleLoop (rect cc))
 
 
+
+-- TODO calculate the grey line taking into consideration scaling and offset
+
+
+nominalLine model =
+    Svg.line
+        LineSegment2d.fromEndpoints
+        ( Point2d.fromCoordinates ( 0, 0 )
+        , Point2d.fromCoordinates ( 100, 100 )
+        )
+
+
 stamp2 col cc =
     Svg.polygon2d
         [ Attributes.fill col
@@ -296,6 +339,7 @@ svgElements model =
     , Svg.placeIn frameAxisX (stamp "blue" rcc)
     , Svg.placeIn frameAxisY (stamp "green" rcc)
     , Svg.placeIn frameLegend (stamp "red" rcc)
+    , Svg.placeIn frameChart (nominalLine model)
     ]
         ++ List.map (\p -> Svg.placeIn frameChart (dat p)) model.scaledPoints
 
