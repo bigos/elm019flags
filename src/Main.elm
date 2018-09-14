@@ -70,7 +70,7 @@ scaleXY flags points boundingBox =
     let
         -- sizes x & y of the view area
         dx =
-            500.0
+            250.0
 
         dy =
             100.0
