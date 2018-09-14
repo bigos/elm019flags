@@ -5,6 +5,7 @@ import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
 import Html exposing (Html, button, div, text)
 import Html.Events exposing (onClick)
+import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
@@ -119,8 +120,47 @@ stamp model =
         (Polygon2d.singleLoop (vertices model))
 
 
+lineSegment1 =
+    Svg.lineSegment2d
+        [ Attributes.stroke "blue"
+        , Attributes.strokeWidth "5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates ( 100, 100 )
+            , Point2d.fromCoordinates ( 200, 100 )
+            )
+        )
+
+
+lineSegment2 =
+    Svg.lineSegment2d
+        [ Attributes.stroke "green"
+        , Attributes.strokeWidth "5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates ( 100, 150 )
+            , Point2d.fromCoordinates ( 200, 150 )
+            )
+        )
+
+
+lineSegment3 =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates ( 100, 200 )
+            , Point2d.fromCoordinates ( 200, 200 )
+            )
+        )
+
+
 frames =
     [ Frame2d.atPoint
+        (Point2d.fromCoordinates ( 10, 350 ))
+        |> Frame2d.reverseY
+    , Frame2d.atPoint
         (Point2d.fromCoordinates ( 25, 25 ))
     , Frame2d.atPoint
         (Point2d.fromCoordinates ( 100, 250 ))
@@ -139,6 +179,18 @@ frames =
     ]
 
 
+newframe =
+    Frame2d.atPoint
+        (Point2d.fromCoordinates ( 10, 250 ))
+        |> Frame2d.reverseY
+
+
+newframe2 =
+    Frame2d.atPoint
+        (Point2d.fromCoordinates ( 50, 250 ))
+        |> Frame2d.reverseY
+
+
 view model =
     div []
         [ button [ onClick Decrement ] [ text "-" ]
@@ -146,12 +198,20 @@ view model =
         , button [ onClick Increment ] [ text "+" ]
         , div []
             [ Svg.svg [ Attributes.viewBox "0 0 600 600" ]
-                [ Svg.g
-                    []
-                    (frames
-                        |> List.map
-                            (\frame -> Svg.placeIn frame (stamp model))
-                    )
+                [ Svg.g []
+                    [ Svg.placeIn newframe (stamp model)
+                    , Svg.placeIn newframe lineSegment1
+                    , Svg.placeIn newframe lineSegment2
+                    , Svg.placeIn newframe lineSegment3
+                    ]
                 ]
+
+            -- [ Svg.g
+            --     []
+            --     (frames
+            --         |> List.map
+            --             (\frame -> Svg.placeIn frame (stamp model))
+            --     )
+            -- ]
             ]
         ]
