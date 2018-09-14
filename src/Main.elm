@@ -70,10 +70,10 @@ scaleXY flags points boundingBox =
     let
         -- sizes x & y of the view area
         dx =
-            300.0
+            500.0
 
         dy =
-            200.0
+            100.0
 
         -- distances x & y before scaling
         distX =
@@ -224,36 +224,85 @@ stamp2 col cc =
 
 frameChart =
     Frame2d.atPoint
-        (Point2d.fromCoordinates ( 100, 300 ))
+        (Point2d.fromCoordinates ( 75, 300 ))
         |> Frame2d.reverseY
 
 
 frameAxisX =
     Frame2d.atPoint
-        (Point2d.fromCoordinates ( 100, 350 ))
+        (Point2d.fromCoordinates ( 75, 350 ))
         |> Frame2d.reverseY
 
 
 frameAxisY =
     Frame2d.atPoint
-        (Point2d.fromCoordinates ( 50, 300 ))
+        (Point2d.fromCoordinates ( 25, 300 ))
         |> Frame2d.reverseY
 
 
 frameLegend =
     Frame2d.atPoint
-        (Point2d.fromCoordinates ( 300, 100 ))
+        (Point2d.fromCoordinates ( 500, 100 ))
         |> Frame2d.reverseY
+
+
+dat : Point2d -> Svg msg
+dat point =
+    Svg.polygon2d
+        [ Attributes.fill "blue"
+        , Attributes.stroke "black"
+        , Attributes.strokeWidth "0.25"
+        ]
+        (Polygon2d.singleLoop (dataPoint ( Point2d.xCoordinate point, Point2d.yCoordinate point )))
+
+
+dataPoint cc =
+    -- draw tilted square around cc coordinates
+    let
+        factor =
+            3.1
+
+        pcx =
+            List.map
+                (\p ->
+                    ( Tuple.first p * factor
+                    , Tuple.second p * factor
+                    )
+                )
+                [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
+
+        pc =
+            List.map
+                (\nc ->
+                    ( Tuple.first cc - Tuple.first nc
+                    , Tuple.second cc - Tuple.second nc
+                    )
+                )
+                pcx
+    in
+    List.map
+        (\c ->
+            Point2d.fromCoordinates
+                ( Tuple.first cc + Tuple.first c
+                , Tuple.second cc + Tuple.second c
+                )
+        )
+        pc
+
+
+svgElements : Model -> List (Svg msg)
+svgElements model =
+    [ Svg.placeIn frameChart (stamp "yellow" rcc)
+    , Svg.placeIn frameAxisX (stamp "blue" rcc)
+    , Svg.placeIn frameAxisY (stamp "green" rcc)
+    , Svg.placeIn frameLegend (stamp "red" rcc)
+    ]
+        ++ List.map (\p -> Svg.placeIn frameChart (dat p)) model.scaledPoints
 
 
 placed model =
     Svg.g []
-        [ Svg.placeIn frameChart (stamp "yellow" rcc)
-        , Svg.placeIn frameChart (stamp2 "orange" model.scaledPoints)
-        , Svg.placeIn frameAxisX (stamp "blue" rcc)
-        , Svg.placeIn frameAxisY (stamp "green" rcc)
-        , Svg.placeIn frameLegend (stamp "red" rcc)
-        ]
+        (svgElements model)
 
 
 readData flags =
