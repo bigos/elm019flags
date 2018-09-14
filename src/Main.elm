@@ -69,13 +69,13 @@ justin v fn =
 scaleXY points boundingBox =
     let
         dx =
-            300.0
+            200.0
 
         dy =
             200.0
 
         sx =
-            dx / justin boundingBox BoundingBox2d.maxX
+            dx / justin boundingBox BoundingBox2d.maxX * 300
 
         ox =
             0
@@ -84,7 +84,7 @@ scaleXY points boundingBox =
                     BoundingBox2d.minX
 
         sy =
-            dy / justin boundingBox BoundingBox2d.maxY
+            dy / justin boundingBox BoundingBox2d.maxY * 3
 
         oy =
             0
@@ -94,9 +94,9 @@ scaleXY points boundingBox =
     Debug.log
         ("scaling and offset values "
             ++ Debug.toString [ sx, ox, sy, oy ]
-            ++ "\nbounding box "
+            ++ "\n bounding box "
             ++ Debug.toString boundingBox
-            ++ "\nminx of bounding box "
+            ++ "\n minx of bounding box "
             ++ Debug.toString
                 (case boundingBox of
                     Nothing ->
@@ -224,6 +224,15 @@ stamp col cc =
         (Polygon2d.singleLoop (rect cc))
 
 
+stamp2 col cc =
+    Svg.polygon2d
+        [ Attributes.fill col
+        , Attributes.stroke "black"
+        , Attributes.strokeWidth "0.5"
+        ]
+        (Polygon2d.singleLoop cc)
+
+
 frameChart =
     Frame2d.atPoint
         (Point2d.fromCoordinates ( 100, 300 ))
@@ -248,39 +257,14 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-placed =
+placed model =
     Svg.g []
         [ Svg.placeIn frameChart (stamp "yellow" rcc)
+        , Svg.placeIn frameChart (stamp2 "orange" model.scaledPoints)
         , Svg.placeIn frameAxisX (stamp "blue" rcc)
         , Svg.placeIn frameAxisY (stamp "green" rcc)
         , Svg.placeIn frameLegend (stamp "red" rcc)
         ]
-
-
-dateExtreme flags f =
-    case f (List.map (\r -> timify r.d) flags.qcresults) of
-        Just n ->
-            n
-
-        Nothing ->
-            0
-
-
-valExtreme flags f =
-    case f (List.map (\r -> r.c) flags.qcresults) of
-        Just n ->
-            n
-
-        Nothing ->
-            0
-
-
-findChartExtremes flags =
-    { minDate = dateExtreme flags List.minimum
-    , maxDate = dateExtreme flags List.maximum
-    , minValue = valExtreme flags List.minimum
-    , maxValue = valExtreme flags List.maximum
-    }
 
 
 readData flags =
@@ -289,7 +273,8 @@ readData flags =
             List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
     in
     -- at the moment we read only the first 5 results for easy debugging
-    List.take 5 qcr
+    -- List.take 5 qcr
+    qcr
 
 
 view model =
@@ -301,7 +286,7 @@ view model =
                 , viewBox "0 0 420 420"
                 , style "border: solid red 1px;"
                 ]
-                [ placed ]
+                [ placed model ]
             ]
         , button [ onClick Decrement ] [ text "-" ]
         , div [] [ text (String.fromInt model.level) ]
