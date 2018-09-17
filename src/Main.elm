@@ -66,7 +66,7 @@ init flags =
       , points = points
       , chartBoundingBox = chartBoundingBox
       , scaledPoints = scaleXY flags points chartBoundingBox
-      , chartScalings = setChartScalings flags points chartBoundingBox
+      , chartScalings = setChartScalings flags chartBoundingBox
       }
     , Cmd.none
     )
@@ -81,7 +81,7 @@ justValFn v fn =
             fn n
 
 
-setChartScalings flags points boundingBox =
+setChartScalings flags boundingBox =
     let
         -- sizes x & y of the view area
         dx =
@@ -124,7 +124,7 @@ setChartScalings flags points boundingBox =
 scaleXY flags points boundingBox =
     let
         cs =
-            setChartScalings flags points boundingBox
+            setChartScalings flags boundingBox
     in
     List.map
         (\p ->
@@ -244,15 +244,21 @@ stamp col cc =
         (Polygon2d.singleLoop (rect cc))
 
 
-
--- TODO calculate the grey line taking into consideration scaling and offset
-
-
 nominalLine model =
-    Svg.line
-        LineSegment2d.fromEndpoints
-        ( Point2d.fromCoordinates ( 0, 0 )
-        , Point2d.fromCoordinates ( 100, 100 )
+    Svg.lineSegment2d
+        [ Attributes.stroke "grey"
+        , Attributes.strokeWidth "2"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( 0
+                , 0
+                )
+            , Point2d.fromCoordinates
+                ( 250
+                , 100
+                )
+            )
         )
 
 
