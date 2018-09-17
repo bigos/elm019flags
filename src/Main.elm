@@ -128,12 +128,20 @@ setChartScalings flags boundingBox =
 
 doX : ChartScalings -> Float -> Float
 doX cs x =
-    cs.scaleX * (cs.offsetX + x)
+    Debug.log
+        ("debugging X "
+            ++ Debug.toString ( cs, x )
+        )
+        (cs.scaleX * (cs.offsetX + x))
 
 
 doY : ChartScalings -> Float -> Float
 doY cs y =
-    cs.scaleY * (cs.offsetY + y)
+    Debug.log
+        ("debugging Y "
+            ++ Debug.toString ( cs, y )
+        )
+        (cs.scaleY * (cs.offsetY + y))
 
 
 scaleXY : Flags -> List Point2d -> Maybe BoundingBox2d -> List Point2d
@@ -373,10 +381,10 @@ controlLine model =
     Debug.log
         (Debug.toString
             { raw = cs
-            , a1 = ax
-            , a2 = ay
-            , b1 = bx
-            , b2 = by
+            , ax = ax
+            , ay = ay
+            , bx = bx
+            , by = by
             }
         )
         (Svg.lineSegment2d
