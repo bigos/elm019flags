@@ -121,6 +121,10 @@ setChartScalings flags boundingBox =
     }
 
 
+
+-- convert prescaled value to scaled one
+
+
 doX cs x =
     cs.scaleX * (cs.offsetX + x)
 
@@ -255,16 +259,110 @@ stamp col cc =
 nominalLine model =
     Svg.lineSegment2d
         [ Attributes.stroke "grey"
-        , Attributes.strokeWidth "2"
+        , Attributes.strokeWidth "1"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( 0
-                , 0
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
+                , doY model.chartScalings model.flags.stats.nominal
                 )
             , Point2d.fromCoordinates
-                ( 250
-                , 100
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , doY model.chartScalings model.flags.stats.nominal
+                )
+            )
+        )
+
+
+meanLine model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
+                , doY model.chartScalings model.flags.stats.mean
+                )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , doY model.chartScalings model.flags.stats.mean
+                )
+            )
+        )
+
+
+deviations model x =
+    model.flags.stats.mean - (model.flags.stats.deviation * x)
+
+
+plus3dLine model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
+                , doY model.chartScalings (deviations model 3)
+                )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , doY model.chartScalings (deviations model 3)
+                )
+            )
+        )
+
+
+plus2dLine model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
+                , doY model.chartScalings (deviations model 2)
+                )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , doY model.chartScalings (deviations model 2)
+                )
+            )
+        )
+
+
+minus2dLine model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
+                , doY model.chartScalings (deviations model -2)
+                )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , doY model.chartScalings (deviations model -2)
+                )
+            )
+        )
+
+
+minus3dLine model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
+                , doY model.chartScalings (deviations model -3)
+                )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , doY model.chartScalings (deviations model -3)
                 )
             )
         )
@@ -354,6 +452,11 @@ svgElements model =
     , Svg.placeIn frameAxisY (stamp "green" rcc)
     , Svg.placeIn frameLegend (stamp "red" rcc)
     , Svg.placeIn frameChart (nominalLine model)
+    , Svg.placeIn frameChart (meanLine model)
+    , Svg.placeIn frameChart (plus3dLine model)
+    , Svg.placeIn frameChart (plus2dLine model)
+    , Svg.placeIn frameChart (minus2dLine model)
+    , Svg.placeIn frameChart (minus3dLine model)
     ]
         ++ List.map (\p -> Svg.placeIn frameChart (dat p)) model.scaledPoints
 
