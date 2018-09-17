@@ -284,11 +284,11 @@ nominalLine model =
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
                 ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
-                , doY model.chartScalings model.flags.stats.nominal
+                , 2.0 * doY model.chartScalings model.flags.stats.nominal
                 )
             , Point2d.fromCoordinates
-                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
-                , doY model.chartScalings model.flags.stats.nominal
+                ( 2.0 * doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , 2.0 * doY model.chartScalings model.flags.stats.nominal
                 )
             )
         )
@@ -303,11 +303,11 @@ meanLine model =
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
                 ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
-                , doY model.chartScalings model.flags.stats.mean
+                , 2.0 * doY model.chartScalings model.flags.stats.mean
                 )
             , Point2d.fromCoordinates
-                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
-                , doY model.chartScalings model.flags.stats.mean
+                ( 2.0 * doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , 2.0 * doY model.chartScalings model.flags.stats.mean
                 )
             )
         )
@@ -327,11 +327,11 @@ plusXdLine model x =
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
                 ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
-                , doY model.chartScalings (deviations model (toFloat x))
+                , 2.0 * doY model.chartScalings (deviations model (toFloat x))
                 )
             , Point2d.fromCoordinates
-                ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
-                , doY model.chartScalings (deviations model (toFloat x))
+                ( 2.0 * doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
+                , 2.0 * doY model.chartScalings (deviations model (toFloat x))
                 )
             )
         )
@@ -397,8 +397,8 @@ controlLine model =
                     , doY model.chartScalings cs.minY
                     )
                 , Point2d.fromCoordinates
-                    ( doX model.chartScalings cs.maxX
-                    , doY model.chartScalings cs.maxY
+                    ( 2.0 * doX model.chartScalings cs.maxX
+                    , 2.0 * doY model.chartScalings cs.maxY
                     )
                 )
             )
