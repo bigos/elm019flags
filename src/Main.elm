@@ -121,6 +121,14 @@ setChartScalings flags boundingBox =
     }
 
 
+doX cs x =
+    cs.scaleX * (cs.offsetX + x)
+
+
+doY cs y =
+    cs.scaleY * (cs.offsetY + y)
+
+
 scaleXY flags points boundingBox =
     let
         cs =
@@ -129,8 +137,8 @@ scaleXY flags points boundingBox =
     List.map
         (\p ->
             Point2d.fromCoordinates
-                ( cs.scaleX * (cs.offsetX + Point2d.xCoordinate p)
-                , cs.scaleY * (cs.offsetY + Point2d.yCoordinate p)
+                ( doX cs (Point2d.xCoordinate p)
+                , doY cs (Point2d.yCoordinate p)
                 )
         )
         points
