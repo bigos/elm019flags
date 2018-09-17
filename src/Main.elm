@@ -81,6 +81,7 @@ justValFn v fn =
             fn n
 
 
+setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
     let
         -- sizes x & y of the view area
@@ -125,14 +126,17 @@ setChartScalings flags boundingBox =
 -- convert prescaled value to scaled one
 
 
+doX : ChartScalings -> Float -> Float
 doX cs x =
     cs.scaleX * (cs.offsetX + x)
 
 
+doY : ChartScalings -> Float -> Float
 doY cs y =
     cs.scaleY * (cs.offsetY + y)
 
 
+scaleXY : Flags -> List Point2d -> Maybe BoundingBox2d -> List Point2d
 scaleXY flags points boundingBox =
     let
         cs =
@@ -148,6 +152,7 @@ scaleXY flags points boundingBox =
         points
 
 
+toPoints : List Datum -> List Point2d
 toPoints data =
     List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
 
@@ -198,6 +203,7 @@ type Msg
     | Decrement
 
 
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
@@ -207,6 +213,7 @@ update msg model =
             ( { model | level = model.level - 1 }, Cmd.none )
 
 
+timify : String -> Int
 timify d =
     case ISO8601.fromString d of
         Ok nd ->
@@ -232,6 +239,7 @@ triangle =
         )
 
 
+vertices : List Point2d
 vertices =
     [ Point2d.fromCoordinates ( 0, 0 )
     , Point2d.fromCoordinates ( 100, 0 )
@@ -239,14 +247,17 @@ vertices =
     ]
 
 
+rcc : List ( number, number )
 rcc =
     [ ( 0, 0 ), ( 50, 0 ), ( 50, 50 ), ( 0, 50 ) ]
 
 
+rect : List ( Float, Float ) -> List Point2d
 rect cc =
     List.map (\c -> Point2d.fromCoordinates c) cc
 
 
+stamp : String -> List ( Float, Float ) -> Svg msg
 stamp col cc =
     Svg.polygon2d
         [ Attributes.fill col
@@ -256,6 +267,7 @@ stamp col cc =
         (Polygon2d.singleLoop (rect cc))
 
 
+nominalLine : Model -> Svg msg
 nominalLine model =
     Svg.lineSegment2d
         [ Attributes.stroke "grey"
@@ -274,6 +286,7 @@ nominalLine model =
         )
 
 
+meanLine : Model -> Svg msg
 meanLine model =
     Svg.lineSegment2d
         [ Attributes.stroke "red"
@@ -292,10 +305,12 @@ meanLine model =
         )
 
 
+deviations : Model -> Float -> Float
 deviations model x =
     model.flags.stats.mean - (model.flags.stats.deviation * x)
 
 
+plusXdLine : Model -> Int -> Svg msg
 plusXdLine model x =
     Svg.lineSegment2d
         [ Attributes.stroke "red"
@@ -304,16 +319,17 @@ plusXdLine model x =
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
                 ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.minX)
-                , doY model.chartScalings (deviations model x)
+                , doY model.chartScalings (deviations model (toFloat x))
                 )
             , Point2d.fromCoordinates
                 ( doX model.chartScalings (justValFn model.chartBoundingBox BoundingBox2d.maxX)
-                , doY model.chartScalings (deviations model x)
+                , doY model.chartScalings (deviations model (toFloat x))
                 )
             )
         )
 
 
+stamp2 : String -> List Point2d -> Svg msg
 stamp2 col cc =
     Svg.polygon2d
         [ Attributes.fill col
@@ -323,24 +339,86 @@ stamp2 col cc =
         (Polygon2d.singleLoop cc)
 
 
+type alias ControlLineCC =
+    { csx : Float, csy : Float, cex : Float, cey : Float }
+
+
+extractContolLineCC model =
+    case model.chartBoundingBox of
+        Nothing ->
+            { maxX = 0.0, maxY = 0.0, minX = 0.0, minY = 0.0 }
+
+        Just n ->
+            BoundingBox2d.extrema n
+
+
+controlLine : Model -> Svg msg
+controlLine model =
+    let
+        cs =
+            extractContolLineCC model
+
+        ax =
+            doX model.chartScalings cs.minX
+
+        ay =
+            doY model.chartScalings cs.minY
+
+        bx =
+            doX model.chartScalings cs.maxX
+
+        by =
+            doY model.chartScalings cs.maxY
+    in
+    Debug.log
+        (Debug.toString
+            { raw = cs
+            , a1 = ax
+            , a2 = ay
+            , b1 = bx
+            , b2 = by
+            }
+        )
+        (Svg.lineSegment2d
+            [ Attributes.stroke "purple"
+            , Attributes.strokeWidth "1"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings cs.minX
+                    , doY model.chartScalings cs.minY
+                    )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings cs.maxX
+                    , doY model.chartScalings cs.maxY
+                    )
+                )
+            )
+        )
+
+
+frameChart : Frame2d
 frameChart =
     Frame2d.atPoint
         (Point2d.fromCoordinates ( 75, 300 ))
         |> Frame2d.reverseY
 
 
+frameAxisX : Frame2d
 frameAxisX =
     Frame2d.atPoint
         (Point2d.fromCoordinates ( 75, 350 ))
         |> Frame2d.reverseY
 
 
+frameAxisY : Frame2d
 frameAxisY =
     Frame2d.atPoint
         (Point2d.fromCoordinates ( 25, 300 ))
         |> Frame2d.reverseY
 
 
+frameLegend : Frame2d
 frameLegend =
     Frame2d.atPoint
         (Point2d.fromCoordinates ( 500, 100 ))
@@ -357,6 +435,7 @@ dat point =
         (Polygon2d.singleLoop (shape point))
 
 
+shape : Point2d -> List Point2d
 shape cc =
     -- draw tilted square around cc coordinates
     -- possibility to refactor into creation of other shapes
@@ -403,19 +482,23 @@ svgElements model =
     , Svg.placeIn frameChart (plusXdLine model 2)
     , Svg.placeIn frameChart (plusXdLine model -2)
     , Svg.placeIn frameChart (plusXdLine model -3)
+    , Svg.placeIn frameChart (controlLine model)
     ]
         ++ List.map (\p -> Svg.placeIn frameChart (dat p)) model.scaledPoints
 
 
+placed : Model -> Svg msg
 placed model =
     Svg.g []
         (svgElements model)
 
 
+readData : Flags -> List Datum
 readData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
 
 
+view : Model -> Html Msg
 view model =
     div []
         [ div [ style "margin: auto ; width:600px" ]
