@@ -673,9 +673,20 @@ view model =
                 Nothing ->
                     []
 
-                _ ->
-                    [ text ("tooltip: " ++ Debug.toString model.qcTooltip) ]
+                Just t ->
+                    showTheTooltip t
             )
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
+
+
+showTheTooltip t =
+    let
+        tm =
+            ISO8601.fromTime (floor t.time)
+
+        t2 =
+            ISO8601.toString tm
+    in
+    [ text ("tooltip: " ++ t2 ++ " - " ++ Debug.toString t.value) ]
