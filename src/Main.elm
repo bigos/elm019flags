@@ -45,8 +45,9 @@ type alias Model =
     , flags : Flags
     , level : Int
     , points : List Point2d
-    , scaledPoints : List Point2d
-    , tooltip : String
+    , scaledPoints : List ScaledPoint
+    , recordTooltip : Maybe ChartRecord
+    , qcTooltip : Maybe Datum
     }
 
 
@@ -79,6 +80,12 @@ type alias ChartScalings =
 type alias Datum =
     { time : Float
     , value : Float
+    }
+
+
+type alias ScaledPoint =
+    { point2d : Point2d
+    , datum : Datum
     }
 
 
@@ -127,9 +134,10 @@ init flags =
       , chartType = "default"
       , points = points
       , chartBoundingBox = chartBoundingBox
-      , scaledPoints = scaleXY flags points chartBoundingBox
+      , scaledPoints = scaleXY flags data chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
-      , tooltip = ""
+      , recordTooltip = Nothing
+      , qcTooltip = Nothing
       }
     , Cmd.none
     )
@@ -140,23 +148,34 @@ init flags =
 
 
 type Msg
-    = Nop
-    | ShowTooltip String
+    = ShowRecordTooltip ChartRecord
+    | HideRecordToolTip
+    | ShowQcTooltip Datum
+    | HideQcTooltip
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    Debug.log
-        ("debugging update: "
-            ++ Debug.toString msg
-        )
-        (case msg of
-            ShowTooltip s ->
-                ( { model | tooltip = s }, Cmd.none )
+    case msg of
+        ShowRecordTooltip s ->
+            ( { model | recordTooltip = Just s }
+            , Cmd.none
+            )
 
-            _ ->
-                ( model, Cmd.none )
-        )
+        HideRecordToolTip ->
+            ( { model | recordTooltip = Nothing }
+            , Cmd.none
+            )
+
+        ShowQcTooltip s ->
+            ( { model | qcTooltip = Just s }
+            , Cmd.none
+            )
+
+        HideQcTooltip ->
+            ( { model | qcTooltip = Nothing }
+            , Cmd.none
+            )
 
 
 
@@ -266,20 +285,21 @@ doY cs y =
     cs.scaleY * (cs.offsetY + y)
 
 
-scaleXY : Flags -> List Point2d -> Maybe BoundingBox2d -> List Point2d
-scaleXY flags points boundingBox =
+scaleXY flags data boundingBox =
     let
         cs =
             setChartScalings flags boundingBox
+
+        points =
+            toPoints data
     in
     List.map
-        (\p ->
-            Point2d.fromCoordinates
-                ( doX cs (Point2d.xCoordinate p)
-                , doY cs (Point2d.yCoordinate p)
-                )
+        (\d ->
+            { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs d.value )
+            , datum = d
+            }
         )
-        points
+        data
 
 
 toPoints : List Datum -> List Point2d
@@ -425,14 +445,16 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-createShape : Point2d -> Svg msg
+createShape : ScaledPoint -> Svg Msg
 createShape point =
     Svg.polygon2d
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
+        , Events.onMouseOver (ShowQcTooltip point.datum)
+        , Events.onMouseOut HideQcTooltip
         ]
-        (Polygon2d.singleLoop (shape point))
+        (Polygon2d.singleLoop (shape point.point2d))
 
 
 genericShape point scale shapeCoordinates =
@@ -555,7 +577,8 @@ createMaintenanceShapes model ml =
         [ Attributes.fill "red"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , Events.onMouseOver (ShowTooltip "abc")
+        , Events.onMouseOver (ShowRecordTooltip ml)
+        , Events.onMouseOut HideRecordToolTip
         ]
         (Polygon2d.singleLoop (maintenanceShape point))
 
@@ -575,6 +598,8 @@ createReviewShapes model r =
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
+        , Events.onMouseOver (ShowRecordTooltip r)
+        , Events.onMouseOut HideRecordToolTip
         ]
         (Polygon2d.singleLoop (reviewShape point))
 
@@ -635,7 +660,22 @@ view model =
                     (svgElements model)
                 ]
             ]
-        , div [] [ text ("tooltip: " ++ model.tooltip) ]
+        , div []
+            (case model.recordTooltip of
+                Nothing ->
+                    []
+
+                _ ->
+                    [ text ("tooltip: " ++ Debug.toString model.recordTooltip) ]
+            )
+        , div []
+            (case model.qcTooltip of
+                Nothing ->
+                    []
+
+                _ ->
+                    [ text ("tooltip: " ++ Debug.toString model.qcTooltip) ]
+            )
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
