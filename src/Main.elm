@@ -52,6 +52,47 @@ type alias ChartScalings =
     }
 
 
+type alias Datum =
+    { time : Float
+    , value : Float
+    }
+
+
+type alias ChartRecord =
+    { on : String
+    , comment : String
+    , by : String
+    }
+
+
+type alias Stats =
+    { nominal : Float
+    , mean : Float
+    , deviation : Float
+    }
+
+
+type alias Flags =
+    { acqnominal : Float
+    , analyteid : Int
+    , chart_type : String
+    , date_from : String
+    , date_to : String
+    , pdf : Bool
+    , stats : Stats
+    , maintenance_logs : List ChartRecord
+    , reviews : List ChartRecord
+    , qcresults : List RawCid
+    }
+
+
+type alias RawCid =
+    { id : Int
+    , c : Float
+    , d : String
+    }
+
+
 prepareTime : String -> Maybe ISO8601.Time
 prepareTime s =
     case ISO8601.fromString s of
@@ -180,47 +221,6 @@ scaleXY flags points boundingBox =
 toPoints : List Datum -> List Point2d
 toPoints data =
     List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
-
-
-type alias Datum =
-    { time : Float
-    , value : Float
-    }
-
-
-type alias ChartRecord =
-    { on : String
-    , comment : String
-    , by : String
-    }
-
-
-type alias Stats =
-    { nominal : Float
-    , mean : Float
-    , deviation : Float
-    }
-
-
-type alias Flags =
-    { acqnominal : Float
-    , analyteid : Int
-    , chart_type : String
-    , date_from : String
-    , date_to : String
-    , pdf : Bool
-    , stats : Stats
-    , maintenance_logs : List ChartRecord
-    , reviews : List ChartRecord
-    , qcresults : List RawCid
-    }
-
-
-type alias RawCid =
-    { id : Int
-    , c : Float
-    , d : String
-    }
 
 
 type Msg
@@ -362,64 +362,6 @@ stamp2 col cc =
         , Attributes.strokeWidth "0.5"
         ]
         (Polygon2d.singleLoop cc)
-
-
-type alias ControlLineCC =
-    { csx : Float, csy : Float, cex : Float, cey : Float }
-
-
-extractContolLineCC model =
-    case model.chartBoundingBox of
-        Nothing ->
-            { maxX = 0.0, maxY = 0.0, minX = 0.0, minY = 0.0 }
-
-        Just n ->
-            BoundingBox2d.extrema n
-
-
-controlLine : Model -> Svg msg
-controlLine model =
-    let
-        cs =
-            extractContolLineCC model
-
-        ax =
-            doX model.chartScalings cs.minX
-
-        ay =
-            doY model.chartScalings cs.minY
-
-        bx =
-            doX model.chartScalings cs.maxX
-
-        by =
-            doY model.chartScalings cs.maxY
-    in
-    Debug.log
-        (Debug.toString
-            { raw = cs
-            , ax = ax
-            , ay = ay
-            , bx = bx
-            , by = by
-            }
-        )
-        (Svg.lineSegment2d
-            [ Attributes.stroke "purple"
-            , Attributes.strokeWidth "1"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings cs.minX
-                    , doY model.chartScalings cs.minY
-                    )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings cs.maxX
-                    , doY model.chartScalings cs.maxY
-                    )
-                )
-            )
-        )
 
 
 frameChart : Frame2d
