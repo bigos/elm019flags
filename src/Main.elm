@@ -86,10 +86,10 @@ setChartScalings flags boundingBox =
     let
         -- sizes x & y of the view area
         dx =
-            250.0
+            500.0
 
         dy =
-            100.0
+            200.0
 
         -- distances x & y before scaling
         distX =
@@ -279,7 +279,7 @@ nominalLine : Model -> Svg msg
 nominalLine model =
     Svg.lineSegment2d
         [ Attributes.stroke "grey"
-        , Attributes.strokeWidth "1"
+        , Attributes.strokeWidth "0.5"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
@@ -298,7 +298,7 @@ meanLine : Model -> Svg msg
 meanLine model =
     Svg.lineSegment2d
         [ Attributes.stroke "red"
-        , Attributes.strokeWidth "1"
+        , Attributes.strokeWidth "0.5"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
@@ -322,7 +322,7 @@ plusXdLine : Model -> Int -> Svg msg
 plusXdLine model x =
     Svg.lineSegment2d
         [ Attributes.stroke "red"
-        , Attributes.strokeWidth "1"
+        , Attributes.strokeWidth "0.4"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
@@ -449,7 +449,7 @@ shape cc =
     -- possibility to refactor into creation of other shapes
     let
         factor =
-            3.1
+            4.5
 
         cp =
             ( Point2d.xCoordinate cc, Point2d.yCoordinate cc )
