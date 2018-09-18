@@ -46,6 +46,7 @@ type alias Model =
     , level : Int
     , points : List Point2d
     , scaledPoints : List Point2d
+    , tooltip : String
     }
 
 
@@ -128,6 +129,7 @@ init flags =
       , chartBoundingBox = chartBoundingBox
       , scaledPoints = scaleXY flags points chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
+      , tooltip = ""
       }
     , Cmd.none
     )
@@ -139,14 +141,22 @@ init flags =
 
 type Msg
     = Nop
-    | NotApplicable
+    | ShowTooltip String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        _ ->
-            ( model, Cmd.none )
+    Debug.log
+        ("debugging update: "
+            ++ Debug.toString msg
+        )
+        (case msg of
+            ShowTooltip s ->
+                ( { model | tooltip = s }, Cmd.none )
+
+            _ ->
+                ( model, Cmd.none )
+        )
 
 
 
@@ -545,6 +555,7 @@ createMaintenanceShapes model ml =
         [ Attributes.fill "red"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
+        , Events.onMouseOver (ShowTooltip "abc")
         ]
         (Polygon2d.singleLoop (maintenanceShape point))
 
@@ -568,7 +579,10 @@ createReviewShapes model r =
         (Polygon2d.singleLoop (reviewShape point))
 
 
-svgElements : Model -> List (Svg msg)
+
+--svgElements : Model -> List (Svg msg)
+
+
 svgElements model =
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
@@ -621,7 +635,7 @@ view model =
                     (svgElements model)
                 ]
             ]
-        , div [] [ "tooltip: " ++ model.tooltip ]
+        , div [] [ text ("tooltip: " ++ model.tooltip) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
