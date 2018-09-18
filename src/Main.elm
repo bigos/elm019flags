@@ -17,6 +17,10 @@ import Triangle2d exposing (Triangle2d)
 import Tuple
 
 
+
+-- MAIN
+
+
 main =
     Browser.element
         { init = init
@@ -24,6 +28,10 @@ main =
         , subscriptions = \_ -> Sub.none
         , view = view
         }
+
+
+
+-- MAJORITY OF TYPE DECLARATIONS
 
 
 type alias Model =
@@ -37,6 +45,20 @@ type alias Model =
     , level : Int
     , points : List Point2d
     , scaledPoints : List Point2d
+    }
+
+
+type alias Flags =
+    { acqnominal : Float
+    , analyteid : Int
+    , chart_type : String
+    , date_from : String
+    , date_to : String
+    , pdf : Bool
+    , stats : Stats
+    , maintenance_logs : List ChartRecord
+    , reviews : List ChartRecord
+    , qcresults : List RawCid
     }
 
 
@@ -72,20 +94,6 @@ type alias Stats =
     }
 
 
-type alias Flags =
-    { acqnominal : Float
-    , analyteid : Int
-    , chart_type : String
-    , date_from : String
-    , date_to : String
-    , pdf : Bool
-    , stats : Stats
-    , maintenance_logs : List ChartRecord
-    , reviews : List ChartRecord
-    , qcresults : List RawCid
-    }
-
-
 type alias RawCid =
     { id : Int
     , c : Float
@@ -93,14 +101,8 @@ type alias RawCid =
     }
 
 
-prepareTime : String -> Maybe ISO8601.Time
-prepareTime s =
-    case ISO8601.fromString s of
-        Err msg ->
-            Nothing
 
-        Result.Ok d ->
-            Just d
+-- INIT
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -130,6 +132,30 @@ init flags =
     )
 
 
+
+-- JUST FUNCTIONS
+
+
+justTimeString : Maybe ISO8601.Time -> String
+justTimeString tv =
+    case tv of
+        Nothing ->
+            ""
+
+        Just tm ->
+            ISO8601.toString tm
+
+
+prepareTime : String -> Maybe ISO8601.Time
+prepareTime s =
+    case ISO8601.fromString s of
+        Err msg ->
+            Nothing
+
+        Result.Ok d ->
+            Just d
+
+
 justValFn v fn =
     case v of
         Nothing ->
@@ -137,6 +163,10 @@ justValFn v fn =
 
         Just n ->
             fn n
+
+
+
+-- OTHER FUNCTIONS
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -223,6 +253,10 @@ toPoints data =
     List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
 
 
+
+-- UPDATE
+
+
 type Msg
     = Increment
     | Decrement
@@ -236,6 +270,10 @@ update msg model =
 
         Decrement ->
             ( { model | level = model.level - 1 }, Cmd.none )
+
+
+
+-- OTHER FUNCTIONS
 
 
 timify : String -> Int
@@ -458,16 +496,6 @@ placed model =
 readData : Flags -> List Datum
 readData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
-
-
-justTimeString : Maybe ISO8601.Time -> String
-justTimeString tv =
-    case tv of
-        Nothing ->
-            ""
-
-        Just tm ->
-            ISO8601.toString tm
 
 
 view : Model -> Html Msg
