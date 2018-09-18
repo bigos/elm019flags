@@ -216,20 +216,12 @@ setChartScalings flags boundingBox =
 
 doX : ChartScalings -> Float -> Float
 doX cs x =
-    Debug.log
-        ("debugging X "
-            ++ Debug.toString ( cs, x )
-        )
-        (cs.scaleX * (cs.offsetX + x))
+    cs.scaleX * (cs.offsetX + x)
 
 
 doY : ChartScalings -> Float -> Float
 doY cs y =
-    Debug.log
-        ("debugging Y "
-            ++ Debug.toString ( cs, y )
-        )
-        (cs.scaleY * (cs.offsetY + y))
+    cs.scaleY * (cs.offsetY + y)
 
 
 scaleXY : Flags -> List Point2d -> Maybe BoundingBox2d -> List Point2d
