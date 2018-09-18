@@ -688,5 +688,9 @@ showTheTooltip t =
 
         t2 =
             ISO8601.toString tm
+
+        t3 =
+            -- extraced date part from the time ticks
+            Maybe.withDefault "" (List.head (String.split "T" t2))
     in
-    [ text ("tooltip: " ++ t2 ++ " - " ++ Debug.toString t.value) ]
+    [ text ("tooltip: " ++ Debug.toString t3 ++ " - " ++ Debug.toString t.value) ]
