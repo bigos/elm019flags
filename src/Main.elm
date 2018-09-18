@@ -133,6 +133,21 @@ init flags =
 
 
 
+-- UPDATE
+-- we do not do any update work at the moment
+
+
+type Msg
+    = None
+    | NotApplicable
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    ( model, Cmd.none )
+
+
+
 -- JUST FUNCTIONS
 
 
@@ -243,25 +258,6 @@ scaleXY flags points boundingBox =
 toPoints : List Datum -> List Point2d
 toPoints data =
     List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
-
-
-
--- UPDATE
-
-
-type Msg
-    = Increment
-    | Decrement
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        Increment ->
-            ( { model | level = model.level + 1 }, Cmd.none )
-
-        Decrement ->
-            ( { model | level = model.level - 1 }, Cmd.none )
 
 
 
