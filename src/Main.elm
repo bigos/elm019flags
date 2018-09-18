@@ -134,7 +134,6 @@ init flags =
 
 
 -- UPDATE
--- we do not do any update work at the moment
 
 
 type Msg
@@ -144,6 +143,7 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    -- we do not do any update work at the moment
     ( model, Cmd.none )
 
 
@@ -182,6 +182,11 @@ justValFn v fn =
 
 
 -- OTHER FUNCTIONS
+
+
+readData : Flags -> List Datum
+readData flags =
+    List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -260,10 +265,6 @@ toPoints data =
     List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
 
 
-
--- OTHER FUNCTIONS
-
-
 timify : String -> Int
 timify d =
     case ISO8601.fromString d of
@@ -272,50 +273,6 @@ timify d =
 
         Err _ ->
             timify "1970-01-01T00:00:00Z"
-
-
-triangle : Svg Msg
-triangle =
-    Svg.triangle2d
-        [ Attributes.stroke "blue"
-        , Attributes.strokeWidth "10"
-        , Attributes.strokeLinejoin "round"
-        , Attributes.fill "orange"
-        ]
-        (Triangle2d.fromVertices
-            ( Point2d.fromCoordinates ( 0, 0 )
-            , Point2d.fromCoordinates ( 60, 5 )
-            , Point2d.fromCoordinates ( 5, 60 )
-            )
-        )
-
-
-vertices : List Point2d
-vertices =
-    [ Point2d.fromCoordinates ( 0, 0 )
-    , Point2d.fromCoordinates ( 100, 0 )
-    , Point2d.fromCoordinates ( 0, 100 )
-    ]
-
-
-rcc : List ( number, number )
-rcc =
-    [ ( 0, 0 ), ( 50, 0 ), ( 50, 50 ), ( 0, 50 ) ]
-
-
-rect : List ( Float, Float ) -> List Point2d
-rect cc =
-    List.map (\c -> Point2d.fromCoordinates c) cc
-
-
-stamp : String -> List ( Float, Float ) -> Svg msg
-stamp col cc =
-    Svg.polygon2d
-        [ Attributes.fill col
-        , Attributes.stroke "blue"
-        , Attributes.strokeWidth "2"
-        ]
-        (Polygon2d.singleLoop (rect cc))
 
 
 nominalLine : Model -> Svg msg
@@ -380,16 +337,6 @@ plusXdLine model x =
         )
 
 
-stamp2 : String -> List Point2d -> Svg msg
-stamp2 col cc =
-    Svg.polygon2d
-        [ Attributes.fill col
-        , Attributes.stroke "black"
-        , Attributes.strokeWidth "0.5"
-        ]
-        (Polygon2d.singleLoop cc)
-
-
 frameChart : Frame2d
 frameChart =
     Frame2d.atPoint
@@ -418,8 +365,8 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-dat : Point2d -> Svg msg
-dat point =
+createShape : Point2d -> Svg msg
+createShape point =
     Svg.polygon2d
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
@@ -431,9 +378,8 @@ dat point =
 shape : Point2d -> List Point2d
 shape cc =
     -- draw tilted square around cc coordinates
-    -- possibility to refactor into creation of other shapes
     let
-        factor =
+        scale =
             4.5
 
         cp =
@@ -441,7 +387,8 @@ shape cc =
 
         pcx =
             List.map
-                (\p -> ( Tuple.first p * factor, Tuple.second p * factor ))
+                (\p -> ( Tuple.first p * scale, Tuple.second p * scale ))
+                -- possibility to refactor into creation of other shapes
                 [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
 
         pc =
@@ -472,18 +419,29 @@ svgElements model =
     , Svg.placeIn frameChart (plusXdLine model -2)
     , Svg.placeIn frameChart (plusXdLine model -3)
     ]
-        ++ List.map (\p -> Svg.placeIn frameChart (dat p)) model.scaledPoints
+        ++ List.map (\p -> Svg.placeIn frameChart (createShape p)) model.scaledPoints
 
 
-placed : Model -> Svg msg
-placed model =
-    Svg.g []
-        (svgElements model)
+pdfLink model =
+    if model.flags.pdf then
+        div [] []
 
-
-readData : Flags -> List Datum
-readData flags =
-    List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
+    else
+        a
+            [ href
+                ("/analytes/"
+                    ++ Debug.toString model.flags.analyteid
+                    ++ "/pdf_report"
+                    ++ "/chart_type/"
+                    ++ model.chartType
+                    ++ "/dating_from/"
+                    ++ String.slice 0 10 (justTimeString model.dateFrom)
+                    ++ "/dating_to/"
+                    ++ String.slice 0 10 (justTimeString model.dateTo)
+                )
+            , target "_blank"
+            ]
+            [ text "Download the PDF" ]
 
 
 view : Model -> Html Msg
@@ -495,26 +453,10 @@ view model =
                 , viewBox "0 0 600 400"
                 , style "border: solid red 1px;"
                 ]
-                [ placed model ]
-            ]
-        , if model.flags.pdf then
-            div [] []
-
-          else
-            a
-                [ href
-                    ("/analytes/"
-                        ++ Debug.toString model.flags.analyteid
-                        ++ "/pdf_report"
-                        ++ "/chart_type/"
-                        ++ model.chartType
-                        ++ "/dating_from/"
-                        ++ String.slice 0 10 (justTimeString model.dateFrom)
-                        ++ "/dating_to/"
-                        ++ String.slice 0 10 (justTimeString model.dateTo)
-                    )
-                , target "_blank"
+                [ Svg.g []
+                    (svgElements model)
                 ]
-                [ text "Download the PDF" ]
+            ]
+        , pdfLink model
         , div [ style "height:5em;" ] []
         ]
