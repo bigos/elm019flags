@@ -13,6 +13,7 @@ import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
+import Svg.Events as Events exposing (..)
 import Triangle2d exposing (Triangle2d)
 import Tuple
 
@@ -137,14 +138,15 @@ init flags =
 
 
 type Msg
-    = None
+    = Nop
     | NotApplicable
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    -- we do not do any update work at the moment
-    ( model, Cmd.none )
+    case msg of
+        _ ->
+            ( model, Cmd.none )
 
 
 
@@ -485,9 +487,6 @@ createMaintenanceLines model ml =
         oni =
             toFloat (timify ml.on)
 
-        mean =
-            model.flags.stats.mean
-
         ld =
             deviations model -4
 
@@ -512,11 +511,8 @@ createReviewLines model ml =
         oni =
             toFloat (timify ml.on)
 
-        mean =
-            model.flags.stats.mean
-
         ld =
-            deviations model -4.5
+            deviations model -4
 
         ud =
             deviations model 4.5
@@ -625,6 +621,7 @@ view model =
                     (svgElements model)
                 ]
             ]
+        , div [] [ "tooltip: " ++ model.tooltip ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
