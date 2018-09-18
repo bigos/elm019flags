@@ -471,8 +471,8 @@ shape cc =
     List.map
         (\c ->
             Point2d.fromCoordinates
-                ( Tuple.first cp + Tuple.first c
-                , Tuple.second cp + Tuple.second c
+                ( (Tuple.first cp + Tuple.first c) / 2.0
+                , (Tuple.second cp + Tuple.second c) / 2.0
                 )
         )
         pc
