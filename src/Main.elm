@@ -4,7 +4,8 @@ import BoundingBox2d exposing (BoundingBox2d)
 import Browser
 import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, a, button, div, text)
+import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
 import ISO8601
 import LineSegment2d exposing (LineSegment2d)
@@ -26,12 +27,15 @@ main =
 
 
 type alias Model =
-    { flags : Flags
-    , level : Int
-    , data : List Datum
-    , points : List Point2d
-    , chartBoundingBox : Maybe BoundingBox2d
+    { chartBoundingBox : Maybe BoundingBox2d
     , chartScalings : ChartScalings
+    , chartType : String
+    , data : List Datum
+    , dateFrom : Maybe ISO8601.Time
+    , dateTo : Maybe ISO8601.Time
+    , flags : Flags
+    , level : Int
+    , points : List Point2d
     , scaledPoints : List Point2d
     }
 
@@ -46,6 +50,16 @@ type alias ChartScalings =
     , offsetX : Float
     , offsetY : Float
     }
+
+
+prepareTime : String -> Maybe ISO8601.Time
+prepareTime s =
+    case ISO8601.fromString s of
+        Err msg ->
+            Nothing
+
+        Result.Ok d ->
+            Just d
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -63,6 +77,9 @@ init flags =
     ( { flags = flags
       , level = 0
       , data = data
+      , dateFrom = prepareTime flags.date_from
+      , dateTo = prepareTime flags.date_to
+      , chartType = "default"
       , points = points
       , chartBoundingBox = chartBoundingBox
       , scaledPoints = scaleXY flags points chartBoundingBox
@@ -480,17 +497,12 @@ shape cc =
 
 svgElements : Model -> List (Svg msg)
 svgElements model =
-    [ Svg.placeIn frameChart (stamp "yellow" rcc)
-    , Svg.placeIn frameAxisX (stamp "blue" rcc)
-    , Svg.placeIn frameAxisY (stamp "green" rcc)
-    , Svg.placeIn frameLegend (stamp "red" rcc)
-    , Svg.placeIn frameChart (nominalLine model)
+    [ Svg.placeIn frameChart (nominalLine model)
     , Svg.placeIn frameChart (meanLine model)
     , Svg.placeIn frameChart (plusXdLine model 3)
     , Svg.placeIn frameChart (plusXdLine model 2)
     , Svg.placeIn frameChart (plusXdLine model -2)
     , Svg.placeIn frameChart (plusXdLine model -3)
-    , Svg.placeIn frameChart (controlLine model)
     ]
         ++ List.map (\p -> Svg.placeIn frameChart (dat p)) model.scaledPoints
 
@@ -506,6 +518,16 @@ readData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
 
 
+justTimeString : Maybe ISO8601.Time -> String
+justTimeString tv =
+    case tv of
+        Nothing ->
+            ""
+
+        Just tm ->
+            ISO8601.toString tm
+
+
 view : Model -> Html Msg
 view model =
     div []
@@ -517,10 +539,24 @@ view model =
                 ]
                 [ placed model ]
             ]
-        , button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (String.fromInt model.level) ]
-        , button [ onClick Increment ] [ text "+" ]
-        , div [] [ text "We have lift off" ]
-        , div [] [ text (Debug.toString model.data) ]
+        , if model.flags.pdf then
+            div [] []
+
+          else
+            a
+                [ href
+                    ("/analytes/"
+                        ++ Debug.toString model.flags.analyteid
+                        ++ "/pdf_report"
+                        ++ "/chart_type/"
+                        ++ model.chartType
+                        ++ "/dating_from/"
+                        ++ String.slice 0 10 (justTimeString model.dateFrom)
+                        ++ "/dating_to/"
+                        ++ String.slice 0 10 (justTimeString model.dateTo)
+                    )
+                , target "_blank"
+                ]
+                [ text "Download the PDF" ]
         , div [ style "height:5em;" ] []
         ]
