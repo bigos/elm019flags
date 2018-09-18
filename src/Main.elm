@@ -1,4 +1,4 @@
-module Main exposing (Flags, Model, Msg(..), init, main, update, view)
+module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, Stats, createMaintenanceLines, createShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, init, justTimeString, justValFn, main, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, sampleml, scaleXY, setChartScalings, shape, svgElements, timify, toPoints, update, view)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -315,7 +315,7 @@ meanLine model =
 
 deviations : Model -> Float -> Float
 deviations model x =
-    model.flags.stats.mean - (model.flags.stats.deviation * x)
+    model.flags.stats.mean + (model.flags.stats.deviation * x)
 
 
 plusXdLine : Model -> Int -> Svg msg
@@ -375,39 +375,153 @@ createShape point =
         (Polygon2d.singleLoop (shape point))
 
 
-shape : Point2d -> List Point2d
-shape cc =
-    -- draw tilted square around cc coordinates
+genericShape point scale shapeCoordinates =
     let
-        scale =
-            4.5
+        pointPair =
+            ( Point2d.xCoordinate point, Point2d.yCoordinate point )
 
-        cp =
-            ( Point2d.xCoordinate cc, Point2d.yCoordinate cc )
-
-        pcx =
+        scaledShapeCoordinates =
             List.map
                 (\p -> ( Tuple.first p * scale, Tuple.second p * scale ))
-                -- possibility to refactor into creation of other shapes
-                [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
+                shapeCoordinates
 
         pc =
             List.map
-                (\nc ->
-                    ( Tuple.first cp - Tuple.first nc
-                    , Tuple.second cp - Tuple.second nc
+                (\sc ->
+                    ( Tuple.first pointPair + Tuple.first sc
+                    , Tuple.second pointPair + Tuple.second sc
                     )
                 )
-                pcx
+                scaledShapeCoordinates
     in
     List.map
         (\c ->
             Point2d.fromCoordinates
-                ( (Tuple.first cp + Tuple.first c) / 2.0
-                , (Tuple.second cp + Tuple.second c) / 2.0
+                ( (Tuple.first pointPair + Tuple.first c) / 2.0
+                , (Tuple.second pointPair + Tuple.second c) / 2.0
                 )
         )
         pc
+
+
+shape : Point2d -> List Point2d
+shape point =
+    -- draw tilted square around point coordinates
+    genericShape point 4.5 [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
+
+
+maintenanceShape point =
+    genericShape point
+        10.5
+        [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
+
+
+reviewShape point =
+    genericShape point
+        10.0
+        [ ( 0.0, 0.0 )
+        , ( 1.0, 1.0 )
+        , ( 1.0, 0.0 )
+        , ( 0.0, -1.0 )
+        , ( -1.0, 0.0 )
+        , ( -1.0, 1.0 )
+        ]
+
+
+sampleml =
+    { by = "Miss Sarah Cooke", comment = "Front end maintenance performed. Liner, gold seal, ferrule and o-ring all changed. Still a slight air leak of 25%. Trasnfer line to be checked as soon as the instrument is available to vent.", on = "2018-06-26" }
+
+
+createMaintenanceLines model ml =
+    let
+        oni =
+            toFloat (timify ml.on)
+
+        mean =
+            model.flags.stats.mean
+
+        ld =
+            deviations model -4
+
+        ud =
+            deviations model 5
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "grey"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings ld )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings ud )
+            )
+        )
+
+
+createReviewLines model ml =
+    let
+        oni =
+            toFloat (timify ml.on)
+
+        mean =
+            model.flags.stats.mean
+
+        ld =
+            deviations model -4.5
+
+        ud =
+            deviations model 4.5
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "green"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings ld )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings ud )
+            )
+        )
+
+
+createMaintenanceShapes model ml =
+    let
+        oni =
+            toFloat (timify ml.on)
+
+        ud =
+            deviations model 5
+
+        point =
+            Point2d.fromCoordinates ( doX model.chartScalings oni, doY model.chartScalings ud )
+    in
+    Svg.polygon2d
+        [ Attributes.fill "red"
+        , Attributes.stroke "black"
+        , Attributes.strokeWidth "0.25"
+        ]
+        (Polygon2d.singleLoop (maintenanceShape point))
+
+
+createReviewShapes model r =
+    let
+        oni =
+            toFloat (timify r.on)
+
+        ud =
+            deviations model 4.5
+
+        point =
+            Point2d.fromCoordinates ( doX model.chartScalings oni, doY model.chartScalings ud )
+    in
+    Svg.polygon2d
+        [ Attributes.fill "blue"
+        , Attributes.stroke "black"
+        , Attributes.strokeWidth "0.25"
+        ]
+        (Polygon2d.singleLoop (reviewShape point))
 
 
 svgElements : Model -> List (Svg msg)
@@ -420,6 +534,10 @@ svgElements model =
     , Svg.placeIn frameChart (plusXdLine model -3)
     ]
         ++ List.map (\p -> Svg.placeIn frameChart (createShape p)) model.scaledPoints
+        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceLines model ml)) model.flags.maintenance_logs
+        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShapes model ml)) model.flags.maintenance_logs
+        ++ List.map (\r -> Svg.placeIn frameChart (createReviewLines model r)) model.flags.reviews
+        ++ List.map (\r -> Svg.placeIn frameChart (createReviewShapes model r)) model.flags.reviews
 
 
 pdfLink model =
