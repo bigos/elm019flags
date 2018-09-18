@@ -275,6 +275,44 @@ timify d =
             timify "1970-01-01T00:00:00Z"
 
 
+axisX : Model -> Svg msg
+axisX model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "0.5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( -50.0
+                , 0.0
+                )
+            , Point2d.fromCoordinates
+                ( doY model.chartScalings (deviations model 10)
+                , 0.0
+                )
+            )
+        )
+
+
+axisY : Model -> Svg msg
+axisY model =
+    Svg.lineSegment2d
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "0.5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( 0.0
+                , -50.0
+                )
+            , Point2d.fromCoordinates
+                ( 0.0
+                , doY model.chartScalings (deviations model 5)
+                )
+            )
+        )
+
+
 nominalLine : Model -> Svg msg
 nominalLine model =
     Svg.lineSegment2d
@@ -526,7 +564,9 @@ createReviewShapes model r =
 
 svgElements : Model -> List (Svg msg)
 svgElements model =
-    [ Svg.placeIn frameChart (nominalLine model)
+    [ Svg.placeIn frameChart (axisX model)
+    , Svg.placeIn frameChart (axisY model)
+    , Svg.placeIn frameChart (nominalLine model)
     , Svg.placeIn frameChart (meanLine model)
     , Svg.placeIn frameChart (plusXdLine model 3)
     , Svg.placeIn frameChart (plusXdLine model 2)
