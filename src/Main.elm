@@ -297,7 +297,7 @@ axisX model =
                 , doY model.chartScalings (deviations model -4.5)
                 )
             , Point2d.fromCoordinates
-                ( doY model.chartScalings (chartEnd model.flags)
+                ( doX model.chartScalings (chartEnd model.flags)
                 , doY model.chartScalings (deviations model -4.5)
                 )
             )
@@ -618,7 +618,7 @@ view model =
         [ div [ style "margin: auto ; width:600px" ]
             [ Svg.svg
                 [ height "400"
-                , viewBox "0 0 600 400"
+                , viewBox "0 0 700 400"
                 , style "border: solid red 1px;"
                 ]
                 [ Svg.g []
