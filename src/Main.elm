@@ -1,4 +1,7 @@
-module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, Stats, createMaintenanceLines, createShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, init, justTimeString, justValFn, main, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, sampleml, scaleXY, setChartScalings, shape, svgElements, timify, toPoints, update, view)
+-- now we are using port for JavaScript inter-operation
+
+
+port module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, Stats, createMaintenanceLines, createShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, init, justTimeString, justValFn, main, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, sampleml, scaleXY, setChartScalings, shape, svgElements, timify, toPoints, update, view)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -8,6 +11,7 @@ import Html exposing (Html, a, button, div, text)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
 import ISO8601
+import Json.Encode as E
 import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
@@ -26,7 +30,7 @@ main =
     Browser.element
         { init = init
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         , view = view
         }
 
@@ -144,6 +148,17 @@ init flags =
 
 
 
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.none
+
+
+
+-- PORT FUNCTIONS
+--port getMousePos : (E.value -> msg) -> Sub msg
 -- UPDATE
 
 
@@ -152,6 +167,7 @@ type Msg
     | HideRecordToolTip
     | ShowQcTooltip Datum
     | HideQcTooltip
+    | MousePos E.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -662,8 +678,6 @@ view model =
             ]
         , showTheTooltip1 model
         , showTheTooltip2 model
-        , div []
-            [ text ("mouse at " ++ Debug.toString Mouse.position) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
