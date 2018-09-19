@@ -660,37 +660,38 @@ view model =
                     (svgElements model)
                 ]
             ]
-        , div []
-            (case model.recordTooltip of
-                Nothing ->
-                    []
-
-                _ ->
-                    [ text ("tooltip: " ++ Debug.toString model.recordTooltip) ]
-            )
-        , div []
-            (case model.qcTooltip of
-                Nothing ->
-                    []
-
-                Just t ->
-                    showTheTooltip t
-            )
+        , showTheTooltip1 model
+        , showTheTooltip2 model
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
 
 
-showTheTooltip t =
-    let
-        tm =
-            ISO8601.fromTime (floor t.time)
+showTheTooltip1 model =
+    case model.recordTooltip of
+        Nothing ->
+            div [] []
 
-        t2 =
-            ISO8601.toString tm
+        _ ->
+            div [] [ text ("tooltip: " ++ Debug.toString model.recordTooltip) ]
 
-        t3 =
-            -- extraced date part from the time ticks
-            Maybe.withDefault "" (List.head (String.split "T" t2))
-    in
-    [ text ("tooltip: " ++ Debug.toString t3 ++ " - " ++ Debug.toString t.value) ]
+
+showTheTooltip2 model =
+    case model.qcTooltip of
+        Nothing ->
+            div [] []
+
+        Just t ->
+            let
+                tm =
+                    ISO8601.fromTime (floor t.time)
+
+                t2 =
+                    ISO8601.toString tm
+
+                t3 =
+                    -- extraced date part from the time ticks
+                    Maybe.withDefault "" (List.head (String.split "T" t2))
+            in
+            div []
+                [ text ("tooltip: " ++ Debug.toString t3 ++ " - " ++ Debug.toString t.value) ]
