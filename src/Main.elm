@@ -662,6 +662,8 @@ view model =
             ]
         , showTheTooltip1 model
         , showTheTooltip2 model
+        , div []
+            [ text ("mouse at " ++ Debug.toString Mouse.position) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
