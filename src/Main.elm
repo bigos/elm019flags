@@ -713,16 +713,14 @@ showTheTooltip1 model =
                 [ class "log-record-tooltip"
                 , style
                     ("left: "
-                        -- the rest of styling will be done in CSS
-                        ++ Debug.toString (10 + Tuple.first model.coordinates)
+                        ++ String.fromFloat (10 + Tuple.first model.coordinates)
                         ++ "px;"
                         ++ "top: "
-                        ++ Debug.toString (10 + Tuple.second model.coordinates)
+                        ++ String.fromFloat (10 + Tuple.second model.coordinates)
                         ++ "px;"
                     )
                 ]
-                [ -- text ("tooltip: " ++ Debug.toString model.recordTooltip)
-                  span [ class "tool-tip-title" ] [ text "Manintenance Log on: " ]
+                [ span [ class "tool-tip-title" ] [ text "Manintenance Log on: " ]
                 , span [] [ text tt.on ]
                 , br [] []
                 , span [ class "tool-tip-title" ] [ text "By: " ]
@@ -747,8 +745,34 @@ showTheTooltip2 model =
                     ISO8601.toString tm
 
                 t3 =
-                    -- extraced date part from the time ticks
-                    Maybe.withDefault "" (List.head (String.split "T" t2))
+                    List.head (String.split "Z" t2)
+
+                t4 =
+                    String.split "T" (Maybe.withDefault "" t3)
+
+                dx =
+                    List.head t4
+
+                tx =
+                    case List.tail t4 of
+                        Nothing ->
+                            ""
+
+                        Just s ->
+                            Maybe.withDefault "" (List.head s)
             in
             div []
-                [ text ("tooltip: " ++ Debug.toString t3 ++ " - " ++ Debug.toString t.value) ]
+                [ span
+                    [ class "tool-tip-title" ]
+                    [ text "Date: " ]
+                , span [] [ text (Maybe.withDefault "" dx) ]
+                , br [] []
+                , span [ class "tool-tip-title" ] [ text "Time: " ]
+                , span [] [ text tx ]
+                , br [] []
+                , span [ class "tool-tip-title" ]
+                    [ text "Concentration: " ]
+                , span
+                    []
+                    [ text (String.fromFloat t.value) ]
+                ]
