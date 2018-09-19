@@ -1,7 +1,4 @@
--- now we are using port for JavaScript inter-operation
-
-
-port module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, Stats, createMaintenanceLines, createShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, init, justTimeString, justValFn, main, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, sampleml, scaleXY, setChartScalings, shape, svgElements, timify, toPoints, update, view)
+module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, Stats, createMaintenanceLines, createShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, init, justTimeString, justValFn, main, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, sampleml, scaleXY, setChartScalings, shape, svgElements, timify, toPoints, update, view)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -10,6 +7,7 @@ import Geometry.Svg as Svg
 import Html exposing (Html, a, button, div, text)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
+import Html.Events.Extra.Mouse as M exposing (..)
 import ISO8601
 import Json.Encode as E
 import LineSegment2d exposing (LineSegment2d)
@@ -52,6 +50,7 @@ type alias Model =
     , scaledPoints : List ScaledPoint
     , recordTooltip : Maybe ChartRecord
     , qcTooltip : Maybe Datum
+    , coordinates : ( Float, Float )
     }
 
 
@@ -142,6 +141,7 @@ init flags =
       , chartScalings = setChartScalings flags chartBoundingBox
       , recordTooltip = Nothing
       , qcTooltip = Nothing
+      , coordinates = ( 0.0, 0.0 )
       }
     , Cmd.none
     )
@@ -167,7 +167,8 @@ type Msg
     | HideRecordToolTip
     | ShowQcTooltip Datum
     | HideQcTooltip
-    | MousePos E.Value
+    | RecordTooltipMouseEnter ChartRecord ( Float, Float )
+    | RecordTooltipMouseLeave
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -190,6 +191,22 @@ update msg model =
 
         HideQcTooltip ->
             ( { model | qcTooltip = Nothing }
+            , Cmd.none
+            )
+
+        RecordTooltipMouseEnter s cc ->
+            ( { model
+                | recordTooltip = Just s
+                , coordinates = cc
+              }
+            , Cmd.none
+            )
+
+        RecordTooltipMouseLeave ->
+            ( { model
+                | recordTooltip = Nothing
+                , coordinates = ( 0, 0 )
+              }
             , Cmd.none
             )
 
@@ -595,6 +612,8 @@ createMaintenanceShapes model ml =
         , Attributes.strokeWidth "0.25"
         , Events.onMouseOver (ShowRecordTooltip ml)
         , Events.onMouseOut HideRecordToolTip
+        , M.onEnter (\event -> RecordTooltipMouseEnter ml event.clientPos)
+        , M.onLeave (\event -> RecordTooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (maintenanceShape point))
 
@@ -676,8 +695,9 @@ view model =
                     (svgElements model)
                 ]
             ]
-        , showTheTooltip1 model
         , showTheTooltip2 model
+        , showTheTooltip1 model
+        , div [] [ text (Debug.toString model.coordinates) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
@@ -689,7 +709,20 @@ showTheTooltip1 model =
             div [] []
 
         _ ->
-            div [] [ text ("tooltip: " ++ Debug.toString model.recordTooltip) ]
+            div
+                [ style
+                    ("position: absolute;"
+                        ++ "border: solid green 1px;"
+                        ++ "z-index: 1000;"
+                        ++ "left: "
+                        ++ Debug.toString (10 + Tuple.first model.coordinates)
+                        ++ "px;"
+                        ++ "top: "
+                        ++ Debug.toString (10 + Tuple.second model.coordinates)
+                        ++ "px;"
+                    )
+                ]
+                [ text ("tooltip: " ++ Debug.toString model.recordTooltip) ]
 
 
 showTheTooltip2 model =
