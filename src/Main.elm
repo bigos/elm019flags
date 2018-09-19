@@ -4,7 +4,7 @@ import BoundingBox2d exposing (BoundingBox2d)
 import Browser
 import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
-import Html exposing (Html, a, button, div, text)
+import Html exposing (Html, a, br, button, div, span, text)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
 import Html.Events.Extra.Mouse as M exposing (..)
@@ -612,7 +612,7 @@ createMaintenanceShapes model ml =
         , Attributes.strokeWidth "0.25"
         , Events.onMouseOver (ShowRecordTooltip ml)
         , Events.onMouseOut HideRecordToolTip
-        , M.onEnter (\event -> RecordTooltipMouseEnter ml event.clientPos)
+        , M.onEnter (\event -> RecordTooltipMouseEnter ml event.pagePos)
         , M.onLeave (\event -> RecordTooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (maintenanceShape point))
@@ -708,13 +708,12 @@ showTheTooltip1 model =
         Nothing ->
             div [] []
 
-        _ ->
+        Just tt ->
             div
-                [ style
-                    ("position: absolute;"
-                        ++ "border: solid green 1px;"
-                        ++ "z-index: 1000;"
-                        ++ "left: "
+                [ class "log-record-tooltip"
+                , style
+                    ("left: "
+                        -- the rest of styling will be done in CSS
                         ++ Debug.toString (10 + Tuple.first model.coordinates)
                         ++ "px;"
                         ++ "top: "
@@ -722,7 +721,16 @@ showTheTooltip1 model =
                         ++ "px;"
                     )
                 ]
-                [ text ("tooltip: " ++ Debug.toString model.recordTooltip) ]
+                [ -- text ("tooltip: " ++ Debug.toString model.recordTooltip)
+                  span [ class "tool-tip-title" ] [ text "Manintenance Log on: " ]
+                , span [] [ text tt.on ]
+                , br [] []
+                , span [ class "tool-tip-title" ] [ text "By: " ]
+                , span [] [ text tt.by ]
+                , br [] []
+                , span [ class "tool-tip-title" ] [ text "Comment: " ]
+                , span [] [ text tt.comment ]
+                ]
 
 
 showTheTooltip2 model =
