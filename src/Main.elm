@@ -86,19 +86,6 @@ type alias Datum =
     }
 
 
-type alias ScaledPoint =
-    { point2d : Point2d
-    , datum : Datum
-    }
-
-
-type alias ChartRecord =
-    { on : String
-    , comment : String
-    , by : String
-    }
-
-
 type alias Stats =
     { nominal : Float
     , mean : Float
@@ -110,6 +97,19 @@ type alias RawCid =
     { id : Int
     , c : Float
     , d : String
+    }
+
+
+type alias ScaledPoint =
+    { point2d : Point2d
+    , datum : Datum
+    }
+
+
+type alias ChartRecord =
+    { on : String
+    , comment : String
+    , by : String
     }
 
 
@@ -610,8 +610,6 @@ createMaintenanceShapes model ml =
         [ Attributes.fill "red"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , Events.onMouseOver (ShowRecordTooltip ml)
-        , Events.onMouseOut HideRecordToolTip
         , M.onEnter (\event -> RecordTooltipMouseEnter ml event.pagePos)
         , M.onLeave (\event -> RecordTooltipMouseLeave)
         ]
