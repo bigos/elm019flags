@@ -466,7 +466,7 @@ createQcShape point =
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter point event.pagePos Nothing)
+        , M.onEnter (\event -> TooltipMouseEnter (DataScaledPoint point) event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (shape point.point2d))
@@ -592,7 +592,7 @@ createMaintenanceShape model ml =
         [ Attributes.fill "red"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter ml event.pagePos (Just "Maintnance"))
+        , M.onEnter (\event -> TooltipMouseEnter (DataChartRecord ml) event.pagePos (Just "Maintnance Log"))
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (maintenanceShape point))
@@ -613,7 +613,7 @@ createReviewShape model r =
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter r event.pagePos (Just "Review"))
+        , M.onEnter (\event -> TooltipMouseEnter (DataChartRecord r) event.pagePos (Just "Review"))
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (reviewShape point))
@@ -678,73 +678,81 @@ view model =
 
         -- , showTheTooltip2 model
         -- , showTheTooltip1 model
+        , showTheTooltip model
         , div [] [ text (Debug.toString model.tooltip) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
 
 
+showTheTooltip model =
+    case model.tooltip of
+        Nothing ->
+            div [] []
 
--- showTheTooltip1 model =
---     case model.recordTooltip of
---         Nothing ->
---             div [] []
---         Just tt ->
---             div
---                 [ class "log-record-tooltip"
---                 , style
---                     ("left: "
---                         ++ String.fromFloat (10 + Tuple.first model.coordinates)
---                         ++ "px;"
---                         ++ "top: "
---                         ++ String.fromFloat (10 + Tuple.second model.coordinates)
---                         ++ "px;"
---                     )
---                 ]
---                 [ span [ class "tool-tip-title" ] [ text "Manintenance Log on: " ]
---                 , span [] [ text tt.on ]
---                 , br [] []
---                 , span [ class "tool-tip-title" ] [ text "By: " ]
---                 , span [] [ text tt.by ]
---                 , br [] []
---                 , span [ class "tool-tip-title" ] [ text "Comment: " ]
---                 , span [] [ text tt.comment ]
---                 ]
--- showTheTooltip2 model =
---     case model.qcTooltip of
---         Nothing ->
---             div [] []
---         Just t ->
---             let
---                 tm =
---                     ISO8601.fromTime (floor t.time)
---                 t2 =
---                     ISO8601.toString tm
---                 t3 =
---                     List.head (String.split "Z" t2)
---                 t4 =
---                     String.split "T" (Maybe.withDefault "" t3)
---                 dx =
---                     List.head t4
---                 tx =
---                     case List.tail t4 of
---                         Nothing ->
---                             ""
---                         Just s ->
---                             Maybe.withDefault "" (List.head s)
---             in
---             div []
---                 [ span
---                     [ class "tool-tip-title" ]
---                     [ text "Date: " ]
---                 , span [] [ text (Maybe.withDefault "" dx) ]
---                 , br [] []
---                 , span [ class "tool-tip-title" ] [ text "Time: " ]
---                 , span [] [ text tx ]
---                 , br [] []
---                 , span [ class "tool-tip-title" ]
---                     [ text "Concentration: " ]
---                 , span
---                     []
---                     [ text (String.fromFloat t.value) ]
---                 ]
+        Just tt ->
+            div
+                [ class "log-record-tooltip"
+                , style
+                    ("left: "
+                        ++ String.fromFloat (10 + Tuple.first tt.coordinates)
+                        ++ "px; "
+                        ++ "top: "
+                        ++ String.fromFloat (10 + Tuple.second tt.coordinates)
+                        ++ "px;"
+                    )
+                ]
+                (case tt.data of
+                    DataChartRecord d ->
+                        [ span [ class "tool-tip-title" ] [ text (Maybe.withDefault "" tt.title) ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ] [ text "On: " ]
+                        , span [] [ text d.on ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ] [ text "By: " ]
+                        , span [] [ text d.by ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ] [ text "Comment: " ]
+                        , span [] [ text d.comment ]
+                        ]
+
+                    DataScaledPoint d ->
+                        let
+                            tm =
+                                ISO8601.fromTime (floor d.datum.time)
+
+                            t2 =
+                                ISO8601.toString tm
+
+                            t3 =
+                                List.head (String.split "Z" t2)
+
+                            t4 =
+                                String.split "T" (Maybe.withDefault "" t3)
+
+                            dx =
+                                List.head t4
+
+                            tx =
+                                case List.tail t4 of
+                                    Nothing ->
+                                        ""
+
+                                    Just s ->
+                                        Maybe.withDefault "" (List.head s)
+                        in
+                        [ span
+                            [ class "tool-tip-title" ]
+                            [ text "Date: " ]
+                        , span [] [ text (Maybe.withDefault "" dx) ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ] [ text "Time: " ]
+                        , span [] [ text tx ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ]
+                            [ text "Concentration: " ]
+                        , span
+                            []
+                            [ text (String.fromFloat d.datum.value) ]
+                        ]
+                )
