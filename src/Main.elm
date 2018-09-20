@@ -1,4 +1,4 @@
-module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, Stats, createMaintenanceLines, createShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, init, justTimeString, justValFn, main, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, sampleml, scaleXY, setChartScalings, shape, svgElements, timify, toPoints, update, view)
+module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartEnd, chartStart, createMaintenanceLine, createMaintenanceShape, createQcShape, createReviewLine, createReviewShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, sampleml, scaleXY, setChartScalings, shape, subscriptions, svgElements, timify, toPoints, update, view)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -48,9 +48,7 @@ type alias Model =
     , level : Int
     , points : List Point2d
     , scaledPoints : List ScaledPoint
-    , recordTooltip : Maybe ChartRecord
-    , qcTooltip : Maybe Datum
-    , coordinates : ( Float, Float )
+    , tooltip : Maybe Tooltip
     }
 
 
@@ -108,8 +106,20 @@ type alias ScaledPoint =
 
 type alias ChartRecord =
     { on : String
-    , comment : String
     , by : String
+    , comment : String
+    }
+
+
+type TooltipData
+    = DataChartRecord ChartRecord
+    | DataScaledPoint ScaledPoint
+
+
+type alias Tooltip =
+    { data : TooltipData
+    , coordinates : ( Float, Float )
+    , title : Maybe String
     }
 
 
@@ -129,19 +139,17 @@ init flags =
         chartBoundingBox =
             BoundingBox2d.containingPoints points
     in
-    ( { flags = flags
-      , level = 0
+    ( { chartBoundingBox = chartBoundingBox
+      , chartScalings = setChartScalings flags chartBoundingBox
+      , chartType = "default"
       , data = data
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to
-      , chartType = "default"
+      , flags = flags
+      , level = 0
       , points = points
-      , chartBoundingBox = chartBoundingBox
       , scaledPoints = scaleXY flags data chartBoundingBox
-      , chartScalings = setChartScalings flags chartBoundingBox
-      , recordTooltip = Nothing
-      , qcTooltip = Nothing
-      , coordinates = ( 0.0, 0.0 )
+      , tooltip = Nothing
       }
     , Cmd.none
     )
@@ -157,56 +165,30 @@ subscriptions model =
 
 
 
--- PORT FUNCTIONS
---port getMousePos : (E.value -> msg) -> Sub msg
 -- UPDATE
 
 
 type Msg
-    = ShowRecordTooltip ChartRecord
-    | HideRecordToolTip
-    | ShowQcTooltip Datum
-    | HideQcTooltip
-    | RecordTooltipMouseEnter ChartRecord ( Float, Float )
-    | RecordTooltipMouseLeave
+    = TooltipMouseEnter TooltipData ( Float, Float ) (Maybe String)
+    | TooltipMouseLeave
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        ShowRecordTooltip s ->
-            ( { model | recordTooltip = Just s }
+        TooltipMouseEnter ttd cc title ->
+            -- let
+            --     tt = model.toolip
+            --     tt.data = ttd
+            --     tt.coordinates = cc
+            --                      tt.title = title
+            -- in
+            ( { model | tooltip = Just (Tooltip ttd cc title) }
             , Cmd.none
             )
 
-        HideRecordToolTip ->
-            ( { model | recordTooltip = Nothing }
-            , Cmd.none
-            )
-
-        ShowQcTooltip s ->
-            ( { model | qcTooltip = Just s }
-            , Cmd.none
-            )
-
-        HideQcTooltip ->
-            ( { model | qcTooltip = Nothing }
-            , Cmd.none
-            )
-
-        RecordTooltipMouseEnter s cc ->
-            ( { model
-                | recordTooltip = Just s
-                , coordinates = cc
-              }
-            , Cmd.none
-            )
-
-        RecordTooltipMouseLeave ->
-            ( { model
-                | recordTooltip = Nothing
-                , coordinates = ( 0, 0 )
-              }
+        TooltipMouseLeave ->
+            ( { model | tooltip = Nothing }
             , Cmd.none
             )
 
@@ -478,14 +460,14 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-createShape : ScaledPoint -> Svg Msg
-createShape point =
+createQcShape : ScaledPoint -> Svg Msg
+createQcShape point =
     Svg.polygon2d
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , Events.onMouseOver (ShowQcTooltip point.datum)
-        , Events.onMouseOut HideQcTooltip
+        , M.onEnter (\event -> TooltipMouseEnter point event.pagePos Nothing)
+        , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (shape point.point2d))
 
@@ -547,7 +529,7 @@ sampleml =
     { by = "Miss Sarah Cooke", comment = "Front end maintenance performed. Liner, gold seal, ferrule and o-ring all changed. Still a slight air leak of 25%. Trasnfer line to be checked as soon as the instrument is available to vent.", on = "2018-06-26" }
 
 
-createMaintenanceLines model ml =
+createMaintenanceLine model ml =
     let
         oni =
             toFloat (timify ml.on)
@@ -571,7 +553,7 @@ createMaintenanceLines model ml =
         )
 
 
-createReviewLines model ml =
+createReviewLine model ml =
     let
         oni =
             toFloat (timify ml.on)
@@ -595,7 +577,7 @@ createReviewLines model ml =
         )
 
 
-createMaintenanceShapes model ml =
+createMaintenanceShape model ml =
     let
         oni =
             toFloat (timify ml.on)
@@ -610,13 +592,13 @@ createMaintenanceShapes model ml =
         [ Attributes.fill "red"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> RecordTooltipMouseEnter ml event.pagePos)
-        , M.onLeave (\event -> RecordTooltipMouseLeave)
+        , M.onEnter (\event -> TooltipMouseEnter ml event.pagePos (Just "Maintnance"))
+        , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (maintenanceShape point))
 
 
-createReviewShapes model r =
+createReviewShape model r =
     let
         oni =
             toFloat (timify r.on)
@@ -631,8 +613,8 @@ createReviewShapes model r =
         [ Attributes.fill "blue"
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , Events.onMouseOver (ShowRecordTooltip r)
-        , Events.onMouseOut HideRecordToolTip
+        , M.onEnter (\event -> TooltipMouseEnter r event.pagePos (Just "Review"))
+        , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (reviewShape point))
 
@@ -651,11 +633,11 @@ svgElements model =
     , Svg.placeIn frameChart (plusXdLine model -2)
     , Svg.placeIn frameChart (plusXdLine model -3)
     ]
-        ++ List.map (\p -> Svg.placeIn frameChart (createShape p)) model.scaledPoints
-        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceLines model ml)) model.flags.maintenance_logs
-        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShapes model ml)) model.flags.maintenance_logs
-        ++ List.map (\r -> Svg.placeIn frameChart (createReviewLines model r)) model.flags.reviews
-        ++ List.map (\r -> Svg.placeIn frameChart (createReviewShapes model r)) model.flags.reviews
+        ++ List.map (\p -> Svg.placeIn frameChart (createQcShape p)) model.scaledPoints
+        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceLine model ml)) model.flags.maintenance_logs
+        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShape model ml)) model.flags.maintenance_logs
+        ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
+        ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
 
 
 pdfLink model =
@@ -693,84 +675,76 @@ view model =
                     (svgElements model)
                 ]
             ]
-        , showTheTooltip2 model
-        , showTheTooltip1 model
-        , div [] [ text (Debug.toString model.coordinates) ]
+
+        -- , showTheTooltip2 model
+        -- , showTheTooltip1 model
+        , div [] [ text (Debug.toString model.tooltip) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
 
 
-showTheTooltip1 model =
-    case model.recordTooltip of
-        Nothing ->
-            div [] []
 
-        Just tt ->
-            div
-                [ class "log-record-tooltip"
-                , style
-                    ("left: "
-                        ++ String.fromFloat (10 + Tuple.first model.coordinates)
-                        ++ "px;"
-                        ++ "top: "
-                        ++ String.fromFloat (10 + Tuple.second model.coordinates)
-                        ++ "px;"
-                    )
-                ]
-                [ span [ class "tool-tip-title" ] [ text "Manintenance Log on: " ]
-                , span [] [ text tt.on ]
-                , br [] []
-                , span [ class "tool-tip-title" ] [ text "By: " ]
-                , span [] [ text tt.by ]
-                , br [] []
-                , span [ class "tool-tip-title" ] [ text "Comment: " ]
-                , span [] [ text tt.comment ]
-                ]
-
-
-showTheTooltip2 model =
-    case model.qcTooltip of
-        Nothing ->
-            div [] []
-
-        Just t ->
-            let
-                tm =
-                    ISO8601.fromTime (floor t.time)
-
-                t2 =
-                    ISO8601.toString tm
-
-                t3 =
-                    List.head (String.split "Z" t2)
-
-                t4 =
-                    String.split "T" (Maybe.withDefault "" t3)
-
-                dx =
-                    List.head t4
-
-                tx =
-                    case List.tail t4 of
-                        Nothing ->
-                            ""
-
-                        Just s ->
-                            Maybe.withDefault "" (List.head s)
-            in
-            div []
-                [ span
-                    [ class "tool-tip-title" ]
-                    [ text "Date: " ]
-                , span [] [ text (Maybe.withDefault "" dx) ]
-                , br [] []
-                , span [ class "tool-tip-title" ] [ text "Time: " ]
-                , span [] [ text tx ]
-                , br [] []
-                , span [ class "tool-tip-title" ]
-                    [ text "Concentration: " ]
-                , span
-                    []
-                    [ text (String.fromFloat t.value) ]
-                ]
+-- showTheTooltip1 model =
+--     case model.recordTooltip of
+--         Nothing ->
+--             div [] []
+--         Just tt ->
+--             div
+--                 [ class "log-record-tooltip"
+--                 , style
+--                     ("left: "
+--                         ++ String.fromFloat (10 + Tuple.first model.coordinates)
+--                         ++ "px;"
+--                         ++ "top: "
+--                         ++ String.fromFloat (10 + Tuple.second model.coordinates)
+--                         ++ "px;"
+--                     )
+--                 ]
+--                 [ span [ class "tool-tip-title" ] [ text "Manintenance Log on: " ]
+--                 , span [] [ text tt.on ]
+--                 , br [] []
+--                 , span [ class "tool-tip-title" ] [ text "By: " ]
+--                 , span [] [ text tt.by ]
+--                 , br [] []
+--                 , span [ class "tool-tip-title" ] [ text "Comment: " ]
+--                 , span [] [ text tt.comment ]
+--                 ]
+-- showTheTooltip2 model =
+--     case model.qcTooltip of
+--         Nothing ->
+--             div [] []
+--         Just t ->
+--             let
+--                 tm =
+--                     ISO8601.fromTime (floor t.time)
+--                 t2 =
+--                     ISO8601.toString tm
+--                 t3 =
+--                     List.head (String.split "Z" t2)
+--                 t4 =
+--                     String.split "T" (Maybe.withDefault "" t3)
+--                 dx =
+--                     List.head t4
+--                 tx =
+--                     case List.tail t4 of
+--                         Nothing ->
+--                             ""
+--                         Just s ->
+--                             Maybe.withDefault "" (List.head s)
+--             in
+--             div []
+--                 [ span
+--                     [ class "tool-tip-title" ]
+--                     [ text "Date: " ]
+--                 , span [] [ text (Maybe.withDefault "" dx) ]
+--                 , br [] []
+--                 , span [ class "tool-tip-title" ] [ text "Time: " ]
+--                 , span [] [ text tx ]
+--                 , br [] []
+--                 , span [ class "tool-tip-title" ]
+--                     [ text "Concentration: " ]
+--                 , span
+--                     []
+--                     [ text (String.fromFloat t.value) ]
+--                 ]
