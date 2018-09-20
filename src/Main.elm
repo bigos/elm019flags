@@ -174,14 +174,8 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        TooltipMouseEnter ttd cc title ->
-            -- let
-            --     tt = model.toolip
-            --     tt.data = ttd
-            --     tt.coordinates = cc
-            --                      tt.title = title
-            -- in
-            ( { model | tooltip = Just (Tooltip ttd cc title) }
+        TooltipMouseEnter tooltipData coordinates title ->
+            ( { model | tooltip = Just (Tooltip tooltipData coordinates title) }
             , Cmd.none
             )
 
@@ -284,6 +278,16 @@ chartEnd flags =
     toFloat (timify flags.date_to)
 
 
+chartBottom : Model -> Float
+chartBottom model =
+    doY model.chartScalings (deviations model -4)
+
+
+chartTop : Model -> Float
+chartTop model =
+    doY model.chartScalings (deviations model 5)
+
+
 
 -- convert prescaled value to scaled one
 
@@ -339,12 +343,12 @@ axisX model =
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( -50.0
-                , doY model.chartScalings (deviations model -4.5)
+                ( 0.0
+                , chartBottom model
                 )
             , Point2d.fromCoordinates
                 ( doX model.chartScalings (chartEnd model.flags)
-                , doY model.chartScalings (deviations model -4.5)
+                , chartBottom model
                 )
             )
         )
@@ -359,11 +363,11 @@ axisY model =
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
                 ( 0.0
-                , doY model.chartScalings (deviations model -5)
+                , chartBottom model
                 )
             , Point2d.fromCoordinates
                 ( 0.0
-                , doY model.chartScalings (deviations model 5)
+                , chartTop model
                 )
             )
         )
@@ -619,10 +623,6 @@ createReviewShape model r =
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (reviewShape point))
-
-
-
---svgElements : Model -> List (Svg msg)
 
 
 svgElements : Model -> List (Svg Msg)
