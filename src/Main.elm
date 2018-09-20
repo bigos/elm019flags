@@ -1,4 +1,4 @@
-module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartEnd, chartStart, createMaintenanceLine, createMaintenanceShape, createQcShape, createReviewLine, createReviewShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, sampleml, scaleXY, setChartScalings, shape, subscriptions, svgElements, timify, toPoints, update, view)
+module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartEnd, chartStart, createMaintenanceLine, createMaintenanceShape, createQcShape, createReviewLine, createReviewShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, subscriptions, svgElements, timify, toPoints, update, view)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -207,6 +207,15 @@ justTimeString tv =
             ISO8601.toString tm
 
 
+justValFn v fn =
+    case v of
+        Nothing ->
+            0
+
+        Just n ->
+            fn n
+
+
 prepareTime : String -> Maybe ISO8601.Time
 prepareTime s =
     case ISO8601.fromString s of
@@ -215,15 +224,6 @@ prepareTime s =
 
         Result.Ok d ->
             Just d
-
-
-justValFn v fn =
-    case v of
-        Nothing ->
-            0
-
-        Just n ->
-            fn n
 
 
 
@@ -300,6 +300,7 @@ doY cs y =
     cs.scaleY * (cs.offsetY + y)
 
 
+scaleXY : Flags -> List Datum -> Maybe BoundingBox2d -> List ScaledPoint
 scaleXY flags data boundingBox =
     let
         cs =
@@ -472,6 +473,7 @@ createQcShape point =
         (Polygon2d.singleLoop (shape point.point2d))
 
 
+genericShape : Point2d -> Float -> List ( Float, Float ) -> List Point2d
 genericShape point scale shapeCoordinates =
     let
         pointPair =
@@ -507,12 +509,14 @@ shape point =
     genericShape point 4.5 [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
 
 
+maintenanceShape : Point2d -> List Point2d
 maintenanceShape point =
     genericShape point
         10.5
         [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
 
 
+reviewShape : Point2d -> List Point2d
 reviewShape point =
     genericShape point
         10.0
@@ -525,10 +529,7 @@ reviewShape point =
         ]
 
 
-sampleml =
-    { by = "Miss Sarah Cooke", comment = "Front end maintenance performed. Liner, gold seal, ferrule and o-ring all changed. Still a slight air leak of 25%. Trasnfer line to be checked as soon as the instrument is available to vent.", on = "2018-06-26" }
-
-
+createMaintenanceLine : Model -> ChartRecord -> Svg Msg
 createMaintenanceLine model ml =
     let
         oni =
@@ -553,6 +554,7 @@ createMaintenanceLine model ml =
         )
 
 
+createReviewLine : Model -> ChartRecord -> Svg Msg
 createReviewLine model ml =
     let
         oni =
@@ -577,6 +579,7 @@ createReviewLine model ml =
         )
 
 
+createMaintenanceShape : Model -> ChartRecord -> Svg Msg
 createMaintenanceShape model ml =
     let
         oni =
@@ -598,6 +601,7 @@ createMaintenanceShape model ml =
         (Polygon2d.singleLoop (maintenanceShape point))
 
 
+createReviewShape : Model -> ChartRecord -> Svg Msg
 createReviewShape model r =
     let
         oni =
@@ -623,6 +627,7 @@ createReviewShape model r =
 --svgElements : Model -> List (Svg msg)
 
 
+svgElements : Model -> List (Svg Msg)
 svgElements model =
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
@@ -640,6 +645,7 @@ svgElements model =
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
 
 
+pdfLink : Model -> Html Msg
 pdfLink model =
     if model.flags.pdf then
         div [] []
@@ -681,6 +687,7 @@ view model =
         ]
 
 
+showTheTooltip : Model -> Html Msg
 showTheTooltip model =
     case model.tooltip of
         Nothing ->
