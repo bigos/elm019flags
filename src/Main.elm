@@ -675,11 +675,7 @@ view model =
                     (svgElements model)
                 ]
             ]
-
-        -- , showTheTooltip2 model
-        -- , showTheTooltip1 model
         , showTheTooltip model
-        , div [] [ text (Debug.toString model.tooltip) ]
         , pdfLink model
         , div [ style "height:5em;" ] []
         ]
