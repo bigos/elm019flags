@@ -45,7 +45,6 @@ type alias Model =
     , dateFrom : Maybe ISO8601.Time
     , dateTo : Maybe ISO8601.Time
     , flags : Flags
-    , level : Int
     , points : List Point2d
     , scaledPoints : List ScaledPoint
     , tooltip : Maybe Tooltip
@@ -146,7 +145,6 @@ init flags =
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to
       , flags = flags
-      , level = 0
       , points = points
       , scaledPoints = scaleXY flags data chartBoundingBox
       , tooltip = Nothing
