@@ -1,4 +1,4 @@
-module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, axv, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
+module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -11,6 +11,7 @@ import Html.Events.Extra.Mouse as M exposing (..)
 import ISO8601
 import Json.Encode as E
 import LineSegment2d exposing (LineSegment2d)
+import List.Extra
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
@@ -749,8 +750,40 @@ createDayTicks model ds =
         )
 
 
-axv =
-    { days = 61, monday = "2018-07-23T00:00:00+01:00", month_starts = [ "2018-08-01T00:00:00+01:00", "2018-09-01T00:00:00+01:00" ], months = 2, weeks = 8, year_starts = [], years = 0 }
+
+-- TODO
+
+
+createMajorTicks model mt =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (chartStart model.flags), doY model.chartScalings mt )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings -50, doY model.chartScalings mt )
+            )
+        )
+
+
+
+-- TODO
+
+
+createMinorTicks model mt =
+    Svg.lineSegment2d
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings (chartStart model.flags), doY model.chartScalings (deviations model -4) )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings (chartStart model.flags), doY model.chartScalings (deviations model -4.1) )
+            )
+        )
 
 
 weekTickVals model =
@@ -804,6 +837,31 @@ dayTickVals model =
         []
 
 
+
+-- :axis_y=>{:min=>205.0, :max=>290.0, :ticks=>17, :step=>5.0}},
+
+
+majorYticks : Model -> List Float
+majorYticks model =
+    let
+        axis_y =
+            model.flags.axes.axis_y
+    in
+    List.map
+        (\n -> axis_y.min + (n * axis_y.step))
+        (List.Extra.initialize axis_y.ticks toFloat)
+
+
+minorYticks : Model -> List Float
+minorYticks model =
+    let
+        axis_y =
+            model.flags.axes.axis_y
+    in
+    List.map (\tn -> axis_y.min + (1.0 / (axis_y.step * toFloat axis_y.ticks)))
+        (List.Extra.initialize (axis_y.ticks * round axis_y.step) toFloat)
+
+
 spacedRange : Int -> Int -> Int -> List Int
 spacedRange spacing first last =
     List.range 0 ((last - first) // spacing)
@@ -830,14 +888,8 @@ svgElements model =
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
         ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
-
-
-
--- ++ List.map (\ds -> Svg.placeIn frameChart (createDayTicks model ds))
---     ( dayTickVals
---         model.flags.date_from
---     , model.flags.date_to
---     )
+        ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTicks model mt)) (majorYticks model)
+        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTicks model mt)) (minorYticks model)
 
 
 pdfLink : Model -> Html Msg
