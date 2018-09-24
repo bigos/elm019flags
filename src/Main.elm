@@ -659,13 +659,13 @@ createYearTicks model ys =
     in
     Svg.lineSegment2d
         [ Attributes.stroke "blue"
-        , Attributes.strokeWidth "6"
+        , Attributes.strokeWidth "4"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (chartBottom model) )
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
             , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (tickBottom model) )
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.6) )
             )
         )
 
@@ -684,7 +684,7 @@ createMonthTicks model ms =
         )
         (Svg.lineSegment2d
             [ Attributes.stroke "green"
-            , Attributes.strokeWidth "7"
+            , Attributes.strokeWidth "3"
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
@@ -713,6 +713,7 @@ svgElements model =
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
         ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
+        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
 
 
