@@ -1,4 +1,4 @@
-module Main exposing (ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartEnd, chartStart, createMaintenanceLine, createMaintenanceShape, createQcShape, createReviewLine, createReviewShape, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, subscriptions, svgElements, timify, toPoints, update, view)
+module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, axv, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createYearTicks, createweekticks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -77,6 +77,7 @@ type alias AxisX =
     , years : Int
     , month_starts : List String
     , year_starts : List String
+    , monday : String
     }
 
 
@@ -688,12 +689,110 @@ createMonthTicks model ms =
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.2) )
-                , Point2d.fromCoordinates
                     ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.2) )
                 )
             )
         )
+
+
+
+-- TODO
+
+
+createweekticks model ws =
+    let
+        oni =
+            toFloat (timify ws)
+    in
+    Debug.log
+        ("debugging month tick for "
+            ++ Debug.toString ws
+            ++ " - "
+            ++ Debug.toString oni
+            ++ " ZZZ"
+        )
+        (Svg.lineSegment2d
+            [ Attributes.stroke "green"
+            , Attributes.strokeWidth "2"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.1) )
+                )
+            )
+        )
+
+
+
+-- TODO
+
+
+createDayTicks model ds =
+    let
+        oni =
+            toFloat (timify ds)
+    in
+    Debug.log
+        ("debugging month tick for "
+            ++ Debug.toString ds
+            ++ " - "
+            ++ Debug.toString oni
+            ++ " ZZZ"
+        )
+        (Svg.lineSegment2d
+            [ Attributes.stroke "green"
+            , Attributes.strokeWidth "2"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.1) )
+                )
+            )
+        )
+
+
+axv =
+    { days = 61, monday = "2018-07-23T00:00:00+01:00", month_starts = [ "2018-08-01T00:00:00+01:00", "2018-09-01T00:00:00+01:00" ], months = 2, weeks = 8, year_starts = [], years = 0 }
+
+
+weekTickVals axis_x first last =
+    let
+        weekMiliseconds =
+            1000 * 3600 * 24 * 7
+
+        afterMonday =
+            spacedRange weekMiliseconds (timify axis_x.monday) (timify last)
+
+        firstDay =
+            timify first
+    in
+    List.filter (\d -> d >= firstDay) afterMonday
+
+
+dayTickVals first last =
+    let
+        dayMiliseconds =
+            1000 * 3600 * 24
+
+        diff =
+            ISO8601.diff (ISO8601.fromTime (timify last)) (ISO8601.fromTime (timify first))
+
+        days =
+            diff // dayMiliseconds
+    in
+    spacedRange dayMiliseconds (timify first) (timify last)
+
+
+spacedRange : Int -> Int -> Int -> List Int
+spacedRange spacing first last =
+    List.range 0 ((last - first) // spacing)
+        |> List.map (\n -> first + n * spacing)
 
 
 svgElements : Model -> List (Svg Msg)
@@ -715,6 +814,14 @@ svgElements model =
         ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
+
+
+
+-- ++ List.map (\ds -> Svg.placeIn frameChart (createDayTicks model ds))
+--     ( dayTickVals
+--         model.flags.date_from
+--     , model.flags.date_to
+--     )
 
 
 pdfLink : Model -> Html Msg
