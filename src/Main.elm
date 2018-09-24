@@ -1,4 +1,4 @@
-module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, axv, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createYearTicks, createweekticks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
+module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, axv, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
 
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -684,8 +684,34 @@ createMonthTicks model ms =
             ++ " ZZZ"
         )
         (Svg.lineSegment2d
-            [ Attributes.stroke "green"
+            [ Attributes.stroke "black"
             , Attributes.strokeWidth "3"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.3) )
+                )
+            )
+        )
+
+
+createWeekTicks model ws =
+    let
+        oni =
+            toFloat ws
+    in
+    Debug.log
+        ("debugging month tick for "
+            ++ Debug.toString ws
+            ++ " - "
+            ++ Debug.toString oni
+            ++ " ZZZ"
+        )
+        (Svg.lineSegment2d
+            [ Attributes.stroke "black"
+            , Attributes.strokeWidth "1.5"
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
@@ -697,44 +723,10 @@ createMonthTicks model ms =
         )
 
 
-
--- TODO
-
-
-createweekticks model ws =
-    let
-        oni =
-            toFloat (timify ws)
-    in
-    Debug.log
-        ("debugging month tick for "
-            ++ Debug.toString ws
-            ++ " - "
-            ++ Debug.toString oni
-            ++ " ZZZ"
-        )
-        (Svg.lineSegment2d
-            [ Attributes.stroke "green"
-            , Attributes.strokeWidth "2"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.1) )
-                )
-            )
-        )
-
-
-
--- TODO
-
-
 createDayTicks model ds =
     let
         oni =
-            toFloat (timify ds)
+            toFloat ds
     in
     Debug.log
         ("debugging month tick for "
@@ -744,8 +736,8 @@ createDayTicks model ds =
             ++ " ZZZ"
         )
         (Svg.lineSegment2d
-            [ Attributes.stroke "green"
-            , Attributes.strokeWidth "2"
+            [ Attributes.stroke "black"
+            , Attributes.strokeWidth "1"
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
@@ -761,8 +753,17 @@ axv =
     { days = 61, monday = "2018-07-23T00:00:00+01:00", month_starts = [ "2018-08-01T00:00:00+01:00", "2018-09-01T00:00:00+01:00" ], months = 2, weeks = 8, year_starts = [], years = 0 }
 
 
-weekTickVals axis_x first last =
+weekTickVals model =
     let
+        axis_x =
+            model.flags.axes.axis_x
+
+        first =
+            model.flags.date_from
+
+        last =
+            model.flags.date_to
+
         weekMiliseconds =
             1000 * 3600 * 24 * 7
 
@@ -772,11 +773,21 @@ weekTickVals axis_x first last =
         firstDay =
             timify first
     in
-    List.filter (\d -> d >= firstDay) afterMonday
+    if model.flags.axes.axis_x.weeks < 100 then
+        List.filter (\d -> d >= firstDay) afterMonday
+
+    else
+        []
 
 
-dayTickVals first last =
+dayTickVals model =
     let
+        first =
+            model.flags.date_from
+
+        last =
+            model.flags.date_to
+
         dayMiliseconds =
             1000 * 3600 * 24
 
@@ -786,7 +797,11 @@ dayTickVals first last =
         days =
             diff // dayMiliseconds
     in
-    spacedRange dayMiliseconds (timify first) (timify last)
+    if model.flags.axes.axis_x.days < 100 then
+        spacedRange dayMiliseconds (timify first) (timify last)
+
+    else
+        []
 
 
 spacedRange : Int -> Int -> Int -> List Int
@@ -813,7 +828,8 @@ svgElements model =
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
         ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
+        ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
+        ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
 
 
 
