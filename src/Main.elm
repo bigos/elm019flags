@@ -58,10 +58,33 @@ type alias Flags =
     , date_from : String
     , date_to : String
     , pdf : Bool
+    , axes : AxisData
     , stats : Stats
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
     , qcresults : List RawCid
+    }
+
+
+type alias AxisData =
+    { axis_x : AxisX, axis_y : AxisY }
+
+
+type alias AxisX =
+    { days : Int
+    , weeks : Int
+    , months : Int
+    , years : Int
+    , month_starts : List String
+    , year_starts : List String
+    }
+
+
+type alias AxisY =
+    { min : Float
+    , max : Float
+    , ticks : Int
+    , step : Float
     }
 
 
@@ -286,6 +309,10 @@ chartBottom model =
 chartTop : Model -> Float
 chartTop model =
     doY model.chartScalings (deviations model 5)
+
+
+tickBottom model =
+    doY model.chartScalings (deviations model -4.1)
 
 
 
@@ -625,6 +652,50 @@ createReviewShape model r =
         (Polygon2d.singleLoop (reviewShape point))
 
 
+createYearTicks model ys =
+    let
+        oni =
+            toFloat (timify ys)
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "blue"
+        , Attributes.strokeWidth "6"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (chartBottom model) )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (tickBottom model) )
+            )
+        )
+
+
+createMonthTicks model ms =
+    let
+        oni =
+            toFloat (timify ms)
+    in
+    Debug.log
+        ("debugging month tick for "
+            ++ Debug.toString ms
+            ++ " - "
+            ++ Debug.toString oni
+            ++ " ZZZ"
+        )
+        (Svg.lineSegment2d
+            [ Attributes.stroke "green"
+            , Attributes.strokeWidth "7"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.2) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                )
+            )
+        )
+
+
 svgElements : Model -> List (Svg Msg)
 svgElements model =
     [ Svg.placeIn frameChart (axisX model)
@@ -641,6 +712,8 @@ svgElements model =
         ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShape model ml)) model.flags.maintenance_logs
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
+        ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
+        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
 
 
 pdfLink : Model -> Html Msg
@@ -664,25 +737,6 @@ pdfLink model =
             , target "_blank"
             ]
             [ text "Download the PDF" ]
-
-
-view : Model -> Html Msg
-view model =
-    div []
-        [ div [ style "margin: auto ; width:600px" ]
-            [ Svg.svg
-                [ height "400"
-                , viewBox "0 0 700 400"
-                , style "border: solid red 1px;"
-                ]
-                [ Svg.g []
-                    (svgElements model)
-                ]
-            ]
-        , showTheTooltip model
-        , pdfLink model
-        , div [ style "height:5em;" ] []
-        ]
 
 
 showTheTooltip : Model -> Html Msg
@@ -757,3 +811,24 @@ showTheTooltip model =
                             [ text (String.fromFloat d.datum.value) ]
                         ]
                 )
+
+
+view : Model -> Html Msg
+view model =
+    div []
+        [ div [ style "margin: auto ; width:600px" ]
+            [ Svg.svg
+                [ height "400"
+                , viewBox "0 0 700 400"
+                , style "border: solid red 1px;"
+                ]
+                [ Svg.g []
+                    (svgElements model)
+                ]
+            ]
+        , showTheTooltip model
+        , pdfLink model
+        , div [ style "height:5em;" ] []
+        , div [] [ text (Debug.toString model.flags.axes.axis_x.month_starts) ]
+        , div [] [ text (Debug.toString model.flags) ]
+        ]
