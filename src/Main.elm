@@ -755,15 +755,19 @@ createDayTicks model ds =
 
 
 createMajorTicks model mt =
+    let
+        ox =
+            chartStart model.flags
+    in
     Svg.lineSegment2d
-        [ Attributes.stroke "red"
-        , Attributes.strokeWidth "5"
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "1.5"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( doX model.chartScalings (chartStart model.flags), doY model.chartScalings mt )
+                ( doX model.chartScalings ox, doY model.chartScalings mt )
             , Point2d.fromCoordinates
-                ( doX model.chartScalings -50, doY model.chartScalings mt )
+                ( doX model.chartScalings ox - 10, doY model.chartScalings mt )
             )
         )
 
