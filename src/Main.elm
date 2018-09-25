@@ -660,18 +660,44 @@ createYearTicks model ys =
     let
         oni =
             toFloat (timify ys)
+
+        yearPart =
+            (ISO8601.fromTime (round oni)).year
+
+        textX =
+            doX model.chartScalings oni
+
+        textY =
+            doY model.chartScalings (deviations model -5.0)
+
+        textPosition =
+            Point2d.fromCoordinates ( textX, textY )
+
+        mirrorAxis =
+            Axis2d.through textPosition Direction2d.x
+
+        tickText =
+            Svg.text_
+                [ fill "red"
+                , x (Debug.toString textX)
+                , y (Debug.toString textY)
+                ]
+                [ text (Debug.toString yearPart) ]
     in
-    Svg.lineSegment2d
-        [ Attributes.stroke "blue"
-        , Attributes.strokeWidth "4"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.6) )
+    Svg.g []
+        [ Svg.lineSegment2d
+            [ Attributes.stroke "blue"
+            , Attributes.strokeWidth "4"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.6) )
+                )
             )
-        )
+        , Svg.mirrorAcross mirrorAxis tickText
+        ]
 
 
 createMonthTicks model ms =
