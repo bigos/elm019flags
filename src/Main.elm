@@ -677,23 +677,15 @@ createMonthTicks model ms =
         oni =
             toFloat (timify ms)
     in
-    Debug.log
-        ("debugging month tick for "
-            ++ Debug.toString ms
-            ++ " - "
-            ++ Debug.toString oni
-            ++ " ZZZ"
-        )
-        (Svg.lineSegment2d
-            [ Attributes.stroke "black"
-            , Attributes.strokeWidth "3"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.3) )
-                )
+    Svg.lineSegment2d
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "3"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.3) )
             )
         )
 
@@ -703,23 +695,15 @@ createWeekTicks model ws =
         oni =
             toFloat ws
     in
-    Debug.log
-        ("debugging month tick for "
-            ++ Debug.toString ws
-            ++ " - "
-            ++ Debug.toString oni
-            ++ " ZZZ"
-        )
-        (Svg.lineSegment2d
-            [ Attributes.stroke "black"
-            , Attributes.strokeWidth "1.5"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.2) )
-                )
+    Svg.lineSegment2d
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "1.5"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.2) )
             )
         )
 
@@ -729,23 +713,15 @@ createDayTicks model ds =
         oni =
             toFloat ds
     in
-    Debug.log
-        ("debugging month tick for "
-            ++ Debug.toString ds
-            ++ " - "
-            ++ Debug.toString oni
-            ++ " ZZZ"
-        )
-        (Svg.lineSegment2d
-            [ Attributes.stroke "black"
-            , Attributes.strokeWidth "1"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.1) )
-                )
+    Svg.lineSegment2d
+        [ Attributes.stroke "black"
+        , Attributes.strokeWidth "1"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.1) )
             )
         )
 
@@ -842,10 +818,16 @@ majorYticks model =
     let
         axis_y =
             model.flags.axes.axis_y
+
+        ti =
+            List.Extra.initialize (axis_y.ticks + 2) toFloat
+
+        all_ticks =
+            List.map
+                (\n -> (axis_y.min - axis_y.step) + (n * axis_y.step))
+                ti
     in
-    List.map
-        (\n -> axis_y.min + (n * axis_y.step))
-        (List.Extra.initialize axis_y.ticks toFloat)
+    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
 
 
 minorYticks : Model -> List Float
@@ -856,12 +838,15 @@ minorYticks model =
 
         step =
             axis_y.step
+
+        all_ticks =
+            List.map
+                (\tn ->
+                    (axis_y.min - axis_y.step) + (tn * (step / toFloat axis_y.ticks))
+                )
+                (List.Extra.initialize ((axis_y.ticks + 2) * 5) toFloat)
     in
-    List.map
-        (\tn ->
-            axis_y.min + (tn * (step / toFloat axis_y.ticks))
-        )
-        (List.Extra.initialize (axis_y.ticks * 5) toFloat)
+    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
 
 
 spacedRange : Int -> Int -> Int -> List Int
