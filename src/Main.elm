@@ -1,7 +1,9 @@
 module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, meanLine, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
 
+import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
+import Direction2d exposing (Direction2d)
 import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
 import Html exposing (Html, a, br, button, div, span, text)
@@ -730,18 +732,41 @@ createMajorTicks model mt =
     let
         ox =
             chartStart model.flags
+
+        textX =
+            doX model.chartScalings ox - 40
+
+        textY =
+            doY model.chartScalings mt
+
+        textPosition =
+            Point2d.fromCoordinates ( textX, textY )
+
+        mirrorAxis =
+            Axis2d.through textPosition Direction2d.x
+
+        daText =
+            Svg.text_
+                [ fill "black"
+                , x (Debug.toString textX)
+                , y (Debug.toString textY)
+                ]
+                [ text (Debug.toString mt) ]
     in
-    Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "1.5"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings ox, doY model.chartScalings mt )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings ox - 10, doY model.chartScalings mt )
+    Svg.g []
+        [ Svg.lineSegment2d
+            [ Attributes.stroke "black"
+            , Attributes.strokeWidth "1.5"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings ox, doY model.chartScalings mt )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings ox - 10, doY model.chartScalings mt )
+                )
             )
-        )
+        , Svg.mirrorAcross mirrorAxis daText
+        ]
 
 
 createMinorTicks model mt =
