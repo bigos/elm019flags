@@ -679,10 +679,10 @@ createYearTicks model ys =
         tickText =
             Svg.text_
                 [ fill "red"
-                , x (Debug.toString textX)
-                , y (Debug.toString textY)
+                , x (String.fromFloat textX)
+                , y (String.fromFloat textY)
                 ]
-                [ text (Debug.toString yearPart) ]
+                [ text (String.fromInt yearPart) ]
     in
     Svg.g []
         [ Svg.lineSegment2d
@@ -704,18 +704,61 @@ createMonthTicks model ms =
     let
         oni =
             toFloat (timify ms)
+
+        monthPartNumber =
+            (ISO8601.fromTime (round oni)).month
+
+        monthPart =
+            List.Extra.getAt
+                monthPartNumber
+                [ ""
+                , "Feb"
+                , "Mar"
+                , "Apr"
+                , "May"
+                , "Jun"
+                , "Jul"
+                , "Aug"
+                , "Sep"
+                , "Oct"
+                , "Nov"
+                , "Dec"
+                ]
+
+        textX =
+            doX model.chartScalings oni
+
+        textY =
+            doY model.chartScalings (deviations model -4.7)
+
+        textPosition =
+            Point2d.fromCoordinates ( textX, textY )
+
+        mirrorAxis =
+            Axis2d.through textPosition Direction2d.x
+
+        tickText =
+            Svg.text_
+                [ fill "red"
+                , x (String.fromFloat textX)
+                , y (String.fromFloat textY)
+                ]
+                [ text (Maybe.withDefault "" monthPart) ]
     in
-    Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "3"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.3) )
+    Svg.g []
+        [ Svg.lineSegment2d
+            [ Attributes.stroke "black"
+            , Attributes.strokeWidth "3"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4) )
+                , Point2d.fromCoordinates
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.3) )
+                )
             )
-        )
+        , Svg.mirrorAcross mirrorAxis tickText
+        ]
 
 
 createWeekTicks model ws =
@@ -774,10 +817,10 @@ createMajorTick model mt =
         tickText =
             Svg.text_
                 [ fill "black"
-                , x (Debug.toString textX)
-                , y (Debug.toString textY)
+                , x (String.fromFloat textX)
+                , y (String.fromFloat textY)
                 ]
-                [ text (Debug.toString mt) ]
+                [ text (String.fromFloat mt) ]
     in
     Svg.g []
         [ Svg.lineSegment2d
