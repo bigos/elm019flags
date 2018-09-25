@@ -1,4 +1,4 @@
-module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMajorTick, createMinorTick, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, majorYticks, meanLine, minorYticks, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
+module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMajorTick, createMinorTick, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, majorYticks, meanLine, minorYticks, monthNumName, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
 
 import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -700,33 +700,51 @@ createYearTicks model ys =
         ]
 
 
+monthNumName : Int -> Maybe String
+monthNumName monthPartNumber =
+    List.Extra.getAt
+        (monthPartNumber - 1)
+        [ "Jan" -- year is in place of Jan
+        , "Feb"
+        , "Mar"
+        , "Apr"
+        , "May"
+        , "Jun"
+        , "Jul"
+        , "Aug"
+        , "Sep"
+        , "Oct"
+        , "Nov"
+        , "Dec"
+        ]
+
+
 createMonthTicks model ms =
     let
+        timi =
+            timify ms
+
         oni =
-            toFloat (timify ms)
+            toFloat timi
 
         monthPartNumber =
-            (ISO8601.fromTime (round oni)).month
+            -- add 1 hour to fix daylight saving time offset problems
+            -- for the beginning of the month
+            (ISO8601.fromTime (timi + (1000 * 3600 * 1))).month
 
         monthPart =
-            List.Extra.getAt
-                monthPartNumber
-                [ ""
-                , "Feb"
-                , "Mar"
-                , "Apr"
-                , "May"
-                , "Jun"
-                , "Jul"
-                , "Aug"
-                , "Sep"
-                , "Oct"
-                , "Nov"
-                , "Dec"
-                ]
+            monthNumName monthPartNumber
 
         textX =
-            doX model.chartScalings oni
+            Debug.log
+                (Debug.toString
+                    { ms = ms
+                    , timi = timi
+                    , monthPartNumber = monthPartNumber
+                    , monthPart = monthPart
+                    }
+                )
+                (doX model.chartScalings oni)
 
         textY =
             doY model.chartScalings (deviations model -4.7)
@@ -739,7 +757,7 @@ createMonthTicks model ms =
 
         tickText =
             Svg.text_
-                [ fill "red"
+                [ fill "black"
                 , x (String.fromFloat textX)
                 , y (String.fromFloat textY)
                 ]
