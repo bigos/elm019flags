@@ -745,7 +745,7 @@ createMajorTicks model mt =
         mirrorAxis =
             Axis2d.through textPosition Direction2d.x
 
-        daText =
+        tickText =
             Svg.text_
                 [ fill "black"
                 , x (Debug.toString textX)
@@ -765,7 +765,9 @@ createMajorTicks model mt =
                     ( doX model.chartScalings ox - 10, doY model.chartScalings mt )
                 )
             )
-        , Svg.mirrorAcross mirrorAxis daText
+
+        -- we have to flip text manually
+        , Svg.mirrorAcross mirrorAxis tickText
         ]
 
 
