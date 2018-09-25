@@ -750,7 +750,7 @@ createMinorTicks model mt =
             chartStart model.flags
     in
     Svg.lineSegment2d
-        [ Attributes.stroke "red"
+        [ Attributes.stroke "black"
         , Attributes.strokeWidth "0.75"
         ]
         (LineSegment2d.fromEndpoints
