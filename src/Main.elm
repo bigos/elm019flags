@@ -750,10 +750,6 @@ createDayTicks model ds =
         )
 
 
-
--- TODO
-
-
 createMajorTicks model mt =
     let
         ox =
@@ -772,20 +768,20 @@ createMajorTicks model mt =
         )
 
 
-
--- TODO
-
-
 createMinorTicks model mt =
+    let
+        ox =
+            chartStart model.flags
+    in
     Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "1"
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "0.75"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( doX model.chartScalings (chartStart model.flags), doY model.chartScalings (deviations model -4) )
+                ( doX model.chartScalings ox, doY model.chartScalings mt )
             , Point2d.fromCoordinates
-                ( doX model.chartScalings (chartStart model.flags), doY model.chartScalings (deviations model -4.1) )
+                ( doX model.chartScalings ox - 7, doY model.chartScalings mt )
             )
         )
 
@@ -841,10 +837,6 @@ dayTickVals model =
         []
 
 
-
--- :axis_y=>{:min=>205.0, :max=>290.0, :ticks=>17, :step=>5.0}},
-
-
 majorYticks : Model -> List Float
 majorYticks model =
     let
@@ -861,9 +853,15 @@ minorYticks model =
     let
         axis_y =
             model.flags.axes.axis_y
+
+        step =
+            axis_y.step
     in
-    List.map (\tn -> axis_y.min + (1.0 / (axis_y.step * toFloat axis_y.ticks)))
-        (List.Extra.initialize (axis_y.ticks * round axis_y.step) toFloat)
+    List.map
+        (\tn ->
+            axis_y.min + (tn * (step / toFloat axis_y.ticks))
+        )
+        (List.Extra.initialize (axis_y.ticks * 5) toFloat)
 
 
 spacedRange : Int -> Int -> Int -> List Int
