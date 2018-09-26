@@ -755,13 +755,23 @@ createMonthTicks model ms =
         mirrorAxis =
             Axis2d.through textPosition Direction2d.x
 
+        months =
+            model.flags.axes.axis_x.month_starts
+
+        reducedMonthPart =
+            if List.length months > 12 then
+                Just ""
+
+            else
+                monthPart
+
         tickText =
             Svg.text_
                 [ fill "black"
                 , x (String.fromFloat textX)
                 , y (String.fromFloat textY)
                 ]
-                [ text (Maybe.withDefault "" monthPart) ]
+                [ text (Maybe.withDefault "" reducedMonthPart) ]
     in
     Svg.g []
         [ Svg.lineSegment2d
