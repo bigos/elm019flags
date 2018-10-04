@@ -257,6 +257,12 @@ readData flags =
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
     let
+        mean =
+            flags.stats.mean
+
+        deviation =
+            flags.stats.deviation
+
         -- sizes x & y of the view area
         dx =
             500.0
@@ -269,7 +275,8 @@ setChartScalings flags boundingBox =
             chartEnd flags - chartStart flags
 
         distY =
-            justValFn boundingBox BoundingBox2d.maxY - justValFn boundingBox BoundingBox2d.minY
+            -- justValFn boundingBox BoundingBox2d.maxY - justValFn boundingBox BoundingBox2d.minY
+            (mean + (3.5 * deviation)) - (mean - (3.5 * deviation))
 
         -- scale and offset
         scaleX =
@@ -282,7 +289,7 @@ setChartScalings flags boundingBox =
             dy / distY
 
         offsetY =
-            0 - justValFn boundingBox BoundingBox2d.minY
+            0 - (mean - (3.5 * deviation))
     in
     { sizeX = dx
     , sizeY = dy
@@ -1135,7 +1142,7 @@ view model =
             [ Svg.svg
                 [ height "400"
                 , viewBox "0 0 700 400"
-                , style "border: solid red 1px;"
+                , style "border: solid #abc 1px;"
                 ]
                 [ Svg.g []
                     (svgElements model)
@@ -1145,7 +1152,7 @@ view model =
         , div [ style "margin-top: 2em; text-align: center;" ]
             [ pdfLink model
             ]
-        , div [ style "height:5em;" ] []
+        , div [ style "height:1em;" ] []
 
         -- , div [] [ text (Debug.toString model.flags) ]
         ]
