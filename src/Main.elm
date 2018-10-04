@@ -968,9 +968,12 @@ minorYticks model =
                 (\tn ->
                     (axis_y.min - axis_y.step) + (tn * (step / toFloat axis_y.ticks))
                 )
-                (List.Extra.initialize ((axis_y.ticks + 2) * round axis_y.step) toFloat)
+                (List.Extra.initialize
+                    (round (axis_y.max - (axis_y.min - axis_y.step)) * 2)
+                    toFloat
+                )
     in
-    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
+    List.filter (\t -> (t >= deviations model -6) && (t <= deviations model 6)) all_ticks
 
 
 spacedRange : Int -> Int -> Int -> List Int
@@ -1102,7 +1105,7 @@ showTheTooltip model =
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ style "border: solid yellow 1px;" ]
         [ div [ style "margin: auto ; width:600px" ]
             [ Svg.svg
                 [ height "400"
@@ -1116,6 +1119,6 @@ view model =
         , showTheTooltip model
         , pdfLink model
         , div [ style "height:5em;" ] []
-        , div [] [ text (Debug.toString model.flags.axes.axis_x.month_starts) ]
-        , div [] [ text (Debug.toString model.flags) ]
+
+        -- , div [] [ text (Debug.toString model.flags) ]
         ]
