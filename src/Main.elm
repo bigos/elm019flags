@@ -964,16 +964,20 @@ minorYticks model =
             axis_y.step
 
         all_ticks =
-            List.map
-                (\tn ->
-                    (axis_y.min - axis_y.step) + (tn * (step / toFloat axis_y.ticks))
-                )
-                (List.Extra.initialize
-                    (round (axis_y.max - (axis_y.min - axis_y.step)) * 2)
-                    toFloat
-                )
+            if step > 5 then
+                List.map
+                    (\tn ->
+                        (axis_y.min - axis_y.step) + (tn * (step / toFloat axis_y.ticks))
+                    )
+                    (List.Extra.initialize
+                        (round (axis_y.max - (axis_y.min - axis_y.step)) * 2)
+                        toFloat
+                    )
+
+            else
+                []
     in
-    List.filter (\t -> (t >= deviations model -6) && (t <= deviations model 6)) all_ticks
+    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
 
 
 spacedRange : Int -> Int -> Int -> List Int
