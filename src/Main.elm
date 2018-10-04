@@ -987,9 +987,16 @@ minorYticks model =
             (round axis_y.max - bottom_tick) * step
 
         all_ticks =
-            List.Extra.initialize
-                tick_dist
-                (\n -> toFloat (n + bottom_tick))
+            -- do not show every minor tick
+            if step >= 10 then
+                List.Extra.initialize
+                    (tick_dist // 5)
+                    (\n -> toFloat (5 * n + bottom_tick))
+
+            else
+                List.Extra.initialize
+                    tick_dist
+                    (\n -> toFloat (n + bottom_tick))
     in
     List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
 
