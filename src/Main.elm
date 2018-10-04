@@ -943,12 +943,22 @@ majorYticks model =
         axis_y =
             model.flags.axes.axis_y
 
+        bottom_baundary =
+            round (deviations model -4)
+
+        bottom_tick_rem =
+            modBy (round axis_y.step) bottom_baundary
+
+        bottom_tick =
+            bottom_baundary
+                - bottom_tick_rem
+
         ti =
-            List.Extra.initialize (axis_y.ticks + 2) toFloat
+            List.Extra.initialize (round axis_y.max - bottom_tick) toFloat
 
         all_ticks =
             List.map
-                (\n -> (axis_y.min - axis_y.step) + (n * axis_y.step))
+                (\n -> n * axis_y.step)
                 ti
     in
     List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
@@ -960,22 +970,26 @@ minorYticks model =
         axis_y =
             model.flags.axes.axis_y
 
+        bottom_baundary =
+            round (deviations model -4)
+
+        bottom_tick_rem =
+            modBy (round axis_y.step) bottom_baundary
+
+        bottom_tick =
+            bottom_baundary
+                - bottom_tick_rem
+
         step =
             axis_y.step
 
-        all_ticks =
-            if step > 5 then
-                List.map
-                    (\tn ->
-                        (axis_y.min - axis_y.step) + (tn * (step / toFloat axis_y.ticks))
-                    )
-                    (List.Extra.initialize
-                        (round (axis_y.max - (axis_y.min - axis_y.step)) * 2)
-                        toFloat
-                    )
+        tick_dist =
+            (round axis_y.max - bottom_tick) * round step
 
-            else
-                []
+        all_ticks =
+            List.Extra.initialize
+                tick_dist
+                (\n -> toFloat (n + bottom_tick))
     in
     List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
 
