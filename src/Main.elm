@@ -1110,7 +1110,7 @@ showTheTooltip model =
 view : Model -> Html Msg
 view model =
     div [ style "border: solid yellow 1px;" ]
-        [ div [ style "margin: auto ; width:600px" ]
+        [ div [ style "margin: auto ; width:700px" ]
             [ Svg.svg
                 [ height "400"
                 , viewBox "0 0 700 400"
@@ -1121,7 +1121,9 @@ view model =
                 ]
             ]
         , showTheTooltip model
-        , pdfLink model
+        , div [ style "margin-top: 2em; text-align: center;" ]
+            [ pdfLink model
+            ]
         , div [ style "height:5em;" ] []
 
         -- , div [] [ text (Debug.toString model.flags) ]
