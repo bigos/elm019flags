@@ -961,7 +961,7 @@ majorYticks model =
                 (\n -> n * axis_y.step)
                 ti
     in
-    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
+    List.filter (\t -> (t >= deviations model -4) && (t <= axis_y.max)) all_ticks
 
 
 minorYticks : Model -> List Float
@@ -998,7 +998,7 @@ minorYticks model =
                     tick_dist
                     (\n -> toFloat (n + bottom_tick))
     in
-    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 5)) all_ticks
+    List.filter (\t -> (t >= deviations model -4) && (t <= axis_y.max)) all_ticks
 
 
 spacedRange : Int -> Int -> Int -> List Int
