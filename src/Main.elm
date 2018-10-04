@@ -970,21 +970,21 @@ minorYticks model =
         axis_y =
             model.flags.axes.axis_y
 
+        step =
+            round axis_y.step
+
         bottom_baundary =
             round (deviations model -4)
 
         bottom_tick_rem =
-            modBy (round axis_y.step) bottom_baundary
+            modBy step bottom_baundary
 
         bottom_tick =
             bottom_baundary
                 - bottom_tick_rem
 
-        step =
-            axis_y.step
-
         tick_dist =
-            (round axis_y.max - bottom_tick) * round step
+            (round axis_y.max - bottom_tick) * step
 
         all_ticks =
             List.Extra.initialize
