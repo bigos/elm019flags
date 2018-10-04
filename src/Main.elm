@@ -988,7 +988,7 @@ minorYticks model =
 
         all_ticks =
             -- do not show every minor tick
-            if step >= 10 then
+            if step > 10 then
                 List.Extra.initialize
                     (tick_dist // 5)
                     (\n -> toFloat (5 * n + bottom_tick))
