@@ -101,6 +101,8 @@ type alias ChartScalings =
     , scaleY : Float
     , offsetX : Float
     , offsetY : Float
+    , upperBoundary : Float
+    , lowerBoundary : Float
     }
 
 
@@ -263,6 +265,15 @@ setChartScalings flags boundingBox =
         deviation =
             flags.stats.deviation
 
+        scalingFactor =
+            3.0
+
+        upperBoundary =
+            mean + scalingFactor * deviation
+
+        lowerBoundary =
+            mean - scalingFactor * deviation
+
         -- sizes x & y of the view area
         dx =
             500.0
@@ -275,8 +286,7 @@ setChartScalings flags boundingBox =
             chartEnd flags - chartStart flags
 
         distY =
-            -- justValFn boundingBox BoundingBox2d.maxY - justValFn boundingBox BoundingBox2d.minY
-            (mean + (3.5 * deviation)) - (mean - (3.5 * deviation))
+            upperBoundary - lowerBoundary
 
         -- scale and offset
         scaleX =
@@ -289,7 +299,7 @@ setChartScalings flags boundingBox =
             dy / distY
 
         offsetY =
-            0 - (mean - (3.5 * deviation))
+            0 - lowerBoundary
     in
     { sizeX = dx
     , sizeY = dy
@@ -299,6 +309,8 @@ setChartScalings flags boundingBox =
     , scaleY = scaleY
     , offsetX = offsetX
     , offsetY = offsetY
+    , upperBoundary = upperBoundary
+    , lowerBoundary = lowerBoundary
     }
 
 
@@ -950,8 +962,14 @@ majorYticks model =
         axis_y =
             model.flags.axes.axis_y
 
+        upperBoundary =
+            model.chartScalings.upperBoundary
+
+        lowerBoundary =
+            model.chartScalings.lowerBoundary
+
         bottom_baundary =
-            round (deviations model -4)
+            round lowerBoundary
 
         bottom_tick_rem =
             modBy (round axis_y.step) bottom_baundary
@@ -961,7 +979,7 @@ majorYticks model =
                 - bottom_tick_rem
 
         ti =
-            List.Extra.initialize (round axis_y.max - bottom_tick) toFloat
+            List.Extra.initialize (round (upperBoundary - lowerBoundary)) toFloat
 
         all_ticks =
             List.map
