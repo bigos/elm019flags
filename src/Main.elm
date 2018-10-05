@@ -266,13 +266,14 @@ setChartScalings flags boundingBox =
             flags.stats.deviation
 
         scalingFactor =
-            3.5
+            -- greater number = smaller chart
+            2.9
 
         upperBoundary =
-            mean + scalingFactor * deviation
+            mean + deviation * scalingFactor
 
         lowerBoundary =
-            mean - scalingFactor * deviation
+            mean - deviation * scalingFactor
 
         -- sizes x & y of the view area
         dx =
