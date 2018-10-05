@@ -1,4 +1,4 @@
-module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMajorTick, createMinorTick, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, findLowerTicks, findTicks, findUpperTicks, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, majorYticks, meanLine, minorYticks, monthNumName, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
+module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMajorTick, createMinorTick, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, majorYticks, meanLine, minorYticks, monthNumName, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
 
 import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -314,6 +314,14 @@ setChartScalings flags boundingBox =
     }
 
 
+hidev =
+    4
+
+
+lodev =
+    -4.5
+
+
 chartStart : Flags -> Float
 chartStart flags =
     toFloat (timify flags.date_from)
@@ -326,7 +334,7 @@ chartEnd flags =
 
 chartBottom : Model -> Float
 chartBottom model =
-    doY model.chartScalings (deviations model -4.5)
+    doY model.chartScalings (deviations model lodev)
 
 
 chartTop : Model -> Float
@@ -588,7 +596,7 @@ createMaintenanceLine model ml =
             toFloat (timify ml.on)
 
         ld =
-            deviations model -4.5
+            deviations model lodev
 
         ud =
             deviations model 5
@@ -613,7 +621,7 @@ createReviewLine model ml =
             toFloat (timify ml.on)
 
         ld =
-            deviations model -4.5
+            deviations model lodev
 
         ud =
             deviations model 4.5
@@ -710,7 +718,7 @@ createYearTicks model ys =
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.5) )
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
                 , Point2d.fromCoordinates
                     ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.9) )
                 )
@@ -799,7 +807,7 @@ createMonthTicks model ms =
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.5) )
+                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
                 , Point2d.fromCoordinates
                     ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.8) )
                 )
@@ -819,7 +827,7 @@ createWeekTicks model ws =
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.5) )
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
             , Point2d.fromCoordinates
                 ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.7) )
             )
@@ -837,7 +845,7 @@ createDayTicks model ds =
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.5) )
+                ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
             , Point2d.fromCoordinates
                 ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.6) )
             )
@@ -960,38 +968,18 @@ dayTickVals model =
 -- ticks below the max value
 
 
-findLowerTicks : Float -> Float -> Float -> List Float -> List Float
-findLowerTicks val bound step acc =
+findTicks1 : Float -> Float -> Float -> List Float -> List Float
+findTicks1 val bound step acc =
     if val < bound then
         acc
 
     else
-        findLowerTicks (val - step) bound step (val :: acc)
+        findTicks1 (val - step) bound step (val :: acc)
 
 
-
--- ticks above the max value
-
-
-findUpperTicks : Float -> Float -> Float -> List Float -> List Float
-findUpperTicks val bound step acc =
-    if val > bound then
-        List.reverse acc
-
-    else
-        findUpperTicks (val + step) bound step (val :: acc)
-
-
-findTicks : Float -> Float -> Float -> Float -> List Float -> List Float
-findTicks val ubound lbound step acc =
-    let
-        ll =
-            findLowerTicks val lbound step []
-
-        ul =
-            findUpperTicks val ubound step []
-    in
-    ll ++ Maybe.withDefault [] (List.tail ul)
+findTicks : Float -> Float -> Float -> List Float
+findTicks val lbound step =
+    findTicks1 val lbound step []
 
 
 majorYticks : Model -> List Float
@@ -1007,9 +995,9 @@ majorYticks model =
             chartBottom model - axis_y.step
 
         all_ticks =
-            findTicks axis_y.max upperBoundary lowerBoundary axis_y.step []
+            findTicks axis_y.max lowerBoundary axis_y.step
     in
-    List.filter (\t -> (t >= deviations model -4.5) && (t <= deviations model 4)) all_ticks
+    List.filter (\t -> (t >= deviations model lodev) && (t <= deviations model hidev)) all_ticks
 
 
 minorYticks : Model -> List Float
@@ -1037,9 +1025,9 @@ minorYticks model =
             axis_y.step / axis_y.step * scaling
 
         all_ticks =
-            findTicks axis_y.max upperBoundary lowerBoundary tickStep []
+            findTicks axis_y.max lowerBoundary tickStep
     in
-    List.filter (\t -> (t >= deviations model -4.5) && (t <= deviations model 4)) all_ticks
+    List.filter (\t -> (t >= deviations model lodev) && (t <= deviations model hidev)) all_ticks
 
 
 spacedRange : Int -> Int -> Int -> List Int
