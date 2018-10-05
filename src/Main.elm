@@ -588,7 +588,7 @@ createMaintenanceLine model ml =
             toFloat (timify ml.on)
 
         ld =
-            deviations model -4
+            deviations model -4.5
 
         ud =
             deviations model 5
@@ -613,7 +613,7 @@ createReviewLine model ml =
             toFloat (timify ml.on)
 
         ld =
-            deviations model -4
+            deviations model -4.5
 
         ud =
             deviations model 4.5
@@ -1004,12 +1004,12 @@ majorYticks model =
             model.chartScalings.upperBoundary
 
         lowerBoundary =
-            model.chartScalings.lowerBoundary - axis_y.step
+            chartBottom model - axis_y.step
 
         all_ticks =
             findTicks axis_y.max upperBoundary lowerBoundary axis_y.step []
     in
-    List.filter (\t -> (t >= deviations model -4) && (t <= deviations model 4)) all_ticks
+    List.filter (\t -> (t >= deviations model -4.5) && (t <= deviations model 4)) all_ticks
 
 
 minorYticks : Model -> List Float
@@ -1018,33 +1018,26 @@ minorYticks model =
         axis_y =
             model.flags.axes.axis_y
 
-        step =
-            round axis_y.step
+        upperBoundary =
+            model.chartScalings.upperBoundary
 
-        bottom_baundary =
-            round (chartBottom model)
+        lowerBoundary =
+            chartBottom model - axis_y.step
 
-        bottom_tick_rem =
-            modBy step bottom_baundary
-
-        bottom_tick =
-            bottom_baundary
-                - bottom_tick_rem
-
-        tick_dist =
-            (round axis_y.max - bottom_tick) * step
-
-        all_ticks =
-            -- do not show every minor tick
-            if step > 10 then
-                List.Extra.initialize
-                    (tick_dist // 5)
-                    (\n -> toFloat (5 * n + bottom_tick))
+        scaling =
+            -- reduce number of minor ticks if too many
+            -- by increasing the distance between them
+            if axis_y.step > 10 then
+                5
 
             else
-                List.Extra.initialize
-                    tick_dist
-                    (\n -> toFloat (n + bottom_tick))
+                1
+
+        tickStep =
+            axis_y.step / axis_y.step * scaling
+
+        all_ticks =
+            findTicks axis_y.max upperBoundary lowerBoundary tickStep []
     in
     List.filter (\t -> (t >= deviations model -4.5) && (t <= deviations model 4)) all_ticks
 
