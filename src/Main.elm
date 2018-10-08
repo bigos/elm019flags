@@ -971,7 +971,7 @@ dayTickVals model =
 
 findTicks1 : Float -> Float -> Float -> List Float -> List Float
 findTicks1 val bound step acc =
-    if val < bound then
+    if (val < bound) || (List.length acc > 250) then
         acc
 
     else
