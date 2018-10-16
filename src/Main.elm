@@ -2,9 +2,10 @@
 -- https://github.com/halfzebra/elm-examples/blob/master/examples/fractal-architecture/src/Main.elm
 
 
-module Main exposing (createMinorTick, createQcShape, dayTickVals, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, reviewShape, shape, showTheTooltip, spacedRange, subscriptions, timify, update, view, weekTickVals)
+module Main exposing (createMinorTick, createQcShape, dayTickVals, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, reviewShape, shape, showTheTooltip, spacedRange, subscriptions, update, view, weekTickVals)
 
 import App.Model exposing (..)
+import App.Utilities exposing (..)
 import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -102,16 +103,6 @@ lodev =
 
 
 -- convert prescaled value to scaled one
-
-
-timify : String -> Int
-timify d =
-    case ISO8601.fromString d of
-        Ok nd ->
-            ISO8601.toTime nd
-
-        Err _ ->
-            timify "1970-01-01T00:00:00Z"
 
 
 frameChart : Frame2d

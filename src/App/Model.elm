@@ -1,5 +1,6 @@
-module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats(..), StatsData, Tooltip, TooltipData(..), averageMean, chartEnd, chartStart, doX, doY, init, largestDeviation, prepareTime, readData, scaleXY, setChartScalings, timify, toPoints)
+module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats(..), StatsData, Tooltip, TooltipData(..), averageMean, chartEnd, chartStart, doX, doY, init, largestDeviation, prepareTime, readData, scaleXY, setChartScalings, toPoints)
 
+import App.Utilities exposing (..)
 import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -182,16 +183,6 @@ init flags =
 readData : Flags -> List Datum
 readData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
-
-
-timify : String -> Int
-timify d =
-    case ISO8601.fromString d of
-        Ok nd ->
-            ISO8601.toTime nd
-
-        Err _ ->
-            timify "1970-01-01T00:00:00Z"
 
 
 toPoints : List Datum -> List Point2d
