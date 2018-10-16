@@ -1,4 +1,4 @@
-module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats, Tooltip, TooltipData(..), axisX, axisY, chartBottom, chartEnd, chartStart, chartTop, createDayTicks, createMaintenanceLine, createMaintenanceShape, createMajorTick, createMinorTick, createMonthTicks, createQcShape, createReviewLine, createReviewShape, createWeekTicks, createYearTicks, dayTickVals, deviations, doX, doY, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, init, justTimeString, justValFn, main, maintenanceShape, majorYticks, meanLine, minorYticks, monthNumName, nominalLine, pdfLink, plusXdLine, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, svgElements, tickBottom, timify, toPoints, update, view, weekTickVals)
+module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), chartEnd, chartStart, createMinorTick, createQcShape, dayTickVals, doX, doY, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, init, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, timify, toPoints, update, view, weekTickVals)
 
 import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -62,7 +62,7 @@ type alias Flags =
     , date_to : String
     , pdf : Bool
     , axes : AxisData
-    , stats : Stats
+    , stats : List StatsData
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
     , qcresults : List RawCid
@@ -118,10 +118,6 @@ type alias StatsData =
     , mean : Float
     , nominal : Float
     }
-
-
-type Stats
-    = List StatsData
 
 
 type alias RawCid =
@@ -265,11 +261,13 @@ setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
     let
         mean =
-            flags.stats.mean
+            1.0
 
+        -- flags.stats.mean
         deviation =
-            flags.stats.deviation
+            1.0
 
+        ---flags.stats.deviation
         scalingFactor =
             -- greater number = smaller chart
             2.9
@@ -338,20 +336,6 @@ chartEnd flags =
     toFloat (timify flags.date_to)
 
 
-chartBottom : Model -> Float
-chartBottom model =
-    doY model.chartScalings (deviations model lodev)
-
-
-chartTop : Model -> Float
-chartTop model =
-    doY model.chartScalings (deviations model 5)
-
-
-tickBottom model =
-    doY model.chartScalings (deviations model -4.7)
-
-
 
 -- convert prescaled value to scaled one
 
@@ -397,112 +381,6 @@ timify d =
 
         Err _ ->
             timify "1970-01-01T00:00:00Z"
-
-
-axisX : Model -> Svg msg
-axisX model =
-    Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "0.5"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( 0.0
-                , chartBottom model
-                )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings (chartEnd model.flags)
-                , chartBottom model
-                )
-            )
-        )
-
-
-axisY : Model -> Svg msg
-axisY model =
-    Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "0.5"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( 0.0
-                , chartBottom model
-                )
-            , Point2d.fromCoordinates
-                ( 0.0
-                , chartTop model
-                )
-            )
-        )
-
-
-nominalLine : Model -> Svg msg
-nominalLine model =
-    Svg.lineSegment2d
-        [ Attributes.stroke "grey"
-        , Attributes.strokeWidth "0.5"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings (chartStart model.flags)
-                , doY model.chartScalings model.flags.stats.nominal
-                )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings (chartEnd model.flags)
-                , doY model.chartScalings model.flags.stats.nominal
-                )
-            )
-        )
-
-
-meanLine : Model -> Svg msg
-meanLine model =
-    Svg.lineSegment2d
-        [ Attributes.stroke "red"
-        , Attributes.strokeWidth "0.5"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings (chartStart model.flags)
-                , doY model.chartScalings model.flags.stats.mean
-                  -- zzz
-                )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings (chartEnd model.flags)
-                , doY model.chartScalings model.flags.stats.mean
-                  -- zzz
-                )
-            )
-        )
-
-
-deviations : Model -> Float -> Float
-deviations model x =
-    model.flags.stats.mean + (model.flags.stats.deviation * x)
-
-
-
--- zzz
-
-
-plusXdLine : Model -> Int -> Svg msg
-plusXdLine model x =
-    Svg.lineSegment2d
-        [ Attributes.stroke "red"
-        , Attributes.strokeWidth "0.4"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings (chartStart model.flags)
-                , doY model.chartScalings (deviations model (toFloat x))
-                )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings (chartEnd model.flags)
-                , doY model.chartScalings (deviations model (toFloat x))
-                )
-            )
-        )
 
 
 frameChart : Frame2d
@@ -601,144 +479,6 @@ reviewShape point =
         ]
 
 
-createMaintenanceLine : Model -> ChartRecord -> Svg Msg
-createMaintenanceLine model ml =
-    let
-        oni =
-            toFloat (timify ml.on)
-
-        ld =
-            deviations model lodev
-
-        ud =
-            deviations model 5
-    in
-    Svg.lineSegment2d
-        [ Attributes.stroke "grey"
-        , Attributes.strokeWidth "1"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings ld )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings ud )
-            )
-        )
-
-
-createReviewLine : Model -> ChartRecord -> Svg Msg
-createReviewLine model ml =
-    let
-        oni =
-            toFloat (timify ml.on)
-
-        ld =
-            deviations model lodev
-
-        ud =
-            deviations model 4.5
-    in
-    Svg.lineSegment2d
-        [ Attributes.stroke "green"
-        , Attributes.strokeWidth "1"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings ld )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings ud )
-            )
-        )
-
-
-createMaintenanceShape : Model -> ChartRecord -> Svg Msg
-createMaintenanceShape model ml =
-    let
-        oni =
-            toFloat (timify ml.on)
-
-        ud =
-            deviations model 5
-
-        point =
-            Point2d.fromCoordinates ( doX model.chartScalings oni, doY model.chartScalings ud )
-    in
-    Svg.polygon2d
-        [ Attributes.fill "red"
-        , Attributes.stroke "black"
-        , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter (DataChartRecord ml) event.pagePos (Just "Maintnance Log"))
-        , M.onLeave (\event -> TooltipMouseLeave)
-        ]
-        (Polygon2d.singleLoop (maintenanceShape point))
-
-
-createReviewShape : Model -> ChartRecord -> Svg Msg
-createReviewShape model r =
-    let
-        oni =
-            toFloat (timify r.on)
-
-        ud =
-            deviations model 4.5
-
-        point =
-            Point2d.fromCoordinates ( doX model.chartScalings oni, doY model.chartScalings ud )
-    in
-    Svg.polygon2d
-        [ Attributes.fill "blue"
-        , Attributes.stroke "black"
-        , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter (DataChartRecord r) event.pagePos (Just "Review"))
-        , M.onLeave (\event -> TooltipMouseLeave)
-        ]
-        (Polygon2d.singleLoop (reviewShape point))
-
-
-createYearTicks model ys =
-    let
-        oni =
-            toFloat (timify ys)
-
-        yearPart =
-            (ISO8601.fromTime (round oni)).year
-
-        textX =
-            doX model.chartScalings oni
-
-        textY =
-            doY model.chartScalings (deviations model -5.6)
-
-        textPosition =
-            Point2d.fromCoordinates ( textX, textY )
-
-        mirrorAxis =
-            Axis2d.through textPosition Direction2d.x
-
-        tickText =
-            Svg.text_
-                [ fill "red"
-                , x (String.fromFloat textX)
-                , y (String.fromFloat textY)
-                ]
-                [ text (String.fromInt yearPart) ]
-    in
-    Svg.g []
-        [ Svg.lineSegment2d
-            [ Attributes.stroke "blue"
-            , Attributes.strokeWidth "4"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.9) )
-                )
-            )
-        , Svg.mirrorAcross mirrorAxis tickText
-        ]
-
-
 monthNumName : Int -> Maybe String
 monthNumName monthPartNumber =
     List.Extra.getAt
@@ -755,155 +495,6 @@ monthNumName monthPartNumber =
         , "Oct"
         , "Nov"
         , "Dec"
-        ]
-
-
-createMonthTicks model ms =
-    let
-        timi =
-            timify ms
-
-        oni =
-            toFloat timi
-
-        monthPartNumber =
-            -- add 1 hour to fix daylight saving time offset problems
-            -- for the beginning of the month
-            (ISO8601.fromTime (timi + (1000 * 3600 * 1))).month
-
-        monthPart =
-            monthNumName monthPartNumber
-
-        textX =
-            Debug.log
-                (Debug.toString
-                    { ms = ms
-                    , timi = timi
-                    , monthPartNumber = monthPartNumber
-                    , monthPart = monthPart
-                    }
-                )
-                (doX model.chartScalings oni)
-
-        textY =
-            doY model.chartScalings (deviations model -5.2)
-
-        textPosition =
-            Point2d.fromCoordinates ( textX, textY )
-
-        mirrorAxis =
-            Axis2d.through textPosition Direction2d.x
-
-        months =
-            model.flags.axes.axis_x.month_starts
-
-        reducedMonthPart =
-            if List.length months > 12 then
-                Just ""
-
-            else
-                monthPart
-
-        tickText =
-            Svg.text_
-                [ fill "black"
-                , x (String.fromFloat textX)
-                , y (String.fromFloat textY)
-                ]
-                [ text (Maybe.withDefault "" reducedMonthPart) ]
-    in
-    Svg.g []
-        [ Svg.lineSegment2d
-            [ Attributes.stroke "black"
-            , Attributes.strokeWidth "3"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.8) )
-                )
-            )
-        , Svg.mirrorAcross mirrorAxis tickText
-        ]
-
-
-createWeekTicks model ws =
-    let
-        oni =
-            toFloat ws
-    in
-    Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "1.5"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.7) )
-            )
-        )
-
-
-createDayTicks model ds =
-    let
-        oni =
-            toFloat ds
-    in
-    Svg.lineSegment2d
-        [ Attributes.stroke "black"
-        , Attributes.strokeWidth "1"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model lodev) )
-            , Point2d.fromCoordinates
-                ( doX model.chartScalings oni, doY model.chartScalings (deviations model -4.6) )
-            )
-        )
-
-
-createMajorTick model mt =
-    let
-        ox =
-            chartStart model.flags
-
-        textX =
-            doX model.chartScalings ox - 40
-
-        textY =
-            doY model.chartScalings mt
-
-        textPosition =
-            Point2d.fromCoordinates ( textX, textY )
-
-        mirrorAxis =
-            Axis2d.through textPosition Direction2d.x
-
-        tickText =
-            Svg.text_
-                [ fill "black"
-                , x (String.fromFloat textX)
-                , y (String.fromFloat textY)
-                ]
-                [ text (String.fromFloat mt) ]
-    in
-    Svg.g []
-        [ Svg.lineSegment2d
-            [ Attributes.stroke "black"
-            , Attributes.strokeWidth "1.5"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( doX model.chartScalings ox, doY model.chartScalings mt )
-                , Point2d.fromCoordinates
-                    ( doX model.chartScalings ox - 10, doY model.chartScalings mt )
-                )
-            )
-
-        -- we have to flip text manually
-        , Svg.mirrorAcross mirrorAxis tickText
         ]
 
 
@@ -994,82 +585,10 @@ findTicks val lbound step =
     findTicks1 val lbound step []
 
 
-majorYticks : Model -> List Float
-majorYticks model =
-    let
-        axis_y =
-            model.flags.axes.axis_y
-
-        upperBoundary =
-            model.chartScalings.upperBoundary
-
-        lowerBoundary =
-            chartBottom model - axis_y.step
-
-        all_ticks =
-            findTicks axis_y.max lowerBoundary axis_y.step
-    in
-    List.filter (\t -> (t >= deviations model lodev) && (t <= deviations model hidev)) all_ticks
-
-
-minorYticks : Model -> List Float
-minorYticks model =
-    let
-        axis_y =
-            model.flags.axes.axis_y
-
-        upperBoundary =
-            model.chartScalings.upperBoundary
-
-        lowerBoundary =
-            chartBottom model - axis_y.step
-
-        scaling =
-            -- reduce number of minor ticks if too many
-            -- by increasing the distance between them
-            if axis_y.step > 10 then
-                5
-
-            else
-                1
-
-        tickStep =
-            axis_y.step / axis_y.step * scaling
-
-        all_ticks =
-            findTicks axis_y.max lowerBoundary tickStep
-    in
-    List.filter (\t -> (t >= deviations model lodev) && (t <= deviations model hidev)) all_ticks
-
-
 spacedRange : Int -> Int -> Int -> List Int
 spacedRange spacing first last =
     List.range 0 ((last - first) // spacing)
         |> List.map (\n -> first + n * spacing)
-
-
-svgElements : Model -> List (Svg Msg)
-svgElements model =
-    [ Svg.placeIn frameChart (axisX model)
-    , Svg.placeIn frameChart (axisY model)
-    , Svg.placeIn frameChart (nominalLine model)
-    , Svg.placeIn frameChart (meanLine model)
-    , Svg.placeIn frameChart (plusXdLine model 3)
-    , Svg.placeIn frameChart (plusXdLine model 2)
-    , Svg.placeIn frameChart (plusXdLine model -2)
-    , Svg.placeIn frameChart (plusXdLine model -3)
-    ]
-        ++ List.map (\p -> Svg.placeIn frameChart (createQcShape p)) model.scaledPoints
-        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceLine model ml)) model.flags.maintenance_logs
-        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShape model ml)) model.flags.maintenance_logs
-        ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
-        ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
-        ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
-        ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
 
 
 pdfLink : Model -> Html Msg
@@ -1178,9 +697,7 @@ view model =
                 , viewBox "0 0 700 400"
                 , style "border: solid #abc 1px;"
                 ]
-                [ Svg.g []
-                    (svgElements model)
-                ]
+                []
             ]
         , showTheTooltip model
         , div [ style "margin-top: 2em; text-align: center;" ]
