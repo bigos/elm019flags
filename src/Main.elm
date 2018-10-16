@@ -112,6 +112,10 @@ type alias Datum =
     }
 
 
+type Stats
+    = List StatsData
+
+
 type alias StatsData =
     { start_date : String
     , deviation : Float
@@ -257,17 +261,33 @@ readData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
 
 
+averageMean : Flags -> Float
+averageMean flags =
+    let
+        meanValues =
+            List.map (\s -> s.mean) flags.stats
+    in
+    List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
+
+
+largestDeviation : Flags -> Float
+largestDeviation flags =
+    let
+        deviationValues =
+            List.map (\s -> s.deviation) flags.stats
+    in
+    Maybe.withDefault 0.0 (List.maximum deviationValues)
+
+
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
     let
         mean =
-            1.0
+            averageMean flags
 
-        -- flags.stats.mean
         deviation =
-            1.0
+            largestDeviation flags
 
-        ---flags.stats.deviation
         scalingFactor =
             -- greater number = smaller chart
             2.9
