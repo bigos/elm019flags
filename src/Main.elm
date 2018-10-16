@@ -112,11 +112,16 @@ type alias Datum =
     }
 
 
-type alias Stats =
-    { nominal : Float
-    , mean : Float
+type alias StatsData =
+    { start_date : String
     , deviation : Float
+    , mean : Float
+    , nominal : Float
     }
+
+
+type Stats
+    = List StatsData
 
 
 type alias RawCid =
@@ -461,10 +466,12 @@ meanLine model =
             ( Point2d.fromCoordinates
                 ( doX model.chartScalings (chartStart model.flags)
                 , doY model.chartScalings model.flags.stats.mean
+                  -- zzz
                 )
             , Point2d.fromCoordinates
                 ( doX model.chartScalings (chartEnd model.flags)
                 , doY model.chartScalings model.flags.stats.mean
+                  -- zzz
                 )
             )
         )
@@ -473,6 +480,10 @@ meanLine model =
 deviations : Model -> Float -> Float
 deviations model x =
     model.flags.stats.mean + (model.flags.stats.deviation * x)
+
+
+
+-- zzz
 
 
 plusXdLine : Model -> Int -> Svg msg
