@@ -1,5 +1,10 @@
-module Main exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), chartEnd, chartStart, createMinorTick, createQcShape, dayTickVals, doX, doY, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, init, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, prepareTime, readData, reviewShape, scaleXY, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, timify, toPoints, update, view, weekTickVals)
+-- code refactoring inspired by
+-- https://github.com/halfzebra/elm-examples/blob/master/examples/fractal-architecture/src/Main.elm
 
+
+module Main exposing (createMinorTick, createQcShape, dayTickVals, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, prepareTime, reviewShape, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, timify, toPoints, update, view, weekTickVals)
+
+import App.Model exposing (..)
 import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
 import Browser
@@ -38,171 +43,12 @@ main =
 
 
 -- MAJORITY OF TYPE DECLARATIONS
-
-
-type alias Model =
-    { chartBoundingBox : Maybe BoundingBox2d
-    , chartScalings : ChartScalings
-    , chartType : String
-    , data : List Datum
-    , dateFrom : Maybe ISO8601.Time
-    , dateTo : Maybe ISO8601.Time
-    , flags : Flags
-    , points : List Point2d
-    , scaledPoints : List ScaledPoint
-    , tooltip : Maybe Tooltip
-    }
-
-
-type alias Flags =
-    { acqnominal : Float
-    , analyteid : Int
-    , chart_type : String
-    , date_from : String
-    , date_to : String
-    , pdf : Bool
-    , axes : AxisData
-    , stats : List StatsData
-    , maintenance_logs : List ChartRecord
-    , reviews : List ChartRecord
-    , qcresults : List RawCid
-    }
-
-
-type alias AxisData =
-    { axis_x : AxisX, axis_y : AxisY }
-
-
-type alias AxisX =
-    { days : Int
-    , weeks : Int
-    , months : Int
-    , years : Int
-    , month_starts : List String
-    , year_starts : List String
-    , monday : String
-    }
-
-
-type alias AxisY =
-    { min : Float
-    , max : Float
-    , ticks : Int
-    , step : Float
-    }
-
-
-type alias ChartScalings =
-    { sizeX : Float
-    , sizeY : Float
-    , distX : Float
-    , distY : Float
-    , scaleX : Float
-    , scaleY : Float
-    , offsetX : Float
-    , offsetY : Float
-    , upperBoundary : Float
-    , lowerBoundary : Float
-    }
-
-
-type alias Datum =
-    { time : Float
-    , value : Float
-    }
-
-
-type Stats
-    = List StatsData
-
-
-type alias StatsData =
-    { start_date : String
-    , deviation : Float
-    , mean : Float
-    , nominal : Float
-    }
-
-
-type alias RawCid =
-    { id : Int
-    , c : Float
-    , d : String
-    }
-
-
-type alias ScaledPoint =
-    { point2d : Point2d
-    , datum : Datum
-    }
-
-
-type alias ChartRecord =
-    { on : String
-    , by : String
-    , comment : String
-    }
-
-
-type TooltipData
-    = DataChartRecord ChartRecord
-    | DataScaledPoint ScaledPoint
-
-
-type alias Tooltip =
-    { data : TooltipData
-    , coordinates : ( Float, Float )
-    , title : Maybe String
-    }
-
-
-
--- INIT
-
-
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    let
-        data =
-            readData flags
-
-        points =
-            toPoints data
-
-        chartBoundingBox =
-            BoundingBox2d.containingPoints points
-    in
-    ( { chartBoundingBox = chartBoundingBox
-      , chartScalings = setChartScalings flags chartBoundingBox
-      , chartType = "default"
-      , data = data
-      , dateFrom = prepareTime flags.date_from
-      , dateTo = prepareTime flags.date_to
-      , flags = flags
-      , points = points
-      , scaledPoints = scaleXY flags data chartBoundingBox
-      , tooltip = Nothing
-      }
-    , Cmd.none
-    )
-
-
-
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.none
-
-
-
--- UPDATE
-
-
-type Msg
-    = TooltipMouseEnter TooltipData ( Float, Float ) (Maybe String)
-    | TooltipMouseLeave
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -254,29 +100,6 @@ prepareTime s =
 
 
 -- OTHER FUNCTIONS
-
-
-readData : Flags -> List Datum
-readData flags =
-    List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
-
-
-averageMean : Flags -> Float
-averageMean flags =
-    let
-        meanValues =
-            List.map (\s -> s.mean) flags.stats
-    in
-    List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
-
-
-largestDeviation : Flags -> Float
-largestDeviation flags =
-    let
-        deviationValues =
-            List.map (\s -> s.deviation) flags.stats
-    in
-    Maybe.withDefault 0.0 (List.maximum deviationValues)
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -346,46 +169,8 @@ lodev =
     -4.5
 
 
-chartStart : Flags -> Float
-chartStart flags =
-    toFloat (timify flags.date_from)
-
-
-chartEnd : Flags -> Float
-chartEnd flags =
-    toFloat (timify flags.date_to)
-
-
 
 -- convert prescaled value to scaled one
-
-
-doX : ChartScalings -> Float -> Float
-doX cs x =
-    cs.scaleX * (cs.offsetX + x)
-
-
-doY : ChartScalings -> Float -> Float
-doY cs y =
-    cs.scaleY * (cs.offsetY + y)
-
-
-scaleXY : Flags -> List Datum -> Maybe BoundingBox2d -> List ScaledPoint
-scaleXY flags data boundingBox =
-    let
-        cs =
-            setChartScalings flags boundingBox
-
-        points =
-            toPoints data
-    in
-    List.map
-        (\d ->
-            { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs d.value )
-            , datum = d
-            }
-        )
-        data
 
 
 toPoints : List Datum -> List Point2d
