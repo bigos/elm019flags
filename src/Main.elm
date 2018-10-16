@@ -2,7 +2,7 @@
 -- https://github.com/halfzebra/elm-examples/blob/master/examples/fractal-architecture/src/Main.elm
 
 
-module Main exposing (createMinorTick, createQcShape, dayTickVals, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, prepareTime, reviewShape, setChartScalings, shape, showTheTooltip, spacedRange, subscriptions, timify, toPoints, update, view, weekTickVals)
+module Main exposing (createMinorTick, createQcShape, dayTickVals, findTicks, findTicks1, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, hidev, justTimeString, justValFn, lodev, main, maintenanceShape, monthNumName, pdfLink, reviewShape, shape, showTheTooltip, spacedRange, subscriptions, timify, update, view, weekTickVals)
 
 import App.Model exposing (..)
 import Axis2d exposing (Axis2d)
@@ -88,77 +88,8 @@ justValFn v fn =
             fn n
 
 
-prepareTime : String -> Maybe ISO8601.Time
-prepareTime s =
-    case ISO8601.fromString s of
-        Err msg ->
-            Nothing
-
-        Result.Ok d ->
-            Just d
-
-
 
 -- OTHER FUNCTIONS
-
-
-setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
-setChartScalings flags boundingBox =
-    let
-        mean =
-            averageMean flags
-
-        deviation =
-            largestDeviation flags
-
-        scalingFactor =
-            -- greater number = smaller chart
-            2.9
-
-        upperBoundary =
-            mean + deviation * scalingFactor
-
-        lowerBoundary =
-            mean - deviation * scalingFactor
-
-        -- sizes x & y of the view area
-        dx =
-            500.0
-
-        dy =
-            200.0
-
-        -- distances x & y before scaling
-        distX =
-            chartEnd flags - chartStart flags
-
-        distY =
-            upperBoundary - lowerBoundary
-
-        -- scale and offset
-        scaleX =
-            dx / distX
-
-        offsetX =
-            0 - chartStart flags
-
-        scaleY =
-            dy / distY
-
-        offsetY =
-            0 - lowerBoundary
-    in
-    { sizeX = dx
-    , sizeY = dy
-    , distX = distX
-    , distY = distY
-    , scaleX = scaleX
-    , scaleY = scaleY
-    , offsetX = offsetX
-    , offsetY = offsetY
-    , upperBoundary = upperBoundary
-    , lowerBoundary = lowerBoundary
-    }
 
 
 hidev =
@@ -171,11 +102,6 @@ lodev =
 
 
 -- convert prescaled value to scaled one
-
-
-toPoints : List Datum -> List Point2d
-toPoints data =
-    List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
 
 
 timify : String -> Int
