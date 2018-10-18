@@ -1,4 +1,4 @@
-module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tempStats, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tempStats, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -280,6 +280,10 @@ deviations model x fn =
             fn devs
     in
     Maybe.withDefault 0.0 calc
+
+
+hidev =
+    6.0
 
 
 lodev =
