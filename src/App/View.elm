@@ -4,12 +4,11 @@ import App.Chart exposing (..)
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
 import App.Utilities exposing (..)
-import Html exposing (Html, a, br, button, div, span, text)
+import Html exposing (Html, a, br, div, span, text)
 import Html.Attributes exposing (href)
 import ISO8601
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
-import Svg.Events as Events exposing (..)
 
 
 showTheTooltip : Model -> Html Msg
@@ -125,5 +124,6 @@ view model =
             [ pdfLink model
             ]
         , div [ style "height:1em;" ] []
-        , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.flags) ]
+
+        -- , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.flags) ]
         ]

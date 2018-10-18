@@ -1,4 +1,4 @@
-module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tempStats, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tempStats, tickBottom, toPoints, tupleize)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -260,10 +260,6 @@ chartStart flags =
 chartEnd : Flags -> Float
 chartEnd flags =
     toFloat (timify flags.date_to + oneDay)
-
-
-
--- change me taking into consideration average mean and largest deviation
 
 
 chartBottom : Model -> Float

@@ -6,18 +6,12 @@ import Axis2d exposing (Axis2d)
 import Direction2d exposing (Direction2d)
 import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
-import Html exposing (Html, a, br, button, div, span, text)
-import Html.Attributes exposing (href)
-import Html.Events exposing (onClick)
-import Html.Events.Extra.Mouse as M exposing (..)
+import Html exposing (text)
 import ISO8601
 import LineSegment2d exposing (LineSegment2d)
-import List.Extra
 import Point2d exposing (Point2d)
-import Polygon2d exposing (Polygon2d)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
-import Svg.Events as Events exposing (..)
 
 
 createYearTicks model ys =
