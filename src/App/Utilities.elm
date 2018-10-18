@@ -1,6 +1,7 @@
-module App.Utilities exposing (timify)
+module App.Utilities exposing (justTimeString, justValFn, monthNumName, timify, untimify)
 
 import ISO8601
+import List.Extra
 
 
 timify : String -> Int
@@ -11,3 +12,50 @@ timify d =
 
         Err _ ->
             timify "1970-01-01T00:00:00Z"
+
+
+untimify : Int -> String
+untimify tint =
+    let
+        t =
+            ISO8601.fromTime tint
+    in
+    ISO8601.toString t
+
+
+justTimeString : Maybe ISO8601.Time -> String
+justTimeString tv =
+    case tv of
+        Nothing ->
+            ""
+
+        Just tm ->
+            ISO8601.toString tm
+
+
+justValFn v fn =
+    case v of
+        Nothing ->
+            0
+
+        Just n ->
+            fn n
+
+
+monthNumName : Int -> Maybe String
+monthNumName monthPartNumber =
+    List.Extra.getAt
+        (monthPartNumber - 1)
+        [ "Jan" -- year is in place of Jan
+        , "Feb"
+        , "Mar"
+        , "Apr"
+        , "May"
+        , "Jun"
+        , "Jul"
+        , "Aug"
+        , "Sep"
+        , "Oct"
+        , "Nov"
+        , "Dec"
+        ]

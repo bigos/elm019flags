@@ -1,27 +1,10 @@
-module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, Stats(..), StatsData, Tooltip, TooltipData(..), averageMean, chartEnd, chartStart, doX, doY, init, largestDeviation, prepareTime, readData, scaleXY, setChartScalings, toPoints)
+module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tempStats, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
-import Axis2d exposing (Axis2d)
 import BoundingBox2d exposing (BoundingBox2d)
-import Browser
-import Direction2d exposing (Direction2d)
-import Frame2d exposing (Frame2d)
-import Geometry.Svg as Svg
-import Html exposing (Html, a, br, button, div, span, text)
-import Html.Attributes exposing (href)
-import Html.Events exposing (onClick)
-import Html.Events.Extra.Mouse as M exposing (..)
 import ISO8601
-import Json.Encode as E
-import LineSegment2d exposing (LineSegment2d)
 import List.Extra
 import Point2d exposing (Point2d)
-import Polygon2d exposing (Polygon2d)
-import Svg exposing (Svg)
-import Svg.Attributes as Attributes exposing (..)
-import Svg.Events as Events exposing (..)
-import Triangle2d exposing (Triangle2d)
-import Tuple
 
 
 type alias Model =
@@ -96,10 +79,6 @@ type alias Datum =
     }
 
 
-type Stats
-    = List StatsData
-
-
 type alias StatsData =
     { start_date : String
     , deviation : Float
@@ -141,7 +120,7 @@ type alias Tooltip =
 
 
 
--- UPDATE
+-- UPDATE TYPES
 
 
 type Msg
@@ -178,6 +157,51 @@ init flags =
       }
     , Cmd.none
     )
+
+
+tempStats : List StatsData
+tempStats =
+    [ { deviation = 37.5, mean = 250, nominal = 250, start_date = "2011-07-29T00:00:00Z" }, { deviation = 15, mean = 245.2, nominal = 250, start_date = "2014-10-17T00:00:00Z" } ]
+
+
+findStatForTime : List StatsData -> Int -> Maybe StatsData
+findStatForTime stats time =
+    let
+        possibleStats =
+            List.Extra.takeWhile (\s -> timify s.start_date <= time) stats
+
+        res =
+            List.Extra.last possibleStats
+    in
+    Debug.log (">>stats results for time>> " ++ Debug.toString res ++ " << " ++ untimify time ++ " <<<<<|\n")
+        res
+
+
+tupleize : List a -> List ( a, Maybe a )
+tupleize xs =
+    tupleizeHelper xs [] |> List.reverse
+
+
+tupleizeHelper : List a -> List ( a, Maybe a ) -> List ( a, Maybe a )
+tupleizeHelper xs acc =
+    case xs of
+        x :: y :: rest ->
+            tupleizeHelper (y :: rest) (( x, Just y ) :: acc)
+
+        [ x ] ->
+            ( x, Nothing ) :: acc
+
+        [] ->
+            acc
+
+
+statStartTimes : Model -> List Int
+statStartTimes model =
+    List.map (\s -> timify s.start_date) model.flags.stats
+
+
+statStartTuples model =
+    tupleize (statStartTimes model)
 
 
 readData : Flags -> List Datum
@@ -236,6 +260,43 @@ chartStart flags =
 chartEnd : Flags -> Float
 chartEnd flags =
     toFloat (timify flags.date_to)
+
+
+
+-- change me taking into consideration average mean and largest deviation
+
+
+chartBottom : Model -> Float
+chartBottom model =
+    doY model.chartScalings (deviations model lodev List.minimum)
+
+
+deviations model x fn =
+    let
+        devs =
+            List.map (\s -> s.mean + s.deviation * x) model.flags.stats
+
+        calc =
+            fn devs
+    in
+    Maybe.withDefault 0.0 calc
+
+
+lodev =
+    -4.5
+
+
+chartTop : Model -> Float
+chartTop model =
+    doY model.chartScalings (deviations model 5 List.maximum)
+
+
+
+-- change me taking into consideration average mean and largest deviation
+
+
+tickBottom model =
+    doY model.chartScalings (deviations model -4.7 List.minimum)
 
 
 averageMean : Flags -> Float
