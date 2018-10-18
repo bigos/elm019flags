@@ -635,6 +635,54 @@ createMajorTick model mt =
         ]
 
 
+majorYticks : Model -> List Float
+majorYticks model =
+    let
+        axis_y =
+            model.flags.axes.axis_y
+
+        upperBoundary =
+            model.chartScalings.upperBoundary
+
+        lowerBoundary =
+            chartBottom model - axis_y.step
+
+        all_ticks =
+            findTicks axis_y.max lowerBoundary axis_y.step
+    in
+    List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
+
+
+minorYticks : Model -> List Float
+minorYticks model =
+    let
+        axis_y =
+            model.flags.axes.axis_y
+
+        upperBoundary =
+            model.chartScalings.upperBoundary
+
+        lowerBoundary =
+            chartBottom model - axis_y.step
+
+        scaling =
+            -- reduce number of minor ticks if too many
+            -- by increasing the distance between them
+            if axis_y.step > 10 then
+                5
+
+            else
+                1
+
+        tickStep =
+            axis_y.step / axis_y.step * scaling
+
+        all_ticks =
+            findTicks axis_y.max lowerBoundary tickStep
+    in
+    List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
+
+
 
 -- ticks below the max value
 
