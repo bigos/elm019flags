@@ -642,7 +642,7 @@ majorYticks model =
             model.flags.axes.axis_y
 
         upperBoundary =
-            model.chartScalings.upperBoundary
+            deviations model 6.7 List.maximum
 
         lowerBoundary =
             chartBottom model - axis_y.step
