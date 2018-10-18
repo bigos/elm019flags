@@ -1,4 +1,4 @@
-module App.Chart exposing (axisX, axisY, createMaintenanceLine, createMaintenanceShape, createMeanLine, createNominalLine, createQcShape, createReviewLine, createReviewShape, createXsdlLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape, svgElements)
+module App.Chart exposing (axisX, axisY, chartElements, createMaintenanceLine, createMaintenanceShape, createMeanLine, createNominalLine, createQcShape, createReviewLine, createReviewShape, createXsdlLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape)
 
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
@@ -374,8 +374,8 @@ createXsdlLine xsd model timeSection =
         )
 
 
-svgElements : Model -> List (Svg Msg)
-svgElements model =
+chartElements : Model -> List (Svg Msg)
+chartElements model =
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
     ]
