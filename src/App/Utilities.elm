@@ -1,4 +1,4 @@
-module App.Utilities exposing (justTimeString, justValFn, monthNumName, timify, untimify)
+module App.Utilities exposing (justTimeString, justValFn, monthNumName, oneDay, timify, untimify)
 
 import ISO8601
 import List.Extra
@@ -59,3 +59,8 @@ monthNumName monthPartNumber =
         , "Nov"
         , "Dec"
         ]
+
+
+oneDay : Int
+oneDay =
+    1000 * 3600 * 24

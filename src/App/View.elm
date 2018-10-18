@@ -256,7 +256,7 @@ createMeanLine model timeSection =
                 (Basics.max (Tuple.first timeSection) (timify model.flags.date_from))
 
         ted =
-            timify model.flags.date_to
+            timify model.flags.date_to + oneDay
 
         et =
             toFloat
@@ -294,7 +294,7 @@ createNominalLine model timeSection =
                 (Basics.max (Tuple.first timeSection) (timify model.flags.date_from))
 
         ted =
-            timify model.flags.date_to
+            timify model.flags.date_to + oneDay
 
         et =
             toFloat
@@ -332,7 +332,7 @@ createXsdlLine xsd model timeSection =
                 (Basics.max (Tuple.first timeSection) (timify model.flags.date_from))
 
         ted =
-            timify model.flags.date_to
+            timify model.flags.date_to + oneDay
 
         et =
             toFloat

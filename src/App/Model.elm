@@ -259,7 +259,7 @@ chartStart flags =
 
 chartEnd : Flags -> Float
 chartEnd flags =
-    toFloat (timify flags.date_to)
+    toFloat (timify flags.date_to + oneDay)
 
 
 
