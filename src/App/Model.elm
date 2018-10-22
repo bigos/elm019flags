@@ -383,13 +383,13 @@ largestDeviation flags =
             List.map (\s -> s.deviation) flags.stats
     in
     if List.length flags.stats == 0 then
-        standardDeviation flags * 2.0
+        standardDeviation flags
 
     else if List.length deviationValues == 0 then
-        standardDeviation flags * 2.0
+        standardDeviation flags
 
     else
-        Maybe.withDefault 25.0 (List.maximum deviationValues)
+        Maybe.withDefault 35.0 (List.maximum deviationValues)
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
