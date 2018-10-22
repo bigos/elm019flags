@@ -272,7 +272,7 @@ createMeanLine model timeSection =
     in
     Svg.lineSegment2d
         [ Attributes.stroke "red"
-        , Attributes.strokeWidth "10"
+        , Attributes.strokeWidth "1"
         ]
         (LineSegment2d.fromEndpoints
             ( Point2d.fromCoordinates

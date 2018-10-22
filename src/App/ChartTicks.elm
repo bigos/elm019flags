@@ -75,15 +75,7 @@ createMonthTicks model ms =
             monthNumName monthPartNumber
 
         textX =
-            Debug.log
-                (Debug.toString
-                    { ms = ms
-                    , timi = timi
-                    , monthPartNumber = monthPartNumber
-                    , monthPart = monthPart
-                    }
-                )
-                (doX model.chartScalings oni)
+            doX model.chartScalings oni
 
         textY =
             doY model.chartScalings (deviations model -5.2 List.minimum)

@@ -168,8 +168,7 @@ findStatForTime stats time =
         res =
             List.Extra.last possibleStats
     in
-    Debug.log (">>stats results for time>> " ++ Debug.toString res ++ " << " ++ untimify time ++ " <<<<<|\n")
-        res
+    res
 
 
 tupleize : List a -> List ( a, Maybe a )
