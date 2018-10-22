@@ -281,11 +281,17 @@ deviations model x fn =
 
                     rd =
                         abs (qmax - qmin)
+
+                    values =
+                        List.map (\qr -> qr.c) model.flags.qcresults
+
+                    mean =
+                        List.foldl (+) 0.0 values / toFloat (List.length values)
                 in
                 [ { start_date = ""
-                  , deviation = rd
-                  , mean = 250.0
-                  , nominal = 250.0
+                  , deviation = standardDeviation model.flags
+                  , mean = mean
+                  , nominal = mean
                   }
                 ]
 
@@ -349,7 +355,7 @@ standardDeviation flags =
             List.foldl (+) 0.0 values / toFloat (List.length values)
 
         sqrd =
-            List.foldl (\v a -> a + ((v - mean) * (v - mean))) 0.0 values
+            List.foldl (\v a -> a + ((v - mean) ^ 2)) 0.0 values
     in
     sqrt (sqrd / toFloat (List.length values - 1))
 
