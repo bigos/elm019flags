@@ -269,8 +269,21 @@ deviations model x fn =
 
         stats2 =
             if List.length stats == 0 then
+                let
+                    qcr =
+                        List.map (\qc -> qc.c) model.flags.qcresults
+
+                    qmax =
+                        Maybe.withDefault 300.0 (List.maximum qcr)
+
+                    qmin =
+                        Maybe.withDefault 200.0 (List.minimum qcr)
+
+                    rd =
+                        abs (qmax - qmin)
+                in
                 [ { start_date = ""
-                  , deviation = 10.0
+                  , deviation = rd
                   , mean = 250.0
                   , nominal = 250.0
                   }
@@ -289,7 +302,7 @@ deviations model x fn =
 
 
 hidev =
-    6.0
+    5.0
 
 
 lodev =
@@ -327,27 +340,31 @@ averageMean flags =
         List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
 
 
+standardDeviation flags =
+    let
+        values =
+            List.map (\qc -> qc.c) flags.qcresults
+
+        mean =
+            List.foldl (+) 0.0 values / toFloat (List.length values)
+
+        sqrd =
+            List.foldl (\v a -> a + ((v - mean) * (v - mean))) 0.0 values
+    in
+    sqrt (sqrd / toFloat (List.length values - 1))
+
+
 largestDeviation : Flags -> Float
 largestDeviation flags =
     let
         deviationValues =
             List.map (\s -> s.deviation) flags.stats
     in
-    if List.length deviationValues == 0 then
-        let
-            qcr =
-                List.map (\qc -> qc.c) flags.qcresults
-
-            qmax =
-                Maybe.withDefault 10.0 (List.maximum qcr)
-
-            qmin =
-                Maybe.withDefault 1.0 (List.minimum qcr)
-        in
-        abs (qmax - qmin)
+    if List.length flags.stats == 0 then
+        standardDeviation flags * 2.0
 
     else
-        Maybe.withDefault 1.0 (List.maximum deviationValues)
+        standardDeviation flags * 2.0
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -367,7 +384,13 @@ setChartScalings flags boundingBox =
             mean + deviation * scalingFactor
 
         lowerBoundary =
-            mean - deviation * scalingFactor
+            Debug.log
+                ("mean "
+                    ++ Debug.toString mean
+                    ++ " deviation "
+                    ++ Debug.toString deviation
+                )
+                (mean - deviation * scalingFactor)
 
         -- sizes x & y of the view area
         dx =
