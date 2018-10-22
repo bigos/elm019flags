@@ -385,8 +385,11 @@ largestDeviation flags =
     if List.length flags.stats == 0 then
         standardDeviation flags * 2.0
 
-    else
+    else if List.length deviationValues == 0 then
         standardDeviation flags * 2.0
+
+    else
+        Maybe.withDefault 25.0 (List.maximum deviationValues)
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -406,13 +409,7 @@ setChartScalings flags boundingBox =
             mean + deviation * scalingFactor
 
         lowerBoundary =
-            Debug.log
-                ("mean "
-                    ++ Debug.toString mean
-                    ++ " deviation "
-                    ++ Debug.toString deviation
-                )
-                (mean - deviation * scalingFactor)
+            mean - deviation * scalingFactor
 
         -- sizes x & y of the view area
         dx =
