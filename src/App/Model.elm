@@ -288,12 +288,21 @@ deviations model x fn =
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
                 in
-                [ { start_date = ""
-                  , deviation = standardDeviation model.flags
-                  , mean = mean
-                  , nominal = mean
-                  }
-                ]
+                if List.length values == 0 then
+                    [ { start_date = ""
+                      , deviation = 25.0
+                      , mean = 250.0
+                      , nominal = 250.0
+                      }
+                    ]
+
+                else
+                    [ { start_date = ""
+                      , deviation = standardDeviation model.flags
+                      , mean = mean
+                      , nominal = mean
+                      }
+                    ]
 
             else
                 stats
@@ -308,7 +317,7 @@ deviations model x fn =
 
 
 hidev =
-    5.0
+    4.5
 
 
 lodev =
@@ -340,7 +349,15 @@ averageMean flags =
             List.map (\s -> s.mean) flags.stats
     in
     if List.length meanValues == 0 then
-        List.foldl (+) 0.0 (List.map (\qc -> qc.c) flags.qcresults) / toFloat (List.length flags.qcresults)
+        let
+            qcvalues =
+                flags.qcresults
+        in
+        if List.length qcvalues == 0 then
+            250.0
+
+        else
+            List.foldl (+) 0.0 (List.map (\qc -> qc.c) qcvalues) / toFloat (List.length flags.qcresults)
 
     else
         List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
@@ -357,7 +374,11 @@ standardDeviation flags =
         sqrd =
             List.foldl (\v a -> a + ((v - mean) ^ 2)) 0.0 values
     in
-    sqrt (sqrd / toFloat (List.length values - 1))
+    if List.length values == 0 then
+        25.0
+
+    else
+        sqrt (sqrd / toFloat (List.length values - 1))
 
 
 largestDeviation : Flags -> Float
