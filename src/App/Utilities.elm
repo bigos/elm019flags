@@ -1,4 +1,4 @@
-module App.Utilities exposing (justTimeString, justValFn, monthNumName, oneDay, timify, untimify)
+module App.Utilities exposing (justTimeString, justValFn, monthNumName, monthQtrName, oneDay, timify, untimify)
 
 import ISO8601
 import List.Extra
@@ -58,6 +58,25 @@ monthNumName monthPartNumber =
         , "Oct"
         , "Nov"
         , "Dec"
+        ]
+
+
+monthQtrName : Int -> Maybe String
+monthQtrName monthPartNumber =
+    List.Extra.getAt
+        (monthPartNumber - 1)
+        [ "Jan" -- year is in place of Jan
+        , ""
+        , ""
+        , "Apr"
+        , ""
+        , ""
+        , "Jul"
+        , ""
+        , ""
+        , "Oct"
+        , ""
+        , ""
         ]
 
 

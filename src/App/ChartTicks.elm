@@ -98,8 +98,11 @@ createMonthTicks model ms =
             model.flags.axes.axis_x.month_starts
 
         reducedMonthPart =
-            if List.length months > 12 then
+            if List.length months > 30 then
                 Just ""
+
+            else if List.length months > 16 then
+                monthQtrName monthPartNumber
 
             else
                 monthPart
