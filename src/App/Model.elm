@@ -305,7 +305,11 @@ averageMean flags =
         meanValues =
             List.map (\s -> s.mean) flags.stats
     in
-    List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
+    if List.length meanValues == 0 then
+        List.foldl (+) 0.0 (List.map (\qc -> qc.c) flags.qcresults) / toFloat (List.length flags.qcresults)
+
+    else
+        List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
 
 
 largestDeviation : Flags -> Float
@@ -314,7 +318,21 @@ largestDeviation flags =
         deviationValues =
             List.map (\s -> s.deviation) flags.stats
     in
-    Maybe.withDefault 0.0 (List.maximum deviationValues)
+    if List.length deviationValues == 0 then
+        let
+            qcr =
+                List.map (\qc -> qc.c) flags.qcresults
+
+            qmax =
+                Maybe.withDefault 10.0 (List.maximum qcr)
+
+            qmin =
+                Maybe.withDefault 1.0 (List.minimum qcr)
+        in
+        abs (qmax - qmin)
+
+    else
+        Maybe.withDefault 0.0 (List.maximum deviationValues)
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
