@@ -262,15 +262,25 @@ chartEnd flags =
     toFloat (timify flags.date_to + oneDay)
 
 
-chartBottom : Model -> Float
-chartBottom model =
-    doY model.chartScalings (deviations model lodev List.minimum)
-
-
 deviations model x fn =
     let
+        stats =
+            model.flags.stats
+
+        stats2 =
+            if List.length stats == 0 then
+                [ { start_date = ""
+                  , deviation = 10.0
+                  , mean = 250.0
+                  , nominal = 250.0
+                  }
+                ]
+
+            else
+                stats
+
         devs =
-            List.map (\s -> s.mean + s.deviation * x) model.flags.stats
+            List.map (\s -> s.mean + s.deviation * x) stats2
 
         calc =
             fn devs
@@ -286,9 +296,14 @@ lodev =
     -4.5
 
 
+chartBottom : Model -> Float
+chartBottom model =
+    doY model.chartScalings (deviations model lodev List.minimum)
+
+
 chartTop : Model -> Float
 chartTop model =
-    doY model.chartScalings (deviations model 5 List.maximum)
+    doY model.chartScalings (deviations model hidev List.maximum)
 
 
 
@@ -332,7 +347,7 @@ largestDeviation flags =
         abs (qmax - qmin)
 
     else
-        Maybe.withDefault 0.0 (List.maximum deviationValues)
+        Maybe.withDefault 1.0 (List.maximum deviationValues)
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
