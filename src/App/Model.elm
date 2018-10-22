@@ -1,4 +1,4 @@
-module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tempStats, tickBottom, toPoints, tupleize)
+module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -157,11 +157,6 @@ init flags =
       }
     , Cmd.none
     )
-
-
-tempStats : List StatsData
-tempStats =
-    [ { deviation = 37.5, mean = 250, nominal = 250, start_date = "2011-07-29T00:00:00Z" }, { deviation = 15, mean = 245.2, nominal = 250, start_date = "2014-10-17T00:00:00Z" } ]
 
 
 findStatForTime : List StatsData -> Int -> Maybe StatsData
