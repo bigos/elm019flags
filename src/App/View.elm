@@ -26,7 +26,7 @@ showTheTooltip model =
                         ++ "px; "
                         ++ "top: "
                         ++ String.fromFloat (10 + Tuple.second tt.coordinates)
-                        ++ "px;"
+                        ++ "px; max-width: 250px;"
                     )
                 ]
                 (case tt.data of
@@ -124,6 +124,7 @@ view model =
             [ pdfLink model
             ]
         , div [ style "height:1em;" ] []
-        , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.chartScalings) ]
-        , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
+
+        -- , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.chartScalings) ]
+        -- , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
         ]
