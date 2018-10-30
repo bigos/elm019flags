@@ -94,7 +94,7 @@ pdfLink model =
         a
             [ href
                 ("/analytes/"
-                    ++ String.fromInt model.flags.analyteid
+                    ++ String.fromInt (singleAnalyteId model)
                     ++ "/pdf_report"
                     ++ "/chart_type/"
                     ++ model.chartType

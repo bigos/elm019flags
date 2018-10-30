@@ -1,4 +1,4 @@
-module App.Model exposing (AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readData, scaleXY, setChartScalings, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize)
+module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readSingleData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -22,7 +22,7 @@ type alias Model =
 
 
 type alias Flags =
-    { analyteid : Int
+    { analyteid : List Int
     , chart_type : String
     , date_from : String
     , date_to : String
@@ -139,7 +139,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         data =
-            readData flags
+            readSingleData flags
 
         points =
             toPoints data
@@ -210,12 +210,17 @@ singleResults flags =
     Maybe.withDefault [] (List.head flags.qcresults)
 
 
+singleAnalyteId : Model -> Int
+singleAnalyteId model =
+    Maybe.withDefault 0 (List.head model.flags.analyteid)
+
+
 
 -- TODO change so it later reads multiple analytes
 
 
-readData : Flags -> List Datum
-readData flags =
+readSingleData : Flags -> List Datum
+readSingleData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) (singleResults flags)
 
 
