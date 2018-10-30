@@ -26,7 +26,7 @@ type alias Flags =
     , chart_type : String
     , date_from : String
     , date_to : String
-    , pdf : Bool
+    , show_pdf_download : Bool
     , axes : AxisData
     , stats : List StatsData
     , maintenance_logs : List ChartRecord

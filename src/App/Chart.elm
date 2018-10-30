@@ -83,10 +83,10 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-createQcShape : ScaledPoint -> Svg Msg
-createQcShape point =
+createQcShape : ScaledPoint -> String -> Svg Msg
+createQcShape point fill =
     Svg.polygon2d
-        [ Attributes.fill "blue"
+        [ Attributes.fill fill
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
         , M.onEnter (\event -> TooltipMouseEnter (DataScaledPoint point) event.pagePos Nothing)
@@ -386,15 +386,14 @@ chartElements model =
         ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) (statStartTuples model)
         ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) (statStartTuples model)
         ++ flatten
-            (List.map
-                (\pl ->
+            (List.map2
+                (\pl c ->
                     List.map
-                        (\p ->
-                            Svg.placeIn frameChart (createQcShape p)
-                        )
+                        (\p -> Svg.placeIn frameChart (createQcShape p c))
                         pl
                 )
                 model.scaledPoints
+                [ "blue", "red", "black", "green", "yellow" ]
             )
         ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts

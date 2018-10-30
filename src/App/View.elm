@@ -87,10 +87,7 @@ showTheTooltip model =
 
 pdfLink : Model -> Html Msg
 pdfLink model =
-    if model.flags.pdf then
-        div [] []
-
-    else
+    if model.flags.show_pdf_download then
         a
             [ href
                 ("/analytes/"
@@ -106,6 +103,9 @@ pdfLink model =
             , target "_blank"
             ]
             [ text "Download the PDF" ]
+
+    else
+        div [] []
 
 
 view : Model -> Html Msg
