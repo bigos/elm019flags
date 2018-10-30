@@ -393,7 +393,7 @@ chartElements model =
                         pl
                 )
                 model.scaledPoints
-                [ "blue", "red", "black", "green", "yellow" ]
+                [ "blue", "red", "black", "green", "yellow", "pink" ]
             )
         ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
         ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
