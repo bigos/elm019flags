@@ -19,7 +19,7 @@ showTheTooltip model =
 
         Just tt ->
             div
-                [ class "log-record-tooltip"
+                [ class "log-record-tooltip-zzz"
                 , style
                     ("left: "
                         ++ String.fromFloat (10 + Tuple.first tt.coordinates)
@@ -82,6 +82,9 @@ showTheTooltip model =
                             []
                             [ text (String.fromFloat d.datum.value) ]
                         ]
+
+                    DataCombinedPoint d ->
+                        [ span [] [ text ("combined tooltip " ++ Debug.toString d) ] ]
                 )
 
 

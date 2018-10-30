@@ -83,13 +83,23 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-createQcShape : ScaledPoint -> String -> Svg Msg
-createQcShape point fill =
+createQcShape : Model -> ScaledPoint -> String -> Svg Msg
+createQcShape model point fill =
+    let
+        myToolTip =
+            Debug.log (" zzzzzzzzzzzzzzzzzzzzzzzzz " ++ Debug.toString model.chartType)
+                (if model.chartType == "default" then
+                    DataScaledPoint point
+
+                 else
+                    DataCombinedPoint point
+                )
+    in
     Svg.polygon2d
         [ Attributes.fill fill
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter (DataScaledPoint point) event.pagePos Nothing)
+        , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
         (Polygon2d.singleLoop (shape point.point2d))
@@ -389,7 +399,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createQcShape p c))
+                        (\p -> Svg.placeIn frameChart (createQcShape model p c))
                         pl
                 )
                 model.scaledPoints

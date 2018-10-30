@@ -1,4 +1,4 @@
-module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, readSingleData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -22,7 +22,7 @@ type alias Model =
 
 
 type alias Flags =
-    { analyteid : List Int
+    { analytes : List { id : Int, name : String }
     , chart_type : String
     , date_from : String
     , date_to : String
@@ -75,6 +75,7 @@ type alias ChartScalings =
 type alias Datum =
     { time : Float
     , value : Float
+    , aid : Int
     }
 
 
@@ -94,6 +95,7 @@ type alias RawCid =
     { id : Int
     , c : Float
     , d : String
+    , aid : Maybe Int
     }
 
 
@@ -113,6 +115,7 @@ type alias ChartRecord =
 type TooltipData
     = DataChartRecord ChartRecord
     | DataScaledPoint ScaledPoint
+    | DataCombinedPoint ScaledPoint
 
 
 type alias Tooltip =
@@ -219,19 +222,21 @@ singleResults flags =
 
 singleAnalyteId : Model -> Int
 singleAnalyteId model =
-    Maybe.withDefault 0 (List.head model.flags.analyteid)
+    let
+        anh =
+            List.head
+                model.flags.analytes
+
+        an =
+            Maybe.withDefault { id = 0, name = "" } anh
+    in
+    an.id
 
 
 
--- TODO change so it later reads multiple analytes
+-- readCombinedData : Flags -> List (List Datum)
 
 
-readSingleData : Flags -> List Datum
-readSingleData flags =
-    List.map (\d -> Datum (toFloat (timify d.d)) d.c) (singleResults flags)
-
-
-readCombinedData : Flags -> List (List Datum)
 readCombinedData flags =
     let
         combinedData =
@@ -240,7 +245,15 @@ readCombinedData flags =
     List.map
         (\singleDataList ->
             List.map
-                (\d -> Datum (toFloat (timify d.d)) d.c)
+                (\d ->
+                    Datum
+                        (toFloat (timify d.d))
+                        d.c
+                        (Maybe.withDefault
+                            0
+                            d.aid
+                        )
+                )
                 singleDataList
         )
         combinedData
