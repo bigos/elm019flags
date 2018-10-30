@@ -1,4 +1,4 @@
-module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, hidev, init, largestDeviation, lodev, prepareTime, readSingleData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, readSingleData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -11,12 +11,12 @@ type alias Model =
     { chartBoundingBox : Maybe BoundingBox2d
     , chartScalings : ChartScalings
     , chartType : String
-    , data : List Datum
+    , data : List (List Datum)
     , dateFrom : Maybe ISO8601.Time
     , dateTo : Maybe ISO8601.Time
     , flags : Flags
-    , points : List Point2d
-    , scaledPoints : List ScaledPoint
+    , points : List (List Point2d)
+    , scaledPoints : List (List ScaledPoint)
     , tooltip : Maybe Tooltip
     }
 
@@ -139,13 +139,16 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         data =
-            readSingleData flags
+            readCombinedData flags
 
         points =
             toPoints data
 
+        flattenedPoints =
+            List.concatMap identity points
+
         chartBoundingBox =
-            BoundingBox2d.containingPoints points
+            BoundingBox2d.containingPoints flattenedPoints
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
@@ -201,6 +204,10 @@ statStartTuples model =
     tupleize (statStartTimes model)
 
 
+flatten lst =
+    List.concatMap identity lst
+
+
 
 --when we have single results the length of the list is 1
 
@@ -224,9 +231,28 @@ readSingleData flags =
     List.map (\d -> Datum (toFloat (timify d.d)) d.c) (singleResults flags)
 
 
-toPoints : List Datum -> List Point2d
-toPoints data =
-    List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+readCombinedData : Flags -> List (List Datum)
+readCombinedData flags =
+    let
+        combinedData =
+            flags.qcresults
+    in
+    List.map
+        (\singleDataList ->
+            List.map
+                (\d -> Datum (toFloat (timify d.d)) d.c)
+                singleDataList
+        )
+        combinedData
+
+
+toPoints : List (List Datum) -> List (List Point2d)
+toPoints combinedData =
+    List.map
+        (\data ->
+            List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+        )
+        combinedData
 
 
 prepareTime : String -> Maybe ISO8601.Time
@@ -239,22 +265,26 @@ prepareTime s =
             Just d
 
 
-scaleXY : Flags -> List Datum -> Maybe BoundingBox2d -> List ScaledPoint
-scaleXY flags data boundingBox =
+scaleXY : Flags -> List (List Datum) -> Maybe BoundingBox2d -> List (List ScaledPoint)
+scaleXY flags combinedData boundingBox =
     let
         cs =
             setChartScalings flags boundingBox
 
         points =
-            toPoints data
+            toPoints combinedData
     in
     List.map
-        (\d ->
-            { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs d.value )
-            , datum = d
-            }
+        (\data ->
+            List.map
+                (\d ->
+                    { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs d.value )
+                    , datum = d
+                    }
+                )
+                data
         )
-        data
+        combinedData
 
 
 doX : ChartScalings -> Float -> Float
