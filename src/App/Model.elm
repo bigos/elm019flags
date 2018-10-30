@@ -86,8 +86,8 @@ type alias StatsData =
     }
 
 
-type AnalyteResults
-    = List RawCid
+type alias AnalyteResults =
+    List RawCid
 
 
 type alias RawCid =
@@ -201,9 +201,22 @@ statStartTuples model =
     tupleize (statStartTimes model)
 
 
+
+--when we have single results the length of the list is 1
+
+
+singleResults : Flags -> AnalyteResults
+singleResults flags =
+    Maybe.withDefault [] (List.head flags.qcresults)
+
+
+
+-- TODO change so it later reads multiple analytes
+
+
 readData : Flags -> List Datum
 readData flags =
-    List.map (\d -> Datum (toFloat (timify d.d)) d.c) flags.qcresults
+    List.map (\d -> Datum (toFloat (timify d.d)) d.c) (singleResults flags)
 
 
 toPoints : List Datum -> List Point2d
@@ -268,7 +281,7 @@ deviations model x fn =
             if List.length stats == 0 then
                 let
                     qcr =
-                        List.map (\qc -> qc.c) model.flags.qcresults
+                        List.map (\qc -> qc.c) (singleResults model.flags)
 
                     qmax =
                         Maybe.withDefault 300.0 (List.maximum qcr)
@@ -280,7 +293,7 @@ deviations model x fn =
                         abs (qmax - qmin)
 
                     values =
-                        List.map (\qr -> qr.c) model.flags.qcresults
+                        List.map (\qr -> qr.c) (singleResults model.flags)
 
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
@@ -348,13 +361,14 @@ averageMean flags =
     if List.length meanValues == 0 then
         let
             qcvalues =
-                flags.qcresults
+                singleResults flags
         in
         if List.length qcvalues == 0 then
             250.0
 
         else
-            List.foldl (+) 0.0 (List.map (\qc -> qc.c) qcvalues) / toFloat (List.length flags.qcresults)
+            List.foldl (+) 0.0 (List.map (\qc -> qc.c) qcvalues)
+                / toFloat (List.length qcvalues)
 
     else
         List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
@@ -363,7 +377,7 @@ averageMean flags =
 standardDeviation flags =
     let
         values =
-            List.map (\qc -> qc.c) flags.qcresults
+            List.map (\qc -> qc.c) (singleResults flags)
 
         mean =
             List.foldl (+) 0.0 values / toFloat (List.length values)
