@@ -155,7 +155,7 @@ init flags =
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
-      , chartType = "default"
+      , chartType = flags.chart_type
       , data = data
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to

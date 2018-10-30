@@ -87,13 +87,11 @@ createQcShape : Model -> ScaledPoint -> String -> Svg Msg
 createQcShape model point fill =
     let
         myToolTip =
-            Debug.log (" zzzzzzzzzzzzzzzzzzzzzzzzz " ++ Debug.toString model.chartType)
-                (if model.chartType == "default" then
-                    DataScaledPoint point
+            if model.chartType == "default" then
+                DataScaledPoint point
 
-                 else
-                    DataCombinedPoint point
-                )
+            else
+                DataCombinedPoint point
     in
     Svg.polygon2d
         [ Attributes.fill fill

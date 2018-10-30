@@ -19,7 +19,7 @@ showTheTooltip model =
 
         Just tt ->
             div
-                [ class "log-record-tooltip-zzz"
+                [ class "log-record-tooltip"
                 , style
                     ("left: "
                         ++ String.fromFloat (10 + Tuple.first tt.coordinates)
@@ -84,7 +84,64 @@ showTheTooltip model =
                         ]
 
                     DataCombinedPoint d ->
-                        [ span [] [ text ("combined tooltip " ++ Debug.toString d) ] ]
+                        let
+                            tm =
+                                ISO8601.fromTime (floor d.datum.time)
+
+                            t2 =
+                                ISO8601.toString tm
+
+                            t3 =
+                                List.head (String.split "Z" t2)
+
+                            t4 =
+                                String.split "T" (Maybe.withDefault "" t3)
+
+                            dx =
+                                List.head t4
+
+                            tx =
+                                case List.tail t4 of
+                                    Nothing ->
+                                        ""
+
+                                    Just s ->
+                                        Maybe.withDefault "" (List.head s)
+
+                            poisonId =
+                                d.datum.aid
+
+                            ana =
+                                "Poison!!! "
+                                    ++ " - "
+                                    ++ Debug.toString
+                                        (List.filter
+                                            (\ax ->
+                                                ax.id == poisonId
+                                            )
+                                            model.flags.analytes
+                                        )
+                        in
+                        [ span
+                            [ class "tool-tip-title" ]
+                            [ text "Date: " ]
+                        , span [] [ text (Maybe.withDefault "" dx) ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ] [ text "Time: " ]
+                        , span [] [ text tx ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ]
+                            [ text "Concentration: " ]
+                        , span
+                            []
+                            [ text (String.fromFloat d.datum.value) ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ]
+                            [ text "Analyte name: " ]
+                        , span
+                            []
+                            [ text ana ]
+                        ]
                 )
 
 
