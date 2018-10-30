@@ -22,8 +22,7 @@ type alias Model =
 
 
 type alias Flags =
-    { acqnominal : Float
-    , analyteid : Int
+    { analyteid : Int
     , chart_type : String
     , date_from : String
     , date_to : String
@@ -32,7 +31,7 @@ type alias Flags =
     , stats : List StatsData
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
-    , qcresults : List RawCid
+    , qcresults : List AnalyteResults
     }
 
 
@@ -85,6 +84,10 @@ type alias StatsData =
     , mean : Float
     , nominal : Float
     }
+
+
+type AnalyteResults
+    = List RawCid
 
 
 type alias RawCid =
