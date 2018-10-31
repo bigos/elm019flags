@@ -4,7 +4,7 @@ import App.Chart exposing (..)
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
 import App.Utilities exposing (..)
-import Html exposing (Html, a, br, div, span, text)
+import Html exposing (Html, a, br, div, hr, span, text)
 import Html.Attributes exposing (href)
 import ISO8601
 import Svg exposing (Svg)
@@ -111,18 +111,47 @@ showTheTooltip model =
                             poisonId =
                                 d.datum.aid
 
-                            ana =
-                                "Poison!!! "
-                                    ++ " - "
-                                    ++ Debug.toString
+                            anarec =
+                                Maybe.withDefault defaultAnalyteData
+                                    (List.head
                                         (List.filter
                                             (\ax ->
                                                 ax.id == poisonId
                                             )
                                             model.flags.analytes
                                         )
+                                    )
                         in
                         [ span
+                            [ class "tool-tip-title" ]
+                            [ text "Analyte: " ]
+                        , span
+                            []
+                            [ text anarec.analyte ]
+                        , br [] []
+                        , span
+                            [ class "tool-tip-title" ]
+                            [ text "EID: " ]
+                        , span
+                            []
+                            [ text (String.fromInt anarec.eid) ]
+                        , br [] []
+                        , span
+                            [ class "tool-tip-title" ]
+                            [ text "Machine: " ]
+                        , span
+                            []
+                            [ text anarec.machine ]
+                        , br [] []
+                        , span
+                            [ class "tool-tip-title" ]
+                            [ text "Sample: " ]
+                        , span
+                            []
+                            [ text anarec.sample ]
+                        , hr []
+                            []
+                        , span
                             [ class "tool-tip-title" ]
                             [ text "Date: " ]
                         , span [] [ text (Maybe.withDefault "" dx) ]
@@ -135,12 +164,6 @@ showTheTooltip model =
                         , span
                             []
                             [ text (String.fromFloat d.datum.value) ]
-                        , br [] []
-                        , span [ class "tool-tip-title" ]
-                            [ text "Analyte name: " ]
-                        , span
-                            []
-                            [ text ana ]
                         ]
                 )
 

@@ -1,4 +1,4 @@
-module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -22,7 +22,14 @@ type alias Model =
 
 
 type alias Flags =
-    { analytes : List { id : Int, name : String }
+    { analytes :
+        List
+            { id : Int
+            , analyte : String
+            , sample : String
+            , machine : String
+            , eid : Int
+            }
     , chart_type : String
     , date_from : String
     , date_to : String
@@ -228,9 +235,20 @@ singleAnalyteId model =
                 model.flags.analytes
 
         an =
-            Maybe.withDefault { id = 0, name = "" } anh
+            Maybe.withDefault
+                defaultAnalyteData
+                anh
     in
     an.id
+
+
+defaultAnalyteData =
+    { id = 0
+    , analyte = ""
+    , sample = ""
+    , machine = ""
+    , eid = 0
+    }
 
 
 
