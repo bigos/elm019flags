@@ -6,6 +6,7 @@ import App.Model exposing (..)
 import App.Utilities exposing (..)
 import Html exposing (Html, a, br, div, hr, span, text)
 import Html.Attributes exposing (href)
+import Html.Events exposing (onClick)
 import ISO8601
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
@@ -212,4 +213,5 @@ view model =
         -- , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
         , hr [] []
         , div [] [ text "legend will go here" ]
+        , div [ onClick GetMachines ] [ text "click to get machines" ]
         ]

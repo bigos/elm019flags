@@ -2,6 +2,7 @@ module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, 
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
+import Http exposing (..)
 import ISO8601
 import List.Extra
 import Point2d exposing (Point2d)
@@ -139,6 +140,8 @@ type alias Tooltip =
 type Msg
     = TooltipMouseEnter TooltipData ( Float, Float ) (Maybe String)
     | TooltipMouseLeave
+    | GetMachines
+    | RequestedMachines (Result Http.Error String)
 
 
 
