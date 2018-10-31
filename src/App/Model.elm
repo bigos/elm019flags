@@ -140,12 +140,13 @@ type alias Tooltip =
 type alias Machine =
     { eid : Int
     , name : String
-    , exclude : Int
-    , manual : Int
-    , branchid : Int
-    , food : Maybe Int
-    , id : Int
-    , instrument_lod : Maybe Int
+
+    -- , exclude : Int
+    -- , manual : Int
+    -- , branchid : Int
+    -- , food : Int
+    -- , id : Int
+    -- , instrument_lod : Int
     }
 
 
@@ -157,7 +158,7 @@ type Msg
     = TooltipMouseEnter TooltipData ( Float, Float ) (Maybe String)
     | TooltipMouseLeave
     | GetMachines
-    | RequestedMachines (Result Http.Error String)
+    | RequestedMachines (Result Http.Error (List Machine))
 
 
 
