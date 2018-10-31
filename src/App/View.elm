@@ -210,4 +210,6 @@ view model =
 
         -- , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.chartScalings) ]
         -- , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
+        , hr [] []
+        , div [] [ text "legend will go here" ]
         ]
