@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import App.Model exposing (..)
+import App.Subscriptions exposing (..)
 import App.Update exposing (..)
 import App.Utilities exposing (..)
 import App.View exposing (view)
@@ -14,8 +15,3 @@ main =
         , subscriptions = subscriptions
         , view = view
         }
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none

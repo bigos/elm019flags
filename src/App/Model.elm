@@ -1,5 +1,6 @@
 module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
+import App.AnalyteSelector exposing (..)
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
 import Http exposing (..)
@@ -19,6 +20,7 @@ type alias Model =
     , points : List (List Point2d)
     , scaledPoints : List (List ScaledPoint)
     , tooltip : Maybe Tooltip
+    , analyteSelector : Maybe AnalyteSelector
     }
 
 
@@ -190,6 +192,7 @@ init flags =
       , points = points
       , scaledPoints = scaleXY flags data chartBoundingBox
       , tooltip = Nothing
+      , analyteSelector = Nothing
       }
     , Cmd.none
     )
