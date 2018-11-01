@@ -213,5 +213,6 @@ view model =
         -- , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
         , hr [] []
         , div [] [ text "legend will go here" ]
-        , button [ onClick GetMachines ] [ text "Get machines" ]
+        , button [ onClick GetMachines ] [ text "Select machine" ]
+        , div [] [ text (Debug.toString model.analyteSelector) ]
         ]
