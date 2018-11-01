@@ -142,13 +142,6 @@ type alias Tooltip =
 type alias Machine =
     { eid : Int
     , name : String
-
-    -- , exclude : Int
-    -- , manual : Int
-    -- , branchid : Int
-    -- , food : Int
-    -- , id : Int
-    -- , instrument_lod : Int
     }
 
 

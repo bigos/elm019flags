@@ -54,12 +54,3 @@ machineDecoder =
     Decode.succeed Machine
         |> required "eid" Decode.int
         |> required "name" Decode.string
-
-
-
--- |> required "exclude" Decode.int
--- |> required "manual" Decode.int
--- |> required "branchid" Decode.int
--- |> required "food" Decode.int
--- |> required "id" Decode.int
--- |> required "instrument_lod" Decode.int
