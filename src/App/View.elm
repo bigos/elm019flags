@@ -211,8 +211,18 @@ view model =
 
         -- , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.chartScalings) ]
         -- , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
-        , hr [] []
-        , div [] [ text "legend will go here" ]
-        , button [ onClick GetMachines ] [ text "Select machine" ]
-        , div [] [ text (Debug.toString model.analyteSelector) ]
+        , showAnalyteSelection model
         ]
+
+
+showAnalyteSelection model =
+    if model.chartType == "default" then
+        div [] []
+
+    else
+        div []
+            [ hr [] []
+            , div [] [ text "legend will go here" ]
+            , button [ onClick GetMachines ] [ text "Select machine" ]
+            , div [] [ text (Debug.toString model.analyteSelector) ]
+            ]

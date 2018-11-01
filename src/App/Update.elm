@@ -1,5 +1,6 @@
 module App.Update exposing (getMachines, machineDecoder, update)
 
+import App.AnalyteSelector exposing (..)
 import App.Model exposing (..)
 import Http exposing (..)
 import Json.Decode as Decode exposing (Decoder, int, list, string)
@@ -27,8 +28,19 @@ update msg model =
             ( model, getMachines )
 
         RequestedMachines res ->
+            let
+                opts =
+                    case res of
+                        Err _ ->
+                            []
+
+                        Ok d ->
+                            List.map Debug.toString d
+            in
             Debug.log ("zzzz " ++ Debug.toString res)
-                ( model, Cmd.none )
+                ( { model | analyteSelector = Just (setMachineOptions model.analyteSelector opts) }
+                , Cmd.none
+                )
 
         Keypress str ->
             Debug.log ("pressed key " ++ Debug.toString str)

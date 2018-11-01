@@ -175,6 +175,13 @@ init flags =
 
         chartBoundingBox =
             BoundingBox2d.containingPoints flattenedPoints
+
+        ansel =
+            if flags.chart_type == "default" then
+                Nothing
+
+            else
+                Just initAnalyteSelector
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
@@ -186,7 +193,7 @@ init flags =
       , points = points
       , scaledPoints = scaleXY flags data chartBoundingBox
       , tooltip = Nothing
-      , analyteSelector = Nothing
+      , analyteSelector = ansel
       }
     , Cmd.none
     )
