@@ -30,6 +30,10 @@ update msg model =
             Debug.log ("zzzz " ++ Debug.toString res)
                 ( model, Cmd.none )
 
+        Keypress str ->
+            Debug.log ("pressed key " ++ Debug.toString str)
+                ( model, Cmd.none )
+
 
 
 -- HTTP

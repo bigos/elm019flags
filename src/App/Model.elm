@@ -161,6 +161,7 @@ type Msg
     | TooltipMouseLeave
     | GetMachines
     | RequestedMachines (Result Http.Error (List Machine))
+    | Keypress String
 
 
 
