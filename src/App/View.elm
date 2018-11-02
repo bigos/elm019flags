@@ -344,12 +344,13 @@ toggleButton =
 
 clearButton : Maybe (Html Never)
 clearButton =
-    Just <|
-        Html.div
-            [ class "selectize__menu-toggle" ]
-            [ i
-                [ class "material-icons"
-                , class "selectize__icon"
-                ]
-                [ text "clear" ]
-            ]
+    -- Just <|
+    --     Html.div
+    --         [ class "selectize__menu-toggle" ]
+    --         [ i
+    --             [ class "material-icons"
+    --             , class "selectize__icon"
+    --             ]
+    --             [ text "clear" ]
+    --         ]
+    Nothing
