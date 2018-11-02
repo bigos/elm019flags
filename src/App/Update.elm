@@ -29,7 +29,14 @@ update msg model =
 
         RequestedMachines res ->
             Debug.log ("zzzz " ++ Debug.toString res)
-                ( model, Cmd.none )
+                -- finish me
+                -- here use Selectize.closed to rebuild the menu items
+                ( { model
+                    | textfieldMenu = rebuildmenu
+                    , buttonMenu = rebuildmenu
+                  }
+                , Cmd.none
+                )
 
         TextfieldMenuMsg selectizeMsg ->
             let

@@ -50,6 +50,7 @@ type alias Flags =
 
 
 type alias AxisData =
+    case
     { axis_x : AxisX, axis_y : AxisY }
 
 
