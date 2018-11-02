@@ -226,7 +226,7 @@ view model =
                     [ class "caption" ]
                     [ text "with autocompletion: " ]
                 , div
-                    [ style "width: 30rem" ]
+                    []
                     [ Selectize.view
                         viewConfigTextfield
                         model.textfieldSelection
