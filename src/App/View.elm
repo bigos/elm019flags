@@ -4,10 +4,11 @@ import App.Chart exposing (..)
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
 import App.Utilities exposing (..)
-import Html exposing (Html, a, br, button, div, hr, span, text)
-import Html.Attributes exposing (href)
+import Html exposing (Html, a, br, button, div, h3, hr, i, span, text)
+import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onClick)
 import ISO8601
+import Selectize
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 
@@ -214,4 +215,141 @@ view model =
         , hr [] []
         , div [] [ text "legend will go here" ]
         , button [ onClick GetMachines ] [ text "Get machines" ]
+        , h3 [] [ text "my menu" ]
+        , div
+            [ style "display: flex"
+            , style "flex-flow: column"
+            ]
+            [ div
+                [ class "container" ]
+                [ div
+                    [ class "caption" ]
+                    [ text "with autocompletion: " ]
+                , div
+                    [ style "width: 30rem" ]
+                    [ Selectize.view
+                        viewConfigTextfield
+                        model.textfieldSelection
+                        model.textfieldMenu
+                        |> Html.map TextfieldMenuMsg
+                    ]
+                ]
+            ]
         ]
+
+
+
+---- CONFIGURATION
+
+
+viewConfigTextfield : Selectize.ViewConfig String
+viewConfigTextfield =
+    viewConfig textfieldSelector
+
+
+viewConfigButton : Selectize.ViewConfig String
+viewConfigButton =
+    viewConfig buttonSelector
+
+
+viewConfig : Selectize.Input String -> Selectize.ViewConfig String
+viewConfig selector =
+    Selectize.viewConfig
+        { container = []
+        , menu =
+            [ class "selectize__menu" ]
+        , ul =
+            [ class "selectize__list" ]
+        , entry =
+            \tree mouseFocused keyboardFocused ->
+                { attributes =
+                    [ class "selectize__item"
+                    , classList
+                        [ ( "selectize__item--mouse-selected"
+                          , mouseFocused
+                          )
+                        , ( "selectize__item--key-selected"
+                          , keyboardFocused
+                          )
+                        ]
+                    ]
+                , children =
+                    [ text tree ]
+                }
+        , divider =
+            \title ->
+                { attributes =
+                    [ class "selectize__divider" ]
+                , children =
+                    [ text title ]
+                }
+        , input = selector
+        }
+
+
+textfieldSelector : Selectize.Input String
+textfieldSelector =
+    Selectize.autocomplete <|
+        { attrs =
+            \sthSelected open ->
+                [ class "selectize__textfield"
+                , classList
+                    [ ( "selectize__textfield--selection", sthSelected )
+                    , ( "selectize__textfield--no-selection", not sthSelected )
+                    , ( "selectize__textfield--menu-open", open )
+                    ]
+                ]
+        , toggleButton = toggleButton
+        , clearButton = clearButton
+        , placeholder = "Select a License"
+        }
+
+
+buttonSelector : Selectize.Input String
+buttonSelector =
+    Selectize.simple
+        { attrs =
+            \sthSelected open ->
+                [ class "selectize__button"
+                , classList
+                    [ ( "selectize__button--light", open && not sthSelected ) ]
+                ]
+        , toggleButton = toggleButton
+        , clearButton = clearButton
+        , placeholder = "Select a License"
+        }
+
+
+toggleButton : Maybe (Bool -> Html Never)
+toggleButton =
+    Just <|
+        \open ->
+            div
+                [ class "selectize__menu-toggle"
+                , classList
+                    [ ( "selectize__menu-toggle--menu-open", open ) ]
+                ]
+                [ i
+                    [ class "material-icons"
+                    , class "selectize__icon"
+                    ]
+                    [ if open then
+                        text "arrow_drop_up"
+
+                      else
+                        text "arrow_drop_down"
+                    ]
+                ]
+
+
+clearButton : Maybe (Html Never)
+clearButton =
+    Just <|
+        Html.div
+            [ class "selectize__menu-toggle" ]
+            [ i
+                [ class "material-icons"
+                , class "selectize__icon"
+                ]
+                [ text "clear" ]
+            ]

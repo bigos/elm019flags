@@ -221,7 +221,7 @@ init flags =
 
 
 menuOptions =
-    List.map Selectize.entry [ "str1", "str2" ]
+    List.map Selectize.entry [ "ala", "ma", "kota" ]
 
 
 findStatForTime : List StatsData -> Int -> Maybe StatsData
