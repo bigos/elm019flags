@@ -15,6 +15,7 @@ keyDecoder =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ Browser.Events.onKeyDown keyDecoder
-        ]
+    -- Sub.batch
+    --     [ Browser.Events.onKeyDown keyDecoder
+    --     ]
+    Sub.none
