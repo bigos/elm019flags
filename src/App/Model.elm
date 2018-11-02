@@ -22,6 +22,7 @@ type alias Model =
     , tooltip : Maybe Tooltip
     , textfieldSelection : Maybe String
     , textfieldMenu : Selectize.State String
+    , textfieldMenuOptions : Maybe (List String)
     , buttonSelection : Maybe String
     , buttonMenu : Selectize.State String
     }
@@ -211,6 +212,7 @@ init flags =
                 "button-menu"
                 identity
                 menuOptions
+      , textfieldMenuOptions = Nothing
       }
     , Cmd.none
     )
