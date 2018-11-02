@@ -42,7 +42,8 @@ update msg model =
                         List.map (\r -> Selectize.entry r.name) opts1
                  in
                  ( { model
-                    | textfieldMenu =
+                    | combinedAdditionStage = Just StageMachine
+                    , textfieldMenu =
                         rebuildMachinesMenu
                             "textfield-menu"
                             opts
@@ -101,7 +102,23 @@ update msg model =
 
         SelectTextfieldOption newSelection ->
             Debug.log ("menu option selection " ++ Debug.toString newSelection)
-                ( { model | textfieldSelection = newSelection }, Cmd.none )
+                (case model.combinedAdditionStage of
+                    Nothing ->
+                        ( { model | textfieldSelection = newSelection }, Cmd.none )
+
+                    Just stage ->
+                        case stage of
+                            StageMachine ->
+                                ( { model
+                                    | textfieldSelection = newSelection
+                                    , combinedAdditionStage = Just StageSample
+                                  }
+                                , Cmd.none
+                                )
+
+                            _ ->
+                                ( { model | textfieldSelection = newSelection }, Cmd.none )
+                )
 
         SelectButtonOption newSelection ->
             ( { model | buttonSelection = newSelection }, Cmd.none )

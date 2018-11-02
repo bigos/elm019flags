@@ -1,4 +1,4 @@
-module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, rebuildMachinesMenu, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, rebuildMachinesMenu, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -26,7 +26,14 @@ type alias Model =
     , textfieldMenuPlaceholder : String
     , buttonSelection : Maybe String
     , buttonMenu : Selectize.State String
+    , combinedAdditionStage : Maybe AdditionStage
     }
+
+
+type AdditionStage
+    = StageMachine
+    | StageSample
+    | StageAnalyte
 
 
 type alias Flags =
@@ -214,7 +221,8 @@ init flags =
                 identity
                 []
       , textfieldMenuOptions = Nothing
-      , textfieldMenuPlaceholder = "Weeeee"
+      , textfieldMenuPlaceholder = "Waiting for Command"
+      , combinedAdditionStage = Nothing
       }
     , Cmd.none
     )

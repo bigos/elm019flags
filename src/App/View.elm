@@ -210,35 +210,50 @@ view model =
             ]
         , div [ style "height:1em;" ] []
         , hr [] []
-        , combinedViewPart model
+        , button [ onClick GetMachines ] [ text "Add Analyte 1/3" ]
+        , if model.chartType == "default" then
+            div [] []
+
+          else
+            combinedViewPart model
         ]
 
 
 combinedViewPart model =
-    if model.chartType == "default" then
-        div [] []
+    case model.combinedAdditionStage of
+        Nothing ->
+            div [] [ text "no particular addition at the moment" ]
 
-    else
-        div []
-            [ div
-                [ style "display: flex"
-                , style "flex-flow: column"
-                ]
-                [ div
-                    [ class "container" ]
-                    [ div []
-                        [ Selectize.view
-                            (viewConfigTextfield
-                                model
-                            )
-                            model.textfieldSelection
-                            model.textfieldMenu
-                            |> Html.map TextfieldMenuMsg
+        Just stage ->
+            case stage of
+                StageAnalyte ->
+                    div [] [ text "analyte stage" ]
+
+                StageSample ->
+                    div [] [ text "sample stage" ]
+
+                StageMachine ->
+                    div []
+                        [ div [] [ text "machine stage" ]
+                        , div
+                            [ style "display: flex"
+                            , style "flex-flow: column"
+                            ]
+                            [ div
+                                [ class "container" ]
+                                [ div []
+                                    [ Selectize.view
+                                        (viewConfigTextfield
+                                            model
+                                        )
+                                        model.textfieldSelection
+                                        model.textfieldMenu
+                                        |> Html.map TextfieldMenuMsg
+                                    ]
+                                ]
+                            ]
+                        , div [] [ text (Debug.toString model) ]
                         ]
-                    ]
-                ]
-            , div [] [ text (Debug.toString model) ]
-            ]
 
 
 
