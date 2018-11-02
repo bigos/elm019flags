@@ -5,6 +5,7 @@ import App.Model exposing (..)
 import Http exposing (..)
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
+import Selectize
 
 
 
@@ -45,6 +46,35 @@ update msg model =
         Keypress str ->
             Debug.log ("pressed key " ++ Debug.toString str)
                 ( model, Cmd.none )
+
+        TextfieldMenuMsg selectizeMsg ->
+            let
+                ( newMenu, menuCmd, maybeMsg ) =
+                    Selectize.update SelectTextfieldMachine
+                        model.analyteSelector.machineSelection
+                        model.analyteSelector.machineMenu
+                        selectizeMsg
+
+                newModel =
+                    let
+                        mas =
+                            model.analyteSelector
+
+                        mas2 =
+                            { mas | machineMenu = newMenu }
+                    in
+                    { model | analyteSelector = mas2 }
+
+                cmd =
+                    menuCmd |> Cmd.map TextfieldMenuMsg
+            in
+            case maybeMsg of
+                Just nextMsg ->
+                    update nextMsg newModel
+                        |> andDo cmd
+
+                Nothing ->
+                    ( newModel, cmd )
 
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
