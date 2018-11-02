@@ -39,7 +39,7 @@ update msg model =
                                 d
 
                     opts =
-                        List.map (\m -> m.name) opts1
+                        List.map (\r -> Selectize.entry r.name) opts1
                  in
                  ( { model
                     | combinedAdditionStage = Just StageMachine
