@@ -1,4 +1,4 @@
-module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, menuOptions, prepareTime, readCombinedData, rebuildMachinesMenu, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -224,6 +224,10 @@ init flags =
 
 menuOptions =
     List.map Selectize.entry [ "ala", "ma", "kota" ]
+
+
+rebuildMachinesMenu id opts =
+    Selectize.closed id identity opts
 
 
 findStatForTime : List StatsData -> Int -> Maybe StatsData

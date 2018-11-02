@@ -241,6 +241,7 @@ combinedViewPart model =
                         ]
                     ]
                 ]
+            , div [] [ text (Debug.toString model) ]
             ]
 
 
