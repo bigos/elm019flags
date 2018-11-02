@@ -4,6 +4,7 @@ import App.Model exposing (..)
 import Http exposing (..)
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
+import Selectize
 
 
 
@@ -29,6 +30,35 @@ update msg model =
         RequestedMachines res ->
             Debug.log ("zzzz " ++ Debug.toString res)
                 ( model, Cmd.none )
+
+        TextfieldMenuMsg selectizeMsg ->
+            let
+                ( newMenu, menuCmd, maybeMsg ) =
+                    Selectize.update SelectTextfieldLicense
+                        model.textfieldSelection
+                        model.textfieldMenu
+                        selectizeMsg
+
+                newModel =
+                    { model | textfieldMenu = newMenu }
+
+                cmd =
+                    menuCmd |> Cmd.map TextfieldMenuMsg
+            in
+            case maybeMsg of
+                Just nextMsg ->
+                    update nextMsg newModel
+                        |> andDo cmd
+
+                Nothing ->
+                    ( newModel, cmd )
+
+
+andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
+andDo cmd ( model, cmds ) =
+    ( model
+    , Cmd.batch [ cmd, cmds ]
+    )
 
 
 

@@ -6,6 +6,7 @@ import Http exposing (..)
 import ISO8601
 import List.Extra
 import Point2d exposing (Point2d)
+import Selectize
 
 
 type alias Model =
@@ -19,6 +20,10 @@ type alias Model =
     , points : List (List Point2d)
     , scaledPoints : List (List ScaledPoint)
     , tooltip : Maybe Tooltip
+    , textfieldSelection : Maybe String
+    , textfieldMenu : Selectize.State String
+    , buttonSelection : Maybe String
+    , buttonMenu : Selectize.State String
     }
 
 
@@ -159,6 +164,10 @@ type Msg
     | TooltipMouseLeave
     | GetMachines
     | RequestedMachines (Result Http.Error (List Machine))
+    | TextfieldMenuMsg (Selectize.Msg String)
+    | ButtonMenuMsg (Selectize.Msg String)
+    | SelectTextfieldLicense (Maybe String)
+    | SelectButtonLicense (Maybe String)
 
 
 
@@ -190,9 +199,29 @@ init flags =
       , points = points
       , scaledPoints = scaleXY flags data chartBoundingBox
       , tooltip = Nothing
+      , textfieldSelection = Nothing
+      , textfieldMenu =
+            Selectize.closed
+                "textfield-menu"
+                identity
+                menuOptions
+      , buttonSelection = Nothing
+      , buttonMenu =
+            Selectize.closed
+                "button-menu"
+                identity
+                menuOptions
       }
     , Cmd.none
     )
+
+
+
+-- menuoptions is licenses in the original
+
+
+menuOptions =
+    List.map Selectize.entry [ "str1", "str2" ]
 
 
 findStatForTime : List StatsData -> Int -> Maybe StatsData
