@@ -53,6 +53,34 @@ update msg model =
                 Nothing ->
                     ( newModel, cmd )
 
+        ButtonMenuMsg selectizeMsg ->
+            let
+                ( newMenu, menuCmd, maybeMsg ) =
+                    Selectize.update SelectButtonLicense
+                        model.buttonSelection
+                        model.buttonMenu
+                        selectizeMsg
+
+                newModel =
+                    { model | buttonMenu = newMenu }
+
+                cmd =
+                    menuCmd |> Cmd.map ButtonMenuMsg
+            in
+            case maybeMsg of
+                Just nextMsg ->
+                    update nextMsg newModel
+                        |> andDo cmd
+
+                Nothing ->
+                    ( newModel, cmd )
+
+        SelectTextfieldLicense newSelection ->
+            ( { model | textfieldSelection = newSelection }, Cmd.none )
+
+        SelectButtonLicense newSelection ->
+            ( { model | buttonSelection = newSelection }, Cmd.none )
+
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
 andDo cmd ( model, cmds ) =
