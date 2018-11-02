@@ -25,7 +25,7 @@ update msg model =
             )
 
         GetMachines ->
-            ( model, getMachines )
+            ( { model | textfieldMenuPlaceholder = "Select Machine" }, getMachines )
 
         RequestedMachines res ->
             Debug.log ("zzzz " ++ Debug.toString res)
@@ -58,7 +58,7 @@ update msg model =
         TextfieldMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectTextfieldLicense
+                    Selectize.update SelectTextfieldOption
                         model.textfieldSelection
                         model.textfieldMenu
                         selectizeMsg
@@ -80,7 +80,7 @@ update msg model =
         ButtonMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectButtonLicense
+                    Selectize.update SelectButtonOption
                         model.buttonSelection
                         model.buttonMenu
                         selectizeMsg
@@ -99,10 +99,11 @@ update msg model =
                 Nothing ->
                     ( newModel, cmd )
 
-        SelectTextfieldLicense newSelection ->
-            ( { model | textfieldSelection = newSelection }, Cmd.none )
+        SelectTextfieldOption newSelection ->
+            Debug.log ("menu option selection " ++ Debug.toString newSelection)
+                ( { model | textfieldSelection = newSelection }, Cmd.none )
 
-        SelectButtonLicense newSelection ->
+        SelectButtonOption newSelection ->
             ( { model | buttonSelection = newSelection }, Cmd.none )
 
 

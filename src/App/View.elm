@@ -209,6 +209,7 @@ view model =
             [ pdfLink model
             ]
         , div [ style "height:1em;" ] []
+        , hr [] []
         , combinedViewPart model
         ]
 
@@ -219,22 +220,17 @@ combinedViewPart model =
 
     else
         div []
-            [ hr [] []
-            , div [] [ text "legend will go here" ]
-            , button [ onClick GetMachines ] [ text "Get machines" ]
-            , h3 [] [ text "my menu" ]
-            , div
+            [ div
                 [ style "display: flex"
                 , style "flex-flow: column"
                 ]
                 [ div
                     [ class "container" ]
-                    [ div
-                        [ class "caption" ]
-                        [ text "with autocompletion: " ]
-                    , div []
+                    [ div []
                         [ Selectize.view
-                            viewConfigTextfield
+                            (viewConfigTextfield
+                                model
+                            )
                             model.textfieldSelection
                             model.textfieldMenu
                             |> Html.map TextfieldMenuMsg
@@ -249,9 +245,9 @@ combinedViewPart model =
 ---- CONFIGURATION
 
 
-viewConfigTextfield : Selectize.ViewConfig String
-viewConfigTextfield =
-    viewConfig textfieldSelector
+viewConfigTextfield : Model -> Selectize.ViewConfig String
+viewConfigTextfield model =
+    viewConfig (textfieldSelector model)
 
 
 viewConfigButton : Selectize.ViewConfig String
@@ -294,8 +290,8 @@ viewConfig selector =
         }
 
 
-textfieldSelector : Selectize.Input String
-textfieldSelector =
+textfieldSelector : Model -> Selectize.Input String
+textfieldSelector model =
     Selectize.autocomplete <|
         { attrs =
             \sthSelected open ->
@@ -308,7 +304,7 @@ textfieldSelector =
                 ]
         , toggleButton = toggleButton
         , clearButton = clearButton
-        , placeholder = "Select a License"
+        , placeholder = model.textfieldMenuPlaceholder
         }
 
 
