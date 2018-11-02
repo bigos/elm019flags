@@ -210,7 +210,6 @@ view model =
             ]
         , div [ style "height:1em;" ] []
         , hr [] []
-        , button [ onClick GetMachines ] [ text "Add Analyte 1/3" ]
         , if model.chartType == "default" then
             div [] []
 
@@ -222,7 +221,12 @@ view model =
 combinedViewPart model =
     case model.combinedAdditionStage of
         Nothing ->
-            div [] [ text "no particular addition at the moment" ]
+            div []
+                [ div []
+                    [ text "no particular addition at the moment"
+                    ]
+                , button [ onClick GetMachines ] [ text "Add Analyte 1/3 - machines" ]
+                ]
 
         Just stage ->
             case stage of
@@ -230,7 +234,12 @@ combinedViewPart model =
                     div [] [ text "analyte stage" ]
 
                 StageSample ->
-                    div [] [ text "sample stage" ]
+                    div
+                        []
+                        [ div [] [ text "sample stage" ]
+                        , button [ onClick GetMachines ]
+                            [ text "Add Analyte 2/3 - samples" ]
+                        ]
 
                 StageMachine ->
                     div []
