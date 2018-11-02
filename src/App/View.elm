@@ -209,33 +209,39 @@ view model =
             [ pdfLink model
             ]
         , div [ style "height:1em;" ] []
+        , combinedViewPart model
+        ]
 
-        -- , div [ style "border: blue solid 3px;" ] [ text (Debug.toString model.chartScalings) ]
-        -- , div [] [ text (Debug.toString (largestDeviation model.flags)) ]
-        , hr [] []
-        , div [] [ text "legend will go here" ]
-        , button [ onClick GetMachines ] [ text "Get machines" ]
-        , h3 [] [ text "my menu" ]
-        , div
-            [ style "display: flex"
-            , style "flex-flow: column"
-            ]
-            [ div
-                [ class "container" ]
+
+combinedViewPart model =
+    if model.chartType == "default" then
+        div [] []
+
+    else
+        div []
+            [ hr [] []
+            , div [] [ text "legend will go here" ]
+            , button [ onClick GetMachines ] [ text "Get machines" ]
+            , h3 [] [ text "my menu" ]
+            , div
+                [ style "display: flex"
+                , style "flex-flow: column"
+                ]
                 [ div
-                    [ class "caption" ]
-                    [ text "with autocompletion: " ]
-                , div
-                    []
-                    [ Selectize.view
-                        viewConfigTextfield
-                        model.textfieldSelection
-                        model.textfieldMenu
-                        |> Html.map TextfieldMenuMsg
+                    [ class "container" ]
+                    [ div
+                        [ class "caption" ]
+                        [ text "with autocompletion: " ]
+                    , div []
+                        [ Selectize.view
+                            viewConfigTextfield
+                            model.textfieldSelection
+                            model.textfieldMenu
+                            |> Html.map TextfieldMenuMsg
+                        ]
                     ]
                 ]
             ]
-        ]
 
 
 
