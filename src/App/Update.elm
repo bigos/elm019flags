@@ -38,13 +38,20 @@ update msg model =
                             List.map Debug.toString d
             in
             Debug.log ("zzzz " ++ Debug.toString res)
-                ( { model | analyteSelector = Just (setMachineOptions model.analyteSelector opts) }
+                ( model
                 , Cmd.none
                 )
 
         Keypress str ->
             Debug.log ("pressed key " ++ Debug.toString str)
                 ( model, Cmd.none )
+
+
+andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
+andDo cmd ( model, cmds ) =
+    ( model
+    , Cmd.batch [ cmd, cmds ]
+    )
 
 
 

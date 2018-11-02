@@ -1,40 +1,23 @@
-module App.AnalyteSelector exposing (AnalyteSelector, SelectorSelection(..), initAnalyteSelector, setMachineOptions)
+module App.AnalyteSelector exposing (AnalyteSelector, initAnalyteSelector, machineList)
+
+import Selectize
 
 
 type alias AnalyteSelector =
-    { machine : Maybe Int
-    , sample : Maybe Int
-    , analyte : Maybe Int
-    , currentSelector : SelectorSelection
-    , selectorOptions : List String
-    , selectedItem : Maybe String
-    , filter : Maybe String
+    { machineSelection : Maybe String
+    , machineMenu : Selectize.State String
     }
-
-
-type SelectorSelection
-    = MachineSelection
-    | SampleSelection
-    | AnalyteSelection
 
 
 initAnalyteSelector =
-    { machine = Nothing
-    , sample = Nothing
-    , analyte = Nothing
-    , currentSelector = MachineSelection
-    , selectorOptions = []
-    , selectedItem = Nothing
-    , filter = Nothing
+    { machineSelection = Nothing
+    , machineMenu = Selectize.closed "machine-menu" identity machineList
     }
 
 
-setMachineOptions ans opts =
-    { machine = Nothing
-    , sample = Nothing
-    , analyte = Nothing
-    , currentSelector = MachineSelection
-    , selectorOptions = opts
-    , selectedItem = Nothing
-    , filter = Nothing
-    }
+machineList =
+    let
+        mm =
+            [ "mach1", "mach2" ]
+    in
+    List.map Selectize.entry mm

@@ -7,6 +7,7 @@ import Http exposing (..)
 import ISO8601
 import List.Extra
 import Point2d exposing (Point2d)
+import Selectize
 
 
 type alias Model =
@@ -155,6 +156,10 @@ type Msg
     | GetMachines
     | RequestedMachines (Result Http.Error (List Machine))
     | Keypress String
+    | TextfieldMenuMsg (Selectize.Msg String) -- machine selector
+    | ButtonMenuMsg (Selectize.Msg String)
+    | SelectTextfieldMachine (Maybe String)
+    | SelectButtonMachine (Maybe String)
 
 
 
