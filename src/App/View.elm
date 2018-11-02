@@ -215,6 +215,9 @@ view model =
 
           else
             combinedViewPart model
+        , div [] [ text <| Debug.toString model.combinedAdditionStage ]
+        , div [] [ text <| Debug.toString model.combinedAdditionMachine ]
+        , div [] [ text <| Debug.toString model.combinedAdditionSample ]
         ]
 
 

@@ -39,17 +39,14 @@ update msg model =
                                 d
 
                     opts =
-                        List.map (\r -> Selectize.entry r.name) opts1
+                        List.map (\m -> m.name) opts1
                  in
                  ( { model
                     | combinedAdditionStage = Just StageMachine
                     , textfieldMenu =
                         rebuildMachinesMenu
                             "textfield-menu"
-                            opts
-                    , buttonMenu =
-                        rebuildMachinesMenu
-                            "button-menu"
+                            identity
                             opts
                    }
                  , Cmd.none
@@ -111,6 +108,9 @@ update msg model =
                             StageMachine ->
                                 ( { model
                                     | textfieldSelection = newSelection
+
+                                    -- we need different way of handline the machine data so we can use ieds here
+                                    , combinedAdditionMachine = Just 1
                                     , combinedAdditionStage = Just StageSample
                                   }
                                 , Cmd.none

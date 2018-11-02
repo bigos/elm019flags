@@ -27,6 +27,9 @@ type alias Model =
     , buttonSelection : Maybe String
     , buttonMenu : Selectize.State String
     , combinedAdditionStage : Maybe AdditionStage
+    , combinedAdditionMachine : Maybe Int
+    , combinedAdditionSample : Maybe Int
+    , combinedAdditionAnalyte : Maybe Int
     }
 
 
@@ -154,13 +157,6 @@ type alias Tooltip =
 type alias Machine =
     { eid : Int
     , name : String
-
-    -- , exclude : Int
-    -- , manual : Int
-    -- , branchid : Int
-    -- , food : Int
-    -- , id : Int
-    -- , instrument_lod : Int
     }
 
 
@@ -223,6 +219,9 @@ init flags =
       , textfieldMenuOptions = Nothing
       , textfieldMenuPlaceholder = "Waiting for Command"
       , combinedAdditionStage = Nothing
+      , combinedAdditionMachine = Nothing
+      , combinedAdditionSample = Nothing
+      , combinedAdditionAnalyte = Nothing
       }
     , Cmd.none
     )
@@ -232,8 +231,10 @@ init flags =
 -- menuoptions is licenses in the original
 
 
-rebuildMachinesMenu id opts =
-    Selectize.closed id identity opts
+rebuildMachinesMenu id fn opts =
+    Selectize.closed id
+        fn
+        opts
 
 
 findStatForTime : List StatsData -> Int -> Maybe StatsData
