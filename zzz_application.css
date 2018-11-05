@@ -1,0 +1,41 @@
+/* line 4, /home/jacekp/code/qc_charts/app/assets/stylesheets/zzz_application.scss */
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* line 8, /home/jacekp/code/qc_charts/app/assets/stylesheets/zzz_application.scss */
+.centered {
+  text-align: center;
+}
+
+/* line 11, /home/jacekp/code/qc_charts/app/assets/stylesheets/zzz_application.scss */
+h1 {
+  margin-top: 2em;
+  margin-bottom: 1.5em;
+}
+
+/* line 15, /home/jacekp/code/qc_charts/app/assets/stylesheets/zzz_application.scss */
+.log-record-tooltip {
+  position: absolute;
+  z-index: 1000;
+  background-color: #88aaff;
+  color: black;
+  border: 1px solid #6688cc;
+  padding: 15px 20px;
+  box-shadow: 0px 3px 2px #8D8D8D;
+  border-radius: 6px;
+}
+
+/* line 25, /home/jacekp/code/qc_charts/app/assets/stylesheets/zzz_application.scss */
+.tool-tip-title {
+  font-weight: bold;
+}
+
+/* line 29, /home/jacekp/code/qc_charts/app/assets/stylesheets/zzz_application.scss */
+.alert {
+  background: red;
+  color: white;
+  font-weight: bold;
+}
+
