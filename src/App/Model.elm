@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -20,14 +20,20 @@ type alias Model =
     , points : List (List Point2d)
     , scaledPoints : List (List ScaledPoint)
     , tooltip : Maybe Tooltip
-    , textfieldSelection : Maybe String
-    , textfieldMenu : Selectize.State String
+    , textfieldSelection : Maybe Tree
+    , textfieldMenu : Selectize.State Tree
     , textfieldMenuOptions : Maybe (List String)
     , textfieldMenuPlaceholder : String
     , combinedAdditionStage : Maybe AdditionStage
     , combinedAdditionMachine : Maybe Int
     , combinedAdditionSample : Maybe Int
     , combinedAdditionAnalyte : Maybe Int
+    }
+
+
+type alias Tree =
+    { id : String
+    , name : String
     }
 
 
@@ -167,8 +173,8 @@ type Msg
     | TooltipMouseLeave
     | GetMachines
     | RequestedMachines (Result Http.Error (List Machine))
-    | TextfieldMenuMsg (Selectize.Msg String)
-    | SelectTextfieldOption (Maybe String)
+    | TextfieldMenuMsg (Selectize.Msg Tree)
+    | SelectTextfieldOption (Maybe Tree)
 
 
 
@@ -204,7 +210,7 @@ init flags =
       , textfieldMenu =
             Selectize.closed
                 "textfield-menu"
-                identity
+                (\tree -> tree.id ++ " - " ++ tree.name)
                 []
       , textfieldMenuOptions = Nothing
       , textfieldMenuPlaceholder = "Waiting for Command"

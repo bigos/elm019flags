@@ -39,12 +39,12 @@ update msg model =
                                 d
 
                     opts =
-                        List.map (\r -> Selectize.entry r.name) opts1
+                        List.map (\r -> Tree (String.fromInt r.eid) r.name) opts1
                  in
                  ( { model
                     | combinedAdditionStage = Just StageMachine
                     , textfieldMenu =
-                        Selectize.closed "textfield-menu" identity opts
+                        Selectize.closed "textfield-menu" (\e -> e.name) opts
                    }
                  , Cmd.none
                  )
