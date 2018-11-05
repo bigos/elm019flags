@@ -24,8 +24,6 @@ type alias Model =
     , textfieldMenu : Selectize.State String
     , textfieldMenuOptions : Maybe (List String)
     , textfieldMenuPlaceholder : String
-    , buttonSelection : Maybe String
-    , buttonMenu : Selectize.State String
     , combinedAdditionStage : Maybe AdditionStage
     , combinedAdditionMachine : Maybe Int
     , combinedAdditionSample : Maybe Int
@@ -170,9 +168,7 @@ type Msg
     | GetMachines
     | RequestedMachines (Result Http.Error (List Machine))
     | TextfieldMenuMsg (Selectize.Msg String)
-    | ButtonMenuMsg (Selectize.Msg String)
     | SelectTextfieldOption (Maybe String)
-    | SelectButtonOption (Maybe String)
 
 
 
@@ -208,12 +204,6 @@ init flags =
       , textfieldMenu =
             Selectize.closed
                 "textfield-menu"
-                identity
-                []
-      , buttonSelection = Nothing
-      , buttonMenu =
-            Selectize.closed
-                "button-menu"
                 identity
                 []
       , textfieldMenuOptions = Nothing

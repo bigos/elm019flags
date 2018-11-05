@@ -72,28 +72,6 @@ update msg model =
                 Nothing ->
                     ( newModel, cmd )
 
-        ButtonMenuMsg selectizeMsg ->
-            let
-                ( newMenu, menuCmd, maybeMsg ) =
-                    Selectize.update SelectButtonOption
-                        model.buttonSelection
-                        model.buttonMenu
-                        selectizeMsg
-
-                newModel =
-                    { model | buttonMenu = newMenu }
-
-                cmd =
-                    menuCmd |> Cmd.map ButtonMenuMsg
-            in
-            case maybeMsg of
-                Just nextMsg ->
-                    update nextMsg newModel
-                        |> andDo cmd
-
-                Nothing ->
-                    ( newModel, cmd )
-
         SelectTextfieldOption newSelection ->
             Debug.log ("menu option selection " ++ Debug.toString newSelection)
                 (case model.combinedAdditionStage of
@@ -116,9 +94,6 @@ update msg model =
                             _ ->
                                 ( { model | textfieldSelection = newSelection }, Cmd.none )
                 )
-
-        SelectButtonOption newSelection ->
-            ( { model | buttonSelection = newSelection }, Cmd.none )
 
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )
