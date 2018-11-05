@@ -258,7 +258,7 @@ combinedViewPart model =
                                         (viewConfigTextfield
                                             model
                                         )
-                                        model.textfieldSelection
+                                        model.textfieldSelection.id
                                         model.textfieldMenu
                                         |> Html.map TextfieldMenuMsg
                                     ]
