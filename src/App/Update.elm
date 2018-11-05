@@ -44,10 +44,7 @@ update msg model =
                  ( { model
                     | combinedAdditionStage = Just StageMachine
                     , textfieldMenu =
-                        rebuildMachinesMenu
-                            "textfield-menu"
-                            identity
-                            opts
+                        Selectize.closed "textfield-menu" identity opts
                    }
                  , Cmd.none
                  )
