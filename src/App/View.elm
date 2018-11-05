@@ -258,9 +258,12 @@ combinedViewPart model =
                                         (viewConfigTextfield
                                             model
                                         )
-                                        model.textfieldSelection.id
-                                        model.textfieldMenu
-                                        |> Html.map TextfieldMenuMsg
+                                        (Just
+                                            (Maybe.withDefault "" model.textfieldSelection.id)
+                                        )
+                                        (Html.map TextfieldMenuMsg
+                                            (Selectize.Msg (Maybe.withDefault "" model.textfieldMenu))
+                                        )
                                     ]
                                 ]
                             ]
