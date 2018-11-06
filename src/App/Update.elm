@@ -75,7 +75,7 @@ update msg model =
                             |> Selectize.closed "textfield-menu" (\e -> e.name)
                  in
                  ( { model
-                    | combinedAdditionStage = Just StageAnalyte
+                    | combinedAdditionStage = Just StageSample
                     , textfieldMenu =
                         opts3
                    }
