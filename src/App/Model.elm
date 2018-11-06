@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, ScaledPoint, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -164,6 +164,12 @@ type alias Machine =
     }
 
 
+type alias Sample =
+    { sampleid : Int
+    , name : String
+    }
+
+
 
 -- UPDATE TYPES
 
@@ -173,6 +179,7 @@ type Msg
     | TooltipMouseLeave
     | GetMachines
     | RequestedMachines (Result Http.Error (List Machine))
+    | RequestedSamples (Result Http.Error (List Sample))
     | TextfieldMenuMsg (Selectize.Msg Tree)
     | SelectTextfieldOption (Maybe Tree)
 

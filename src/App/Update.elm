@@ -28,7 +28,7 @@ update msg model =
             ( { model | textfieldMenuPlaceholder = "Select Machine" }, getMachines )
 
         RequestedMachines res ->
-            Debug.log ("zzzz " ++ Debug.toString res)
+            Debug.log ("requested machines " ++ Debug.toString res)
                 (let
                     opts1 =
                         case res of
@@ -48,6 +48,34 @@ update msg model =
                  in
                  ( { model
                     | combinedAdditionStage = Just StageMachine
+                    , textfieldMenu =
+                        opts3
+                   }
+                 , Cmd.none
+                 )
+                )
+
+        RequestedSamples res ->
+            Debug.log ("requested samples " ++ Debug.toString res)
+                (let
+                    opts1 =
+                        case res of
+                            Err _ ->
+                                []
+
+                            Ok d ->
+                                d
+
+                    opts2 =
+                        List.map (\r -> Tree (String.fromInt r.sampleid) r.name) opts1
+
+                    opts3 =
+                        opts2
+                            |> List.map Selectize.entry
+                            |> Selectize.closed "textfield-menu" (\e -> e.name)
+                 in
+                 ( { model
+                    | combinedAdditionStage = Just StageAnalyte
                     , textfieldMenu =
                         opts3
                    }
@@ -96,11 +124,13 @@ update msg model =
                                                 String.toInt ns.id
                                 in
                                 ( { model
-                                    | textfieldSelection = newSelection
-                                    , combinedAdditionMachine = mid
+                                    | combinedAdditionMachine = mid
                                     , combinedAdditionStage = Just StageSample
+                                    , textfieldMenuPlaceholder = "Select Sample"
+                                    , textfieldSelection = Nothing
+                                    , textfieldMenuOptions = Nothing
                                   }
-                                , Cmd.none
+                                , getSamples model
                                 )
 
                             _ ->
@@ -137,19 +167,29 @@ getSamples : Model -> Cmd Msg
 getSamples model =
     let
         id =
-            1
+            3203
+
+        -- TODO hardcoded
     in
     Http.send
         RequestedSamples
-        Http.get
-        ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples")
-        (Decode.list sampleDecoder)
+        (Http.get
+            ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples")
+            (Decode.list sampleDecoder)
+        )
 
 
 machineDecoder : Decoder Machine
 machineDecoder =
     Decode.succeed Machine
         |> required "eid" Decode.int
+        |> required "name" Decode.string
+
+
+sampleDecoder : Decoder Sample
+sampleDecoder =
+    Decode.succeed Sample
+        |> required "sampleid" Decode.int
         |> required "name" Decode.string
 
 

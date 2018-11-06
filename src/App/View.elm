@@ -240,8 +240,24 @@ combinedViewPart model =
                     div
                         []
                         [ div [] [ text "sample stage" ]
-                        , button [ onClick GetMachines ]
-                            [ text "Add Analyte 2/3 - samples" ]
+                        , div
+                            [ style "display: flex"
+                            , style "flex-flow: column"
+                            ]
+                            [ div
+                                [ class "container" ]
+                                [ div []
+                                    [ Html.map TextfieldMenuMsg <|
+                                        Selectize.view
+                                            (viewConfigTextfield
+                                                model
+                                            )
+                                            model.textfieldSelection
+                                            model.textfieldMenu
+                                    ]
+                                ]
+                            ]
+                        , div [] [ text (Debug.toString model) ]
                         ]
 
                 StageMachine ->
