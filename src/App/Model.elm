@@ -287,7 +287,7 @@ flatten lst =
 
 singleResults : Flags -> AnalyteResults
 singleResults flags =
-    Maybe.withDefault [] (List.head flags.qcresults)
+    flatten flags.qcresults
 
 
 singleAnalyteId : Model -> Int
@@ -314,10 +314,7 @@ defaultAnalyteData =
     }
 
 
-
--- readCombinedData : Flags -> List (List Datum)
-
-
+readCombinedData : Flags -> List (List Datum)
 readCombinedData flags =
     let
         combinedData =
