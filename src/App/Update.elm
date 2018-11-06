@@ -123,15 +123,16 @@ update msg model =
                                             Just ns ->
                                                 String.toInt ns.id
                                 in
-                                ( { model
-                                    | combinedAdditionMachine = mid
-                                    , combinedAdditionStage = Just StageSample
-                                    , textfieldMenuPlaceholder = "Select Sample"
-                                    , textfieldSelection = Nothing
-                                    , textfieldMenuOptions = Nothing
-                                  }
-                                , getSamples model
-                                )
+                                Debug.log ("debugging machine stage " ++ Debug.toString mid)
+                                    ( { model
+                                        | combinedAdditionMachine = mid
+                                        , combinedAdditionStage = Just StageSample
+                                        , textfieldMenuPlaceholder = "Select Sample"
+                                        , textfieldSelection = Nothing
+                                        , textfieldMenuOptions = Nothing
+                                      }
+                                    , getSamples mid
+                                    )
 
                             StageSample ->
                                 let
@@ -143,15 +144,16 @@ update msg model =
                                             Just ns ->
                                                 String.toInt ns.id
                                 in
-                                ( { model
-                                    | combinedAdditionMachine = mid
-                                    , combinedAdditionStage = Just StageAnalyte
-                                    , textfieldMenuPlaceholder = "Select Analyte"
-                                    , textfieldSelection = Nothing
-                                    , textfieldMenuOptions = Nothing
-                                  }
-                                , getSamples model
-                                )
+                                Debug.log "debugging sample stage"
+                                    ( { model
+                                        | combinedAdditionSample = mid
+                                        , combinedAdditionStage = Just StageAnalyte
+                                        , textfieldMenuPlaceholder = "Select Analyte"
+                                        , textfieldSelection = Nothing
+                                        , textfieldMenuOptions = Nothing
+                                      }
+                                    , getSamples mid
+                                    )
 
                             _ ->
                                 ( { model | textfieldSelection = newSelection }, Cmd.none )
@@ -183,11 +185,16 @@ getMachines =
 -- sketched out way of getting samples
 
 
-getSamples : Model -> Cmd Msg
-getSamples model =
+getSamples : Maybe Int -> Cmd Msg
+getSamples mid =
     let
         id =
-            3203
+            case mid of
+                Nothing ->
+                    -1
+
+                Just maid ->
+                    maid
 
         -- TODO hardcoded
     in
