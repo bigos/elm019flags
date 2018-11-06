@@ -254,16 +254,13 @@ combinedViewPart model =
                             [ div
                                 [ class "container" ]
                                 [ div []
-                                    [ Selectize.view
-                                        (viewConfigTextfield
-                                            model
-                                        )
-                                        (Just
-                                            (Maybe.withDefault "" model.textfieldSelection.id)
-                                        )
-                                        (Html.map TextfieldMenuMsg
-                                            (Selectize.Msg (Maybe.withDefault "" model.textfieldMenu))
-                                        )
+                                    [ Html.map TextfieldMenuMsg <|
+                                        Selectize.view
+                                            (viewConfigTextfield
+                                                model
+                                            )
+                                            model.textfieldSelection
+                                            model.textfieldMenu
                                     ]
                                 ]
                             ]
@@ -275,17 +272,20 @@ combinedViewPart model =
 ---- CONFIGURATION
 
 
-viewConfigTextfield : Model -> Selectize.ViewConfig String
+viewConfigTextfield : Model -> Selectize.ViewConfig Tree
 viewConfigTextfield model =
     viewConfig (textfieldSelector model)
 
 
-viewConfigButton : Selectize.ViewConfig String
-viewConfigButton =
-    viewConfig buttonSelector
+
+{-
+   viewConfigButton : Selectize.ViewConfig Tree
+   viewConfigButton =
+       viewConfig buttonSelector
+-}
 
 
-viewConfig : Selectize.Input String -> Selectize.ViewConfig String
+viewConfig : Selectize.Input Tree -> Selectize.ViewConfig Tree
 viewConfig selector =
     Selectize.viewConfig
         { container = []
@@ -307,7 +307,7 @@ viewConfig selector =
                         ]
                     ]
                 , children =
-                    [ text tree ]
+                    [ text tree.name ]
                 }
         , divider =
             \title ->
@@ -320,7 +320,7 @@ viewConfig selector =
         }
 
 
-textfieldSelector : Model -> Selectize.Input String
+textfieldSelector : Model -> Selectize.Input Tree
 textfieldSelector model =
     Selectize.autocomplete <|
         { attrs =
@@ -338,19 +338,22 @@ textfieldSelector model =
         }
 
 
-buttonSelector : Selectize.Input String
-buttonSelector =
-    Selectize.simple
-        { attrs =
-            \sthSelected open ->
-                [ class "selectize__button"
-                , classList
-                    [ ( "selectize__button--light", open && not sthSelected ) ]
-                ]
-        , toggleButton = toggleButton
-        , clearButton = clearButton
-        , placeholder = "Select a License"
-        }
+
+{-
+   buttonSelector : Selectize.Input String
+   buttonSelector =
+       Selectize.simple
+           { attrs =
+               \sthSelected open ->
+                   [ class "selectize__button"
+                   , classList
+                       [ ( "selectize__button--light", open && not sthSelected ) ]
+                   ]
+           , toggleButton = toggleButton
+           , clearButton = clearButton
+           , placeholder = "Select a License"
+           }
+-}
 
 
 toggleButton : Maybe (Bool -> Html Never)
