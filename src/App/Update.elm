@@ -83,6 +83,34 @@ update msg model =
                  )
                 )
 
+        RequestedAnalytes res ->
+            Debug.log ("requested analytes " ++ Debug.toString res)
+                (let
+                    opts1 =
+                        case res of
+                            Err _ ->
+                                []
+
+                            Ok d ->
+                                d
+
+                    opts2 =
+                        List.map (\r -> Tree (String.fromInt r.analyteid) r.name) opts1
+
+                    opts3 =
+                        opts2
+                            |> List.map Selectize.entry
+                            |> Selectize.closed "textfield-menu" (\e -> e.name)
+                 in
+                 ( { model
+                    | combinedAdditionStage = Just StageAnalyte
+                    , textfieldMenu =
+                        opts3
+                   }
+                 , Cmd.none
+                 )
+                )
+
         TextfieldMenuMsg selectizeMsg ->
             let
                 ( newMenu, menuCmd, maybeMsg ) =
@@ -144,7 +172,7 @@ update msg model =
                                             Just ns ->
                                                 String.toInt ns.id
                                 in
-                                Debug.log "debugging sample stage"
+                                Debug.log ("debugging sample stage" ++ Debug.toString mid)
                                     ( { model
                                         | combinedAdditionSample = mid
                                         , combinedAdditionStage = Just StageAnalyte
@@ -152,7 +180,7 @@ update msg model =
                                         , textfieldSelection = Nothing
                                         , textfieldMenuOptions = Nothing
                                       }
-                                    , getSamples mid
+                                    , getAnalytes mid
                                     )
 
                             _ ->
@@ -181,10 +209,6 @@ getMachines =
         )
 
 
-
--- sketched out way of getting samples
-
-
 getSamples : Maybe Int -> Cmd Msg
 getSamples mid =
     let
@@ -195,14 +219,31 @@ getSamples mid =
 
                 Just maid ->
                     maid
-
-        -- TODO hardcoded
     in
     Http.send
         RequestedSamples
         (Http.get
             ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples")
             (Decode.list sampleDecoder)
+        )
+
+
+getAnalytes : Maybe Int -> Cmd Msg
+getAnalytes mid =
+    let
+        id =
+            case mid of
+                Nothing ->
+                    -1
+
+                Just maid ->
+                    maid
+    in
+    Http.send
+        RequestedAnalytes
+        (Http.get
+            ("http://localhost:3000/samples/" ++ String.fromInt id ++ "/analytes")
+            (Decode.list analyteDecoder)
         )
 
 
@@ -217,6 +258,13 @@ sampleDecoder : Decoder Sample
 sampleDecoder =
     Decode.succeed Sample
         |> required "sampleid" Decode.int
+        |> required "name" Decode.string
+
+
+analyteDecoder : Decoder Analyte
+analyteDecoder =
+    Decode.succeed Analyte
+        |> required "analyteid" Decode.int
         |> required "name" Decode.string
 
 
