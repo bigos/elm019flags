@@ -142,25 +142,24 @@ update msg model =
                     Just stage ->
                         case stage of
                             StageMachine ->
-                                let
-                                    mid =
-                                        case newSelection of
-                                            Nothing ->
-                                                Nothing
+                                case newSelection of
+                                    Nothing ->
+                                        ( model, Cmd.none )
 
-                                            Just ns ->
+                                    Just ns ->
+                                        let
+                                            mid =
                                                 String.toInt ns.id
-                                in
-                                Debug.log ("debugging machine stage " ++ Debug.toString mid)
-                                    ( { model
-                                        | combinedAdditionMachine = mid
-                                        , combinedAdditionStage = Just StageSample
-                                        , textfieldMenuPlaceholder = "Select Sample"
-                                        , textfieldSelection = Nothing
-                                        , textfieldMenuOptions = Nothing
-                                      }
-                                    , getSamples mid
-                                    )
+                                        in
+                                        ( { model
+                                            | combinedAdditionMachine = mid
+                                            , combinedAdditionStage = Just StageSample
+                                            , textfieldMenuPlaceholder = "Select Sample"
+                                            , textfieldSelection = Nothing
+                                            , textfieldMenuOptions = Nothing
+                                          }
+                                        , getSamples mid
+                                        )
 
                             StageSample ->
                                 let
