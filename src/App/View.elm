@@ -277,14 +277,6 @@ viewConfigTextfield model =
     viewConfig (textfieldSelector model)
 
 
-
-{-
-   viewConfigButton : Selectize.ViewConfig Tree
-   viewConfigButton =
-       viewConfig buttonSelector
--}
-
-
 viewConfig : Selectize.Input Tree -> Selectize.ViewConfig Tree
 viewConfig selector =
     Selectize.viewConfig
@@ -336,24 +328,6 @@ textfieldSelector model =
         , clearButton = clearButton
         , placeholder = model.textfieldMenuPlaceholder
         }
-
-
-
-{-
-   buttonSelector : Selectize.Input String
-   buttonSelector =
-       Selectize.simple
-           { attrs =
-               \sthSelected open ->
-                   [ class "selectize__button"
-                   , classList
-                       [ ( "selectize__button--light", open && not sthSelected ) ]
-                   ]
-           , toggleButton = toggleButton
-           , clearButton = clearButton
-           , placeholder = "Select a License"
-           }
--}
 
 
 toggleButton : Maybe (Bool -> Html Never)
