@@ -222,7 +222,7 @@ getMachines =
     Http.send
         RequestedMachines
         (Http.get
-            "http://localhost:3000/machines"
+            "http://localhost:3000/machines.json"
             (Decode.list machineDecoder)
         )
 
@@ -241,7 +241,7 @@ getSamples mid =
     Http.send
         RequestedSamples
         (Http.get
-            ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples")
+            ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples.json")
             (Decode.list sampleDecoder)
         )
 
@@ -260,7 +260,7 @@ getAnalytes mid =
     Http.send
         RequestedAnalytes
         (Http.get
-            ("http://localhost:3000/samples/" ++ String.fromInt id ++ "/analytes")
+            ("http://localhost:3000/samples/" ++ String.fromInt id ++ "/analytes.json")
             (Decode.list analyteDecoder)
         )
 
