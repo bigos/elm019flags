@@ -86,11 +86,18 @@ update msg model =
                     Just stage ->
                         case stage of
                             StageMachine ->
+                                let
+                                    mid =
+                                        case newSelection of
+                                            Nothing ->
+                                                Nothing
+
+                                            Just ns ->
+                                                String.toInt ns.id
+                                in
                                 ( { model
                                     | textfieldSelection = newSelection
-
-                                    -- we need different way of handline the machine data so we can use ieds here
-                                    , combinedAdditionMachine = Just 1
+                                    , combinedAdditionMachine = mid
                                     , combinedAdditionStage = Just StageSample
                                   }
                                 , Cmd.none
