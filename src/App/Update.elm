@@ -172,7 +172,7 @@ update msg model =
                                             Just ns ->
                                                 String.toInt ns.id
                                 in
-                                Debug.log ("debugging sample stage" ++ Debug.toString mid)
+                                Debug.log ("debugging sample stage " ++ Debug.toString mid)
                                     ( { model
                                         | combinedAdditionSample = mid
                                         , combinedAdditionStage = Just StageAnalyte
@@ -183,8 +183,26 @@ update msg model =
                                     , getAnalytes mid
                                     )
 
-                            _ ->
-                                ( { model | textfieldSelection = newSelection }, Cmd.none )
+                            StageAnalyte ->
+                                let
+                                    mid =
+                                        case newSelection of
+                                            Nothing ->
+                                                Nothing
+
+                                            Just ns ->
+                                                String.toInt ns.id
+                                in
+                                Debug.log ("debugging analyte stage " ++ Debug.toString mid)
+                                    ( { model
+                                        | combinedAdditionAnalyte = mid
+                                        , combinedAdditionStage = Nothing
+                                        , textfieldMenuPlaceholder = ""
+                                        , textfieldSelection = Nothing
+                                        , textfieldMenuOptions = Nothing
+                                      }
+                                    , Cmd.none
+                                    )
                 )
 
 

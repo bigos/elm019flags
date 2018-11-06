@@ -215,9 +215,10 @@ view model =
 
           else
             combinedViewPart model
-        , div [] [ text <| Debug.toString model.combinedAdditionStage ]
-        , div [] [ text <| Debug.toString model.combinedAdditionMachine ]
-        , div [] [ text <| Debug.toString model.combinedAdditionSample ]
+        , div [] [ text ("stage" ++ Debug.toString model.combinedAdditionStage) ]
+        , div [] [ text ("machine" ++ Debug.toString model.combinedAdditionMachine) ]
+        , div [] [ text ("sample" ++ Debug.toString model.combinedAdditionSample) ]
+        , div [] [ text ("analyte" ++ Debug.toString model.combinedAdditionAnalyte) ]
         ]
 
 
@@ -234,11 +235,29 @@ combinedViewPart model =
         Just stage ->
             case stage of
                 StageAnalyte ->
-                    div [] [ text "analyte stage" ]
+                    div []
+                        [ div [] [ text "analyte stage" ]
+                        , div
+                            [ style "display: flex"
+                            , style "flex-flow: column"
+                            ]
+                            [ div
+                                [ class "container" ]
+                                [ div []
+                                    [ Html.map TextfieldMenuMsg <|
+                                        Selectize.view
+                                            (viewConfigTextfield
+                                                model
+                                            )
+                                            model.textfieldSelection
+                                            model.textfieldMenu
+                                    ]
+                                ]
+                            ]
+                        ]
 
                 StageSample ->
-                    div
-                        []
+                    div []
                         [ div [] [ text "sample stage" ]
                         , div
                             [ style "display: flex"
@@ -257,7 +276,6 @@ combinedViewPart model =
                                     ]
                                 ]
                             ]
-                        , div [] [ text (Debug.toString model) ]
                         ]
 
                 StageMachine ->
@@ -280,7 +298,6 @@ combinedViewPart model =
                                     ]
                                 ]
                             ]
-                        , div [] [ text (Debug.toString model) ]
                         ]
 
 
