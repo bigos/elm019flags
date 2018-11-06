@@ -129,6 +129,23 @@ getMachines =
         )
 
 
+
+-- sketched out way of getting samples
+
+
+getSamples : Model -> Cmd Msg
+getSamples model =
+    let
+        id =
+            1
+    in
+    Http.send
+        RequestedSamples
+        Http.get
+        ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples")
+        (Decode.list sampleDecoder)
+
+
 machineDecoder : Decoder Machine
 machineDecoder =
     Decode.succeed Machine
