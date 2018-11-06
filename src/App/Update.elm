@@ -133,6 +133,26 @@ update msg model =
                                 , getSamples model
                                 )
 
+                            StageSample ->
+                                let
+                                    mid =
+                                        case newSelection of
+                                            Nothing ->
+                                                Nothing
+
+                                            Just ns ->
+                                                String.toInt ns.id
+                                in
+                                ( { model
+                                    | combinedAdditionMachine = mid
+                                    , combinedAdditionStage = Just StageAnalyte
+                                    , textfieldMenuPlaceholder = "Select Analyte"
+                                    , textfieldSelection = Nothing
+                                    , textfieldMenuOptions = Nothing
+                                  }
+                                , getSamples model
+                                )
+
                             _ ->
                                 ( { model | textfieldSelection = newSelection }, Cmd.none )
                 )
