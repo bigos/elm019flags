@@ -162,46 +162,44 @@ update msg model =
                                         )
 
                             StageSample ->
-                                let
-                                    mid =
-                                        case newSelection of
-                                            Nothing ->
-                                                Nothing
+                                case newSelection of
+                                    Nothing ->
+                                        ( model, Cmd.none )
 
-                                            Just ns ->
+                                    Just ns ->
+                                        let
+                                            mid =
                                                 String.toInt ns.id
-                                in
-                                Debug.log ("debugging sample stage " ++ Debug.toString mid)
-                                    ( { model
-                                        | combinedAdditionSample = mid
-                                        , combinedAdditionStage = Just StageAnalyte
-                                        , textfieldMenuPlaceholder = "Select Analyte"
-                                        , textfieldSelection = Nothing
-                                        , textfieldMenuOptions = Nothing
-                                      }
-                                    , getAnalytes mid
-                                    )
+                                        in
+                                        ( { model
+                                            | combinedAdditionSample = mid
+                                            , combinedAdditionStage = Just StageAnalyte
+                                            , textfieldMenuPlaceholder = "Select Analyte"
+                                            , textfieldSelection = Nothing
+                                            , textfieldMenuOptions = Nothing
+                                          }
+                                        , getAnalytes mid
+                                        )
 
                             StageAnalyte ->
-                                let
-                                    mid =
-                                        case newSelection of
-                                            Nothing ->
-                                                Nothing
+                                case newSelection of
+                                    Nothing ->
+                                        ( model, Cmd.none )
 
-                                            Just ns ->
+                                    Just ns ->
+                                        let
+                                            mid =
                                                 String.toInt ns.id
-                                in
-                                Debug.log ("debugging analyte stage " ++ Debug.toString mid)
-                                    ( { model
-                                        | combinedAdditionAnalyte = mid
-                                        , combinedAdditionStage = Just StageAnalyteConfirmation
-                                        , textfieldMenuPlaceholder = ""
-                                        , textfieldSelection = Nothing
-                                        , textfieldMenuOptions = Nothing
-                                      }
-                                    , Cmd.none
-                                    )
+                                        in
+                                        ( { model
+                                            | combinedAdditionAnalyte = mid
+                                            , combinedAdditionStage = Just StageAnalyteConfirmation
+                                            , textfieldMenuPlaceholder = ""
+                                            , textfieldSelection = Nothing
+                                            , textfieldMenuOptions = Nothing
+                                          }
+                                        , Cmd.none
+                                        )
 
                             StageAnalyteConfirmation ->
                                 ( model, Cmd.none )
