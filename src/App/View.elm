@@ -9,6 +9,7 @@ import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onClick)
 import ISO8601
 import Selectize
+import String.Interpolate exposing (interpolate)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 
@@ -222,6 +223,37 @@ view model =
         ]
 
 
+newIdsLink : Model -> String
+newIdsLink model =
+    let
+        aa =
+            model.flags.analytes
+
+        ids2 =
+            List.map (\a -> a.id) aa
+
+        ids1 =
+            ids2
+                ++ (case model.combinedAdditionAnalyte of
+                        Nothing ->
+                            []
+
+                        Just a ->
+                            [ a ]
+                   )
+
+        ids =
+            String.join "," (List.map (\z -> String.fromInt z) ids1)
+    in
+    interpolate
+        "http://{0}/analytes/combined/dating_from/{1}/dating_to/{2}/analyte_ids/{3}"
+        [ "localhost:3000"
+        , model.flags.date_from
+        , model.flags.date_to
+        , ids
+        ]
+
+
 combinedViewPart model =
     case model.combinedAdditionStage of
         Nothing ->
@@ -229,11 +261,17 @@ combinedViewPart model =
                 [ div []
                     [ text "no particular addition at the moment"
                     ]
-                , button [ onClick GetMachines ] [ text "Add Analyte 1/3 - machines" ]
+                , button [ onClick GetMachines ] [ text "Add Analyte - first step - machines" ]
                 ]
 
         Just stage ->
             case stage of
+                StageAnalyteConfirmation ->
+                    div []
+                        [ div [] [ text "analyte confirmation" ]
+                        , a [ href (newIdsLink model) ] [ text ("Add analyute " ++ Debug.toString model.combinedAdditionAnalyte) ]
+                        ]
+
                 StageAnalyte ->
                     div []
                         [ div [] [ text "analyte stage" ]

@@ -196,13 +196,16 @@ update msg model =
                                 Debug.log ("debugging analyte stage " ++ Debug.toString mid)
                                     ( { model
                                         | combinedAdditionAnalyte = mid
-                                        , combinedAdditionStage = Nothing
+                                        , combinedAdditionStage = Just StageAnalyteConfirmation
                                         , textfieldMenuPlaceholder = ""
                                         , textfieldSelection = Nothing
                                         , textfieldMenuOptions = Nothing
                                       }
                                     , Cmd.none
                                     )
+
+                            StageAnalyteConfirmation ->
+                                ( model, Cmd.none )
                 )
 
 

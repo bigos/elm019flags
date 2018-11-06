@@ -41,6 +41,7 @@ type AdditionStage
     = StageMachine
     | StageSample
     | StageAnalyte
+    | StageAnalyteConfirmation
 
 
 type alias Flags =
