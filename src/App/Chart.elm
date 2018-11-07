@@ -295,6 +295,33 @@ createMeanLine model timeSection =
         )
 
 
+createOrangeMeanLine : Model -> DataStats -> Svg msg
+createOrangeMeanLine model stats =
+    let
+        st =
+            toFloat
+                (timify model.flags.date_from)
+
+        ted =
+            timify model.flags.date_to + oneDay
+
+        et =
+            toFloat
+                ted
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "orange"
+        , Attributes.strokeWidth "1.2"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings st, doY model.chartScalings stats.mean )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings et, doY model.chartScalings stats.mean )
+            )
+        )
+
+
 createNominalLine : Model -> ( Int, Maybe Int ) -> Svg msg
 createNominalLine model timeSection =
     let
@@ -387,6 +414,13 @@ chartElements model =
     let
         statsDateRanges =
             statStartTuples model
+
+        orangeStats =
+            if List.length model.flags.stats == 0 then
+                [ dataStats model ]
+
+            else
+                []
     in
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
@@ -404,6 +438,7 @@ chartElements model =
         ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) statsDateRanges
         ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) statsDateRanges
         -- orange stats lines will go here
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeMeanLine model s)) orangeStats
         -- data points
         ++ flatten
             (List.map2

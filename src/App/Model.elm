@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, Datum, Flags, Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, DataStats, Datum, Flags, Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -107,6 +107,10 @@ type alias Datum =
     , value : Float
     , aid : Int
     }
+
+
+type alias DataStats =
+    { mean : Float, sd : Float }
 
 
 type alias StatsData =
@@ -395,18 +399,22 @@ chartEnd flags =
     toFloat (timify flags.date_to + oneDay)
 
 
+dataStats : Model -> DataStats
+dataStats model =
+    let
+        values =
+            List.map (\qr -> qr.c) (singleResults model.flags)
 
--- dataStats : Model -> Bool
--- dataStats model =
---     let
---         qcr =
---             List.map (\qc -> qc.c) (singleResults model.flags)
---         values =
---             List.map (\qr -> qr.c) (singleResults model.flags)
---         mean =
---             List.foldl (+) 0.0 values / toFloat (List.length values)
---     in
---     1
+        mean =
+            List.foldl (+) 0.0 values / toFloat (List.length values)
+
+        sqrd =
+            List.foldl (\v a -> a + ((v - mean) ^ 2)) 0.0 values
+
+        sd =
+            sqrt (sqrd / toFloat (List.length values - 1))
+    in
+    DataStats mean sd
 
 
 deviations model x fn =
