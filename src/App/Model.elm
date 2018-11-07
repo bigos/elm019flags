@@ -417,6 +417,7 @@ dataStats model =
     DataStats mean sd
 
 
+deviations : Model -> Float -> (List Float -> Maybe Float) -> Float
 deviations model x fn =
     let
         stats =
@@ -477,10 +478,7 @@ chartTop model =
     doY model.chartScalings (deviations model hidev List.maximum)
 
 
-
--- change me taking into consideration average mean and largest deviation
-
-
+tickBottom : Model -> Float
 tickBottom model =
     doY model.chartScalings (deviations model -4.7 List.minimum)
 
@@ -507,6 +505,7 @@ averageMean flags =
         List.foldl (+) 0.0 meanValues / toFloat (List.length meanValues)
 
 
+standardDeviation : Flags -> Float
 standardDeviation flags =
     let
         values =

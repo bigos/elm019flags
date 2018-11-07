@@ -273,11 +273,7 @@ createMeanLine model timeSection =
         dmean =
             case sd of
                 Nothing ->
-                    -- we do nos seem to calculate any statistics if there is no
-                    -- stats in the flags
-                    -- we need to review all the cases of hardcoded values and
-                    -- calculate the statistics on eklm side
-                    150.0
+                    (dataStats model).mean
 
                 Just v ->
                     v.mean
@@ -342,7 +338,7 @@ createNominalLine model timeSection =
         dmean =
             case sd of
                 Nothing ->
-                    150.0
+                    (dataStats model).mean
 
                 Just v ->
                     v.nominal
@@ -380,7 +376,7 @@ createXsdlLine xsd model timeSection =
         dmean =
             case sd of
                 Nothing ->
-                    0.0
+                    (dataStats model).mean
 
                 Just v ->
                     v.mean
@@ -388,7 +384,7 @@ createXsdlLine xsd model timeSection =
         ddev =
             case sd of
                 Nothing ->
-                    0.0
+                    (dataStats model).sd
 
                 Just v ->
                     v.deviation
