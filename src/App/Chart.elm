@@ -384,6 +384,10 @@ createXsdlLine xsd model timeSection =
 
 chartElements : Model -> List (Svg Msg)
 chartElements model =
+    let
+        statsDateRanges =
+            statStartTuples model
+    in
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
     ]
@@ -392,12 +396,15 @@ chartElements model =
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
         -- functions using statStartTuples work with single analyte charts
-        ++ List.map (\s -> Svg.placeIn frameChart (createNominalLine model s)) (statStartTuples model)
-        ++ List.map (\s -> Svg.placeIn frameChart (createMeanLine model s)) (statStartTuples model)
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 3.0 model s)) (statStartTuples model)
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 2.0 model s)) (statStartTuples model)
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) (statStartTuples model)
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) (statStartTuples model)
+        ++ List.map (\s -> Svg.placeIn frameChart (createNominalLine model s)) statsDateRanges
+        -- red stats lines
+        ++ List.map (\s -> Svg.placeIn frameChart (createMeanLine model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 3.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 2.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) statsDateRanges
+        -- orange stats lines will go here
+        -- data points
         ++ flatten
             (List.map2
                 (\pl c ->

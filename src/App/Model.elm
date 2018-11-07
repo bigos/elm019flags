@@ -395,6 +395,20 @@ chartEnd flags =
     toFloat (timify flags.date_to + oneDay)
 
 
+
+-- dataStats : Model -> Bool
+-- dataStats model =
+--     let
+--         qcr =
+--             List.map (\qc -> qc.c) (singleResults model.flags)
+--         values =
+--             List.map (\qr -> qr.c) (singleResults model.flags)
+--         mean =
+--             List.foldl (+) 0.0 values / toFloat (List.length values)
+--     in
+--     1
+
+
 deviations model x fn =
     let
         stats =
@@ -403,18 +417,6 @@ deviations model x fn =
         stats2 =
             if List.length stats == 0 then
                 let
-                    qcr =
-                        List.map (\qc -> qc.c) (singleResults model.flags)
-
-                    qmax =
-                        Maybe.withDefault 300.0 (List.maximum qcr)
-
-                    qmin =
-                        Maybe.withDefault 200.0 (List.minimum qcr)
-
-                    rd =
-                        abs (qmax - qmin)
-
                     values =
                         List.map (\qr -> qr.c) (singleResults model.flags)
 
