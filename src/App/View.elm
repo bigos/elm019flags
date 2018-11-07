@@ -48,11 +48,9 @@ showTheTooltip model =
 
                     DataScaledPoint d ->
                         let
-                            tm =
-                                ISO8601.fromTime (floor d.datum.time)
-
                             t2 =
-                                ISO8601.toString tm
+                                ISO8601.toString <|
+                                    ISO8601.fromTime (floor d.datum.time)
 
                             t3 =
                                 List.head (String.split "Z" t2)
@@ -88,11 +86,9 @@ showTheTooltip model =
 
                     DataCombinedPoint d ->
                         let
-                            tm =
-                                ISO8601.fromTime (floor d.datum.time)
-
                             t2 =
-                                ISO8601.toString tm
+                                ISO8601.toString <|
+                                    ISO8601.fromTime (floor d.datum.time)
 
                             t3 =
                                 List.head (String.split "Z" t2)
@@ -425,13 +421,4 @@ toggleButton =
 
 clearButton : Maybe (Html Never)
 clearButton =
-    -- Just <|
-    --     Html.div
-    --         [ class "selectize__menu-toggle" ]
-    --         [ i
-    --             [ class "material-icons"
-    --             , class "selectize__icon"
-    --             ]
-    --             [ text "clear" ]
-    --         ]
     Nothing

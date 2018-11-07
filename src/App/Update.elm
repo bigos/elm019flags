@@ -7,10 +7,6 @@ import Json.Decode.Pipeline exposing (required)
 import Selectize
 
 
-
--- https://package.elm-lang.org/packages/NoRedInk/elm-json-decode-pipeline/latest/Json-Decode-Pipeline
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -276,12 +272,3 @@ analyteDecoder =
     Decode.succeed Analyte
         |> required "analyteid" Decode.int
         |> required "name" Decode.string
-
-
-
--- |> required "exclude" Decode.int
--- |> required "manual" Decode.int
--- |> required "branchid" Decode.int
--- |> required "food" Decode.int
--- |> required "id" Decode.int
--- |> required "instrument_lod" Decode.int

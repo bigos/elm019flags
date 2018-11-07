@@ -1,4 +1,4 @@
-module App.Utilities exposing (justTimeString, justValFn, monthNumName, monthQtrName, oneDay, timify, untimify)
+module App.Utilities exposing (justTimeString, monthNumName, monthQtrName, oneDay, timify, untimify)
 
 import ISO8601
 import List.Extra
@@ -31,15 +31,6 @@ justTimeString tv =
 
         Just tm ->
             ISO8601.toString tm
-
-
-justValFn v fn =
-    case v of
-        Nothing ->
-            0
-
-        Just n ->
-            fn n
 
 
 monthNumName : Int -> Maybe String
