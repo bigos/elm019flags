@@ -391,6 +391,7 @@ chartElements model =
         ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShape model ml)) model.flags.maintenance_logs
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
         ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
+        -- functions using statStartTuples work with single analyte charts
         ++ List.map (\s -> Svg.placeIn frameChart (createNominalLine model s)) (statStartTuples model)
         ++ List.map (\s -> Svg.placeIn frameChart (createMeanLine model s)) (statStartTuples model)
         ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 3.0 model s)) (statStartTuples model)

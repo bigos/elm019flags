@@ -274,7 +274,8 @@ statStartTimes model =
 
 
 statStartTuples model =
-    tupleize (statStartTimes model)
+    Debug.log ("debugging start tuples with " ++ Debug.toString (statStartTimes model))
+        (tupleize (statStartTimes model))
 
 
 flatten lst =
