@@ -14,6 +14,7 @@ import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 
 
+createYearTicks : Model -> String -> Svg msg
 createYearTicks model ys =
     let
         oni =
@@ -58,6 +59,7 @@ createYearTicks model ys =
         ]
 
 
+createMonthTicks : Model -> String -> Svg msg
 createMonthTicks model ms =
     let
         timi =
@@ -123,6 +125,7 @@ createMonthTicks model ms =
         ]
 
 
+createWeekTicks : Model -> Int -> Svg msg
 createWeekTicks model ws =
     let
         oni =
@@ -141,6 +144,7 @@ createWeekTicks model ws =
         )
 
 
+createDayTicks : Model -> Int -> Svg msg
 createDayTicks model ds =
     let
         oni =
@@ -159,6 +163,7 @@ createDayTicks model ds =
         )
 
 
+createMinorTick : Model -> Float -> Svg msg
 createMinorTick model mt =
     let
         ox =
@@ -177,6 +182,7 @@ createMinorTick model mt =
         )
 
 
+weekTickVals : Model -> List Int
 weekTickVals model =
     let
         axis_x =
@@ -204,6 +210,7 @@ weekTickVals model =
         []
 
 
+dayTickVals : Model -> List Int
 dayTickVals model =
     let
         first =
@@ -228,6 +235,7 @@ dayTickVals model =
         []
 
 
+createMajorTick : Model -> Float -> Svg msg
 createMajorTick model mt =
     let
         ox =
