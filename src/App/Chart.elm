@@ -409,6 +409,36 @@ createXsdlLine xsd model timeSection =
         )
 
 
+createOrangeXsdlLine : Float -> Model -> DataStats -> Svg msg
+createOrangeXsdlLine x model stats =
+    let
+        st =
+            toFloat
+                (timify model.flags.date_from)
+
+        ted =
+            timify model.flags.date_to + oneDay
+
+        et =
+            toFloat
+                ted
+
+        dx =
+            stats.mean + (stats.sd * x)
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "orange"
+        , Attributes.strokeWidth "1.2"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings st, doY model.chartScalings dx )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings et, doY model.chartScalings dx )
+            )
+        )
+
+
 chartElements : Model -> List (Svg Msg)
 chartElements model =
     let
@@ -439,6 +469,10 @@ chartElements model =
         ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) statsDateRanges
         -- orange stats lines will go here
         ++ List.map (\s -> Svg.placeIn frameChart (createOrangeMeanLine model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 3.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 2.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -2.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -3.0 model s)) orangeStats
         -- data points
         ++ flatten
             (List.map2
