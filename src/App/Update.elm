@@ -28,88 +28,82 @@ update msg model =
             ( { model | textfieldMenuPlaceholder = "Select Machine" }, getMachines )
 
         RequestedMachines res ->
-            Debug.log ("requested machines " ++ Debug.toString res)
-                (let
-                    opts1 =
-                        case res of
-                            Err _ ->
-                                []
+            let
+                opts1 =
+                    case res of
+                        Err _ ->
+                            []
 
-                            Ok d ->
-                                d
+                        Ok d ->
+                            d
 
-                    opts2 =
-                        List.map (\r -> Tree (String.fromInt r.eid) r.name) opts1
+                opts2 =
+                    List.map (\r -> Tree (String.fromInt r.eid) r.name) opts1
 
-                    opts3 =
-                        opts2
-                            |> List.map Selectize.entry
-                            |> Selectize.closed "textfield-menu" (\e -> e.name)
-                 in
-                 ( { model
-                    | combinedAdditionStage = Just StageMachine
-                    , textfieldMenu =
-                        opts3
-                   }
-                 , Cmd.none
-                 )
-                )
+                opts3 =
+                    opts2
+                        |> List.map Selectize.entry
+                        |> Selectize.closed "textfield-menu" (\e -> e.name)
+            in
+            ( { model
+                | combinedAdditionStage = Just StageMachine
+                , textfieldMenu =
+                    opts3
+              }
+            , Cmd.none
+            )
 
         RequestedSamples res ->
-            Debug.log ("requested samples " ++ Debug.toString res)
-                (let
-                    opts1 =
-                        case res of
-                            Err _ ->
-                                []
+            let
+                opts1 =
+                    case res of
+                        Err _ ->
+                            []
 
-                            Ok d ->
-                                d
+                        Ok d ->
+                            d
 
-                    opts2 =
-                        List.map (\r -> Tree (String.fromInt r.sampleid) r.name) opts1
+                opts2 =
+                    List.map (\r -> Tree (String.fromInt r.sampleid) r.name) opts1
 
-                    opts3 =
-                        opts2
-                            |> List.map Selectize.entry
-                            |> Selectize.closed "textfield-menu" (\e -> e.name)
-                 in
-                 ( { model
-                    | combinedAdditionStage = Just StageSample
-                    , textfieldMenu =
-                        opts3
-                   }
-                 , Cmd.none
-                 )
-                )
+                opts3 =
+                    opts2
+                        |> List.map Selectize.entry
+                        |> Selectize.closed "textfield-menu" (\e -> e.name)
+            in
+            ( { model
+                | combinedAdditionStage = Just StageSample
+                , textfieldMenu =
+                    opts3
+              }
+            , Cmd.none
+            )
 
         RequestedAnalytes res ->
-            Debug.log ("requested analytes " ++ Debug.toString res)
-                (let
-                    opts1 =
-                        case res of
-                            Err _ ->
-                                []
+            let
+                opts1 =
+                    case res of
+                        Err _ ->
+                            []
 
-                            Ok d ->
-                                d
+                        Ok d ->
+                            d
 
-                    opts2 =
-                        List.map (\r -> Tree (String.fromInt r.analyteid) r.name) opts1
+                opts2 =
+                    List.map (\r -> Tree (String.fromInt r.analyteid) r.name) opts1
 
-                    opts3 =
-                        opts2
-                            |> List.map Selectize.entry
-                            |> Selectize.closed "textfield-menu" (\e -> e.name)
-                 in
-                 ( { model
-                    | combinedAdditionStage = Just StageAnalyte
-                    , textfieldMenu =
-                        opts3
-                   }
-                 , Cmd.none
-                 )
-                )
+                opts3 =
+                    opts2
+                        |> List.map Selectize.entry
+                        |> Selectize.closed "textfield-menu" (\e -> e.name)
+            in
+            ( { model
+                | combinedAdditionStage = Just StageAnalyte
+                , textfieldMenu =
+                    opts3
+              }
+            , Cmd.none
+            )
 
         TextfieldMenuMsg selectizeMsg ->
             let
@@ -134,76 +128,74 @@ update msg model =
                     ( newModel, cmd )
 
         SelectTextfieldOption newSelection ->
-            Debug.log ("menu option selection " ++ Debug.toString newSelection)
-                (case model.combinedAdditionStage of
-                    Nothing ->
-                        ( { model | textfieldSelection = newSelection }, Cmd.none )
+            case model.combinedAdditionStage of
+                Nothing ->
+                    ( { model | textfieldSelection = newSelection }, Cmd.none )
 
-                    Just stage ->
-                        case stage of
-                            StageMachine ->
-                                case newSelection of
-                                    Nothing ->
-                                        ( model, Cmd.none )
+                Just stage ->
+                    case stage of
+                        StageMachine ->
+                            case newSelection of
+                                Nothing ->
+                                    ( model, Cmd.none )
 
-                                    Just ns ->
-                                        let
-                                            mid =
-                                                String.toInt ns.id
-                                        in
-                                        ( { model
-                                            | combinedAdditionMachine = mid
-                                            , combinedAdditionStage = Just StageSample
-                                            , textfieldMenuPlaceholder = "Select Sample"
-                                            , textfieldSelection = Nothing
-                                            , textfieldMenuOptions = Nothing
-                                          }
-                                        , getSamples mid
-                                        )
+                                Just ns ->
+                                    let
+                                        mid =
+                                            String.toInt ns.id
+                                    in
+                                    ( { model
+                                        | combinedAdditionMachine = mid
+                                        , combinedAdditionStage = Just StageSample
+                                        , textfieldMenuPlaceholder = "Select Sample"
+                                        , textfieldSelection = Nothing
+                                        , textfieldMenuOptions = Nothing
+                                      }
+                                    , getSamples mid
+                                    )
 
-                            StageSample ->
-                                case newSelection of
-                                    Nothing ->
-                                        ( model, Cmd.none )
+                        StageSample ->
+                            case newSelection of
+                                Nothing ->
+                                    ( model, Cmd.none )
 
-                                    Just ns ->
-                                        let
-                                            mid =
-                                                String.toInt ns.id
-                                        in
-                                        ( { model
-                                            | combinedAdditionSample = mid
-                                            , combinedAdditionStage = Just StageAnalyte
-                                            , textfieldMenuPlaceholder = "Select Analyte"
-                                            , textfieldSelection = Nothing
-                                            , textfieldMenuOptions = Nothing
-                                          }
-                                        , getAnalytes mid
-                                        )
+                                Just ns ->
+                                    let
+                                        mid =
+                                            String.toInt ns.id
+                                    in
+                                    ( { model
+                                        | combinedAdditionSample = mid
+                                        , combinedAdditionStage = Just StageAnalyte
+                                        , textfieldMenuPlaceholder = "Select Analyte"
+                                        , textfieldSelection = Nothing
+                                        , textfieldMenuOptions = Nothing
+                                      }
+                                    , getAnalytes mid
+                                    )
 
-                            StageAnalyte ->
-                                case newSelection of
-                                    Nothing ->
-                                        ( model, Cmd.none )
+                        StageAnalyte ->
+                            case newSelection of
+                                Nothing ->
+                                    ( model, Cmd.none )
 
-                                    Just ns ->
-                                        let
-                                            mid =
-                                                String.toInt ns.id
-                                        in
-                                        ( { model
-                                            | combinedAdditionAnalyte = mid
-                                            , combinedAdditionStage = Just StageAnalyteConfirmation
-                                            , textfieldMenuPlaceholder = ""
-                                            , textfieldSelection = Nothing
-                                            , textfieldMenuOptions = Nothing
-                                          }
-                                        , Cmd.none
-                                        )
+                                Just ns ->
+                                    let
+                                        mid =
+                                            String.toInt ns.id
+                                    in
+                                    ( { model
+                                        | combinedAdditionAnalyte = mid
+                                        , combinedAdditionStage = Just StageAnalyteConfirmation
+                                        , textfieldMenuPlaceholder = ""
+                                        , textfieldSelection = Nothing
+                                        , textfieldMenuOptions = Nothing
+                                      }
+                                    , Cmd.none
+                                    )
 
-                            StageAnalyteConfirmation ->
-                                ( model, Cmd.none )
-                )
+                        StageAnalyteConfirmation ->
+                            ( model, Cmd.none )
 
 
 andDo : Cmd msg -> ( model, Cmd msg ) -> ( model, Cmd msg )

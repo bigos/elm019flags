@@ -281,10 +281,6 @@ flatten lst =
     List.concatMap identity lst
 
 
-
---when we have single results the length of the list is 1
-
-
 singleResults : Flags -> AnalyteResults
 singleResults flags =
     flatten flags.qcresults
