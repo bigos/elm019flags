@@ -9,6 +9,10 @@ import Point2d exposing (Point2d)
 import Selectize
 
 
+
+-- TODO we need to change our assumptions about fixed limits charts
+
+
 type alias Model =
     { chartBoundingBox : Maybe BoundingBox2d
     , chartScalings : ChartScalings
