@@ -318,19 +318,24 @@ createOrangeMeanLine model stats =
         )
 
 
-createNominalLine : Model -> ( Int, Maybe Int ) -> Svg msg
+
+-- createNominalLine : Model -> ( Int, Maybe Int ) -> Svg msg
+
+
+createNominalLine : Model -> ( SectionData, Maybe SectionData ) -> Svg msg
 createNominalLine model timeSection =
     let
         st =
             toFloat
-                (Basics.max (Tuple.first timeSection) (timify model.flags.date_from))
+                (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
 
         ted =
             timify model.flags.date_to + oneDay
 
         et =
             toFloat
-                (Basics.min ted (Maybe.withDefault ted (Tuple.second timeSection)))
+                -- finish that tomorrow
+                (Basics.min ted (Maybe.withDefault ted (Tuple.second timeSection).start))
 
         sd =
             findStatForTime model.flags.stats (round st)

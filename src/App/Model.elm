@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, DataStats, Datum, Flags, Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, DataStats, Datum, Flags, Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -115,6 +115,10 @@ type alias Datum =
 
 type alias DataStats =
     { mean : Float, sd : Float }
+
+
+type alias SectionData =
+    { start : Int, fixed : Bool }
 
 
 type alias StatsData =
@@ -278,6 +282,7 @@ tupleizeHelper xs acc =
             acc
 
 
+fixedFlagCheck : StatsData -> Bool
 fixedFlagCheck s =
     -- check if it is a fixed chart
     case s.max of
@@ -288,12 +293,13 @@ fixedFlagCheck s =
             True
 
 
-statStartTimes : Model -> List ( Int, Bool )
+statStartTimes : Model -> List SectionData
 statStartTimes model =
-    List.map (\s -> ( timify s.start_date, fixedFlagCheck s )) model.flags.stats
+    List.map (\s -> SectionData (timify s.start_date) (fixedFlagCheck s))
+        model.flags.stats
 
 
-statStartTuples : Model -> List ( ( Int, Bool ), Maybe ( Int, Bool ) )
+statStartTuples : Model -> List ( SectionData, Maybe SectionData )
 statStartTuples model =
     Debug.log ("debugging start tuples with " ++ Debug.toString (statStartTimes model))
         (tupleize (statStartTimes model))
