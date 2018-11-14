@@ -447,6 +447,9 @@ chartElements model =
 
             else
                 []
+
+        boo =
+            1
     in
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
