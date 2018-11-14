@@ -278,11 +278,22 @@ tupleizeHelper xs acc =
             acc
 
 
-statStartTimes : Model -> List Int
+fixedFlagCheck s =
+    -- check if it is a fixed chart
+    case s.max of
+        Nothing ->
+            False
+
+        Just v ->
+            True
+
+
+statStartTimes : Model -> List ( Int, Bool )
 statStartTimes model =
-    List.map (\s -> timify s.start_date) model.flags.stats
+    List.map (\s -> ( timify s.start_date, fixedFlagCheck s )) model.flags.stats
 
 
+statStartTuples : Model -> List ( ( Int, Bool ), Maybe ( Int, Bool ) )
 statStartTuples model =
     Debug.log ("debugging start tuples with " ++ Debug.toString (statStartTimes model))
         (tupleize (statStartTimes model))

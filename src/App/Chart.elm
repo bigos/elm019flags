@@ -449,7 +449,8 @@ chartElements model =
                 []
 
         boo =
-            1
+            Debug.log ("eeeeeeeeeeeeeeeeeeeeee " ++ Debug.toString statsDateRanges)
+                1
     in
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
