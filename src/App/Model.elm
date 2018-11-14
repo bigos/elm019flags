@@ -122,6 +122,8 @@ type alias StatsData =
     , deviation : Float
     , mean : Float
     , nominal : Float
+    , min : Maybe Float
+    , max : Maybe Float
     }
 
 
@@ -441,6 +443,8 @@ deviations model x fn =
                       , deviation = 25.0
                       , mean = 250.0
                       , nominal = 250.0
+                      , min = Nothing
+                      , max = Nothing
                       }
                     ]
 
@@ -449,6 +453,8 @@ deviations model x fn =
                       , deviation = standardDeviation model.flags
                       , mean = mean
                       , nominal = mean
+                      , min = Nothing
+                      , max = Nothing
                       }
                     ]
 
