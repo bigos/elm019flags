@@ -543,10 +543,6 @@ chartElements model =
 
             else
                 []
-
-        boo =
-            Debug.log ("eeeeeeeeeeeeeeeeeeeeee " ++ Debug.toString statsDateRanges)
-                1
     in
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
@@ -588,4 +584,4 @@ chartElements model =
         ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
         ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
         ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
+        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (Debug.log ("yticks " ++ Debug.toString (minorYticks model)) (minorYticks model))

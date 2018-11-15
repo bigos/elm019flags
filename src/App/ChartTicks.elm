@@ -307,38 +307,32 @@ minorYticks model =
             model.chartScalings.upperBoundary
 
         lowerBoundary =
-            chartBottom model - axis_y.step
-
-        scaling =
-            -- reduce number of minor ticks if too many
-            -- by increasing the distance between them
-            if axis_y.step > 10 then
-                5
-
-            else
-                1
+            model.flags.axes.axis_y.min
 
         tickStep =
-            axis_y.step / axis_y.step * scaling
+            axis_y.step / 5.0
 
         all_ticks =
             findTicks axis_y.max lowerBoundary tickStep
+
+        boo =
+            Debug.log ("all ticks " ++ Debug.toString all_ticks) 1
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 
 
 findTicks1 : Float -> Float -> Float -> List Float -> List Float
-findTicks1 val bound step acc =
-    if (val < bound) || (List.length acc > 250) then
+findTicks1 val limit step acc =
+    if (val < limit) || (List.length acc > 250) then
         acc
 
     else
-        findTicks1 (val - step) bound step (val :: acc)
+        findTicks1 (val - step) limit step (val :: acc)
 
 
 findTicks : Float -> Float -> Float -> List Float
-findTicks val lbound step =
-    findTicks1 val lbound step []
+findTicks val limit step =
+    findTicks1 val limit step []
 
 
 spacedRange : Int -> Int -> Int -> List Int
