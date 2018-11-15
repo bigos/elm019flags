@@ -314,9 +314,6 @@ minorYticks model =
 
         all_ticks =
             findTicks axis_y.max lowerBoundary tickStep
-
-        boo =
-            Debug.log ("all ticks " ++ Debug.toString all_ticks) 1
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 

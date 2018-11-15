@@ -381,8 +381,7 @@ createMinLine model timeSection =
             timify model.flags.date_to + oneDay
 
         et =
-            Debug.log ("timesection " ++ Debug.toString timeSection)
-                (calcEt timeSection ted)
+            calcEt timeSection ted
 
         sd =
             findStatForTime model.flags.stats (round st)
@@ -584,4 +583,4 @@ chartElements model =
         ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
         ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
         ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (Debug.log ("yticks " ++ Debug.toString (minorYticks model)) (minorYticks model))
+        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)

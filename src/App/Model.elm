@@ -301,8 +301,7 @@ statStartTimes model =
 
 statStartTuples : Model -> List ( SectionData, Maybe SectionData )
 statStartTuples model =
-    Debug.log ("debugging start tuples with " ++ Debug.toString (statStartTimes model))
-        (tupleize (statStartTimes model))
+    tupleize (statStartTimes model)
 
 
 flatten lst =
@@ -454,9 +453,6 @@ deviations model x fn =
 
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
-
-                    boo =
-                        Debug.log ("values used to get deviations " ++ Debug.toString values) 1
                 in
                 if List.length values == 0 then
                     [ { start_date = ""
