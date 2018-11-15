@@ -274,6 +274,7 @@ createMeanLine model timeSection =
 
         dmean =
             if fixed then
+                -- TODO make it guarantee not to be shown at all
                 0.0
 
             else
@@ -482,6 +483,7 @@ createXsdLine xsd model timeSection =
 
         dx =
             if fixed then
+                -- TODO make it better, gaurantee it does not show on the chart
                 0.0
 
             else
