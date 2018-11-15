@@ -1,4 +1,4 @@
-module App.Chart exposing (axisX, axisY, chartElements, createMaintenanceLine, createMaintenanceShape, createMeanLine, createNominalLine, createQcShape, createReviewLine, createReviewShape, createXsdlLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape)
+module App.Chart exposing (axisX, axisY, calcEt, chartElements, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createQcShape, createReviewLine, createReviewShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape)
 
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
@@ -253,19 +253,18 @@ createReviewShape model r =
         (Polygon2d.singleLoop (reviewShape point))
 
 
-createMeanLine : Model -> ( Int, Maybe Int ) -> Svg msg
+createMeanLine : Model -> ( SectionData, Maybe SectionData ) -> Svg msg
 createMeanLine model timeSection =
     let
         st =
             toFloat
-                (Basics.max (Tuple.first timeSection) (timify model.flags.date_from))
+                (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
 
         ted =
             timify model.flags.date_to + oneDay
 
         et =
-            toFloat
-                (Basics.min ted (Maybe.withDefault ted (Tuple.second timeSection)))
+            calcEt timeSection ted
 
         sd =
             findStatForTime model.flags.stats (round st)
@@ -318,8 +317,13 @@ createOrangeMeanLine model stats =
         )
 
 
-
--- createNominalLine : Model -> ( Int, Maybe Int ) -> Svg msg
+calcEt timeSection ted =
+    toFloat
+        (Basics.min ted
+            (Maybe.withDefault { start = ted, fixed = False }
+                (Tuple.second timeSection)
+            ).start
+        )
 
 
 createNominalLine : Model -> ( SectionData, Maybe SectionData ) -> Svg msg
@@ -333,9 +337,7 @@ createNominalLine model timeSection =
             timify model.flags.date_to + oneDay
 
         et =
-            toFloat
-                -- finish that tomorrow
-                (Basics.min ted (Maybe.withDefault ted (Tuple.second timeSection).start))
+            calcEt timeSection ted
 
         sd =
             findStatForTime model.flags.stats (round st)
@@ -361,19 +363,93 @@ createNominalLine model timeSection =
         )
 
 
-createXsdlLine : Float -> Model -> ( Int, Maybe Int ) -> Svg msg
-createXsdlLine xsd model timeSection =
+createMinLine : Model -> ( SectionData, Maybe SectionData ) -> Svg msg
+createMinLine model timeSection =
     let
         st =
             toFloat
-                (Basics.max (Tuple.first timeSection) (timify model.flags.date_from))
+                (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
 
         ted =
             timify model.flags.date_to + oneDay
 
         et =
+            calcEt timeSection ted
+
+        sd =
+            findStatForTime model.flags.stats (round st)
+
+        dmean =
+            case sd of
+                Nothing ->
+                    (dataStats model).mean
+
+                Just v ->
+                    Maybe.withDefault 0.0
+                        v.min
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "yellow"
+        , Attributes.strokeWidth "3"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings st, doY model.chartScalings dmean )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings et, doY model.chartScalings dmean )
+            )
+        )
+
+
+createMaxLine : Model -> ( SectionData, Maybe SectionData ) -> Svg msg
+createMaxLine model timeSection =
+    let
+        st =
             toFloat
-                (Basics.min ted (Maybe.withDefault ted (Tuple.second timeSection)))
+                (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
+
+        ted =
+            timify model.flags.date_to + oneDay
+
+        et =
+            calcEt timeSection ted
+
+        sd =
+            findStatForTime model.flags.stats (round st)
+
+        dmean =
+            case sd of
+                Nothing ->
+                    (dataStats model).mean
+
+                Just v ->
+                    Maybe.withDefault 0.0 v.max
+    in
+    Svg.lineSegment2d
+        [ Attributes.stroke "yellow"
+        , Attributes.strokeWidth "3"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( doX model.chartScalings st, doY model.chartScalings dmean )
+            , Point2d.fromCoordinates
+                ( doX model.chartScalings et, doY model.chartScalings dmean )
+            )
+        )
+
+
+createXsdLine : Float -> Model -> ( SectionData, Maybe SectionData ) -> Svg msg
+createXsdLine xsd model timeSection =
+    let
+        st =
+            toFloat
+                (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
+
+        ted =
+            timify model.flags.date_to + oneDay
+
+        et =
+            calcEt timeSection ted
 
         sd =
             findStatForTime model.flags.stats (round st)
@@ -410,8 +486,8 @@ createXsdlLine xsd model timeSection =
         )
 
 
-createOrangeXsdlLine : Float -> Model -> DataStats -> Svg msg
-createOrangeXsdlLine x model stats =
+createOrangeXsdLine : Float -> Model -> DataStats -> Svg msg
+createOrangeXsdLine x model stats =
     let
         st =
             toFloat
@@ -468,16 +544,19 @@ chartElements model =
         ++ List.map (\s -> Svg.placeIn frameChart (createNominalLine model s)) statsDateRanges
         -- red stats lines
         ++ List.map (\s -> Svg.placeIn frameChart (createMeanLine model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 3.0 model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 2.0 model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdLine 3.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdLine 2.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdLine -2.0 model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createXsdLine -3.0 model s)) statsDateRanges
+        -- min max lines
+        ++ List.map (\s -> Svg.placeIn frameChart (createMinLine model s)) statsDateRanges
+        ++ List.map (\s -> Svg.placeIn frameChart (createMaxLine model s)) statsDateRanges
         -- orange stats lines will go here
         ++ List.map (\s -> Svg.placeIn frameChart (createOrangeMeanLine model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 3.0 model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 2.0 model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -2.0 model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -3.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine 3.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine 2.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine -2.0 model s)) orangeStats
+        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine -3.0 model s)) orangeStats
         -- data points
         ++ flatten
             (List.map2
