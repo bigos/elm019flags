@@ -256,6 +256,9 @@ createReviewShape model r =
 createMeanLine : Model -> ( SectionData, Maybe SectionData ) -> Svg msg
 createMeanLine model timeSection =
     let
+        fixed =
+            (Tuple.first timeSection).fixed
+
         st =
             toFloat
                 (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
@@ -270,12 +273,16 @@ createMeanLine model timeSection =
             findStatForTime model.flags.stats (round st)
 
         dmean =
-            case sd of
-                Nothing ->
-                    (dataStats model).mean
+            if fixed then
+                0.0
 
-                Just v ->
-                    v.mean
+            else
+                case sd of
+                    Nothing ->
+                        (dataStats model).mean
+
+                    Just v ->
+                        v.mean
     in
     Svg.lineSegment2d
         [ Attributes.stroke "red"
@@ -374,7 +381,8 @@ createMinLine model timeSection =
             timify model.flags.date_to + oneDay
 
         et =
-            calcEt timeSection ted
+            Debug.log ("timesection " ++ Debug.toString timeSection)
+                (calcEt timeSection ted)
 
         sd =
             findStatForTime model.flags.stats (round st)
@@ -382,7 +390,7 @@ createMinLine model timeSection =
         dmean =
             case sd of
                 Nothing ->
-                    (dataStats model).mean
+                    0.0
 
                 Just v ->
                     Maybe.withDefault 0.0
@@ -420,7 +428,7 @@ createMaxLine model timeSection =
         dmean =
             case sd of
                 Nothing ->
-                    (dataStats model).mean
+                    0.0
 
                 Just v ->
                     Maybe.withDefault 0.0 v.max
@@ -441,6 +449,9 @@ createMaxLine model timeSection =
 createXsdLine : Float -> Model -> ( SectionData, Maybe SectionData ) -> Svg msg
 createXsdLine xsd model timeSection =
     let
+        fixed =
+            (Tuple.first timeSection).fixed
+
         st =
             toFloat
                 (Basics.max (Tuple.first timeSection).start (timify model.flags.date_from))
@@ -471,7 +482,11 @@ createXsdLine xsd model timeSection =
                     v.deviation
 
         dx =
-            dmean + xsd * ddev
+            if fixed then
+                0.0
+
+            else
+                dmean + xsd * ddev
     in
     Svg.lineSegment2d
         [ Attributes.stroke "red"
