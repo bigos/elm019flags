@@ -244,12 +244,12 @@ createMajorTick model mt =
         mtStr =
             String.fromFloat mt
 
-        tlto =
+        labelOffset =
             toFloat (String.length mtStr) * 8.0 + 15
 
         textX =
             doX model.chartScalings ox
-                - tlto
+                - labelOffset
 
         textY =
             doY model.chartScalings mt
