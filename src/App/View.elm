@@ -242,8 +242,8 @@ newIdsLink model =
             String.join "," (List.map (\z -> String.fromInt z) ids1)
     in
     interpolate
-        "http://{0}/analytes/combined/dating_from/{1}/dating_to/{2}/analyte_ids/{3}"
-        [ "localhost:3000"
+        "{0}/analytes/combined/dating_from/{1}/dating_to/{2}/analyte_ids/{3}"
+        [ model.flags.host
         , model.flags.date_from
         , model.flags.date_to
         , ids

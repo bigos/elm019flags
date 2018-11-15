@@ -58,6 +58,7 @@ type alias Flags =
             , eid : Int
             }
     , chart_type : String
+    , host : String
     , date_from : String
     , date_to : String
     , show_pdf_download : Bool

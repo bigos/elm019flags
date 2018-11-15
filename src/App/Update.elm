@@ -5,6 +5,7 @@ import Http exposing (..)
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
 import Selectize
+import String.Interpolate exposing (interpolate)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -21,7 +22,7 @@ update msg model =
             )
 
         GetMachines ->
-            ( { model | textfieldMenuPlaceholder = "Select Machine" }, getMachines )
+            ( { model | textfieldMenuPlaceholder = "Select Machine" }, getMachines model )
 
         RequestedMachines res ->
             let
@@ -147,7 +148,7 @@ update msg model =
                                         , textfieldSelection = Nothing
                                         , textfieldMenuOptions = Nothing
                                       }
-                                    , getSamples mid
+                                    , getSamples mid model
                                     )
 
                         StageSample ->
@@ -167,7 +168,7 @@ update msg model =
                                         , textfieldSelection = Nothing
                                         , textfieldMenuOptions = Nothing
                                       }
-                                    , getAnalytes mid
+                                    , getAnalytes mid model
                                     )
 
                         StageAnalyte ->
@@ -205,18 +206,18 @@ andDo cmd ( model, cmds ) =
 -- HTTP
 
 
-getMachines : Cmd Msg
-getMachines =
+getMachines : Model -> Cmd Msg
+getMachines model =
     Http.send
         RequestedMachines
         (Http.get
-            "http://localhost:3000/machines.json"
+            (interpolate "{0}/machines.json" [ model.flags.host ])
             (Decode.list machineDecoder)
         )
 
 
-getSamples : Maybe Int -> Cmd Msg
-getSamples mid =
+getSamples : Maybe Int -> Model -> Cmd Msg
+getSamples mid model =
     let
         id =
             case mid of
@@ -229,13 +230,13 @@ getSamples mid =
     Http.send
         RequestedSamples
         (Http.get
-            ("http://localhost:3000/machines/" ++ String.fromInt id ++ "/samples.json")
+            (interpolate "{0}/machines/{1}/samples.json" [ model.flags.host, String.fromInt id ])
             (Decode.list sampleDecoder)
         )
 
 
-getAnalytes : Maybe Int -> Cmd Msg
-getAnalytes mid =
+getAnalytes : Maybe Int -> Model -> Cmd Msg
+getAnalytes mid model =
     let
         id =
             case mid of
@@ -248,7 +249,7 @@ getAnalytes mid =
     Http.send
         RequestedAnalytes
         (Http.get
-            ("http://localhost:3000/samples/" ++ String.fromInt id ++ "/analytes.json")
+            (interpolate "{0}/samples/{1}/analytes.json" [ model.flags.host, String.fromInt id ])
             (Decode.list analyteDecoder)
         )
 
