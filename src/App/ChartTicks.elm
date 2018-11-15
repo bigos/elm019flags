@@ -245,20 +245,12 @@ createMajorTick model mt =
             String.fromFloat mt
 
         tlto =
-            toFloat (String.length mtStr) * 13.0
-
-        tx =
-            ox + 4000
-
-        boo =
-            Debug.log
-                ("weeee " ++ Debug.toString { str = mtStr, tlto = tlto, tx = tx })
-                1
+            toFloat (String.length mtStr) * 8.0 + 15
 
         textX =
-            doX model.chartScalings tx
+            doX model.chartScalings ox
+                - tlto
 
-        --  (ox - 0.0 - 60.0 * tlto)
         textY =
             doY model.chartScalings mt
 
