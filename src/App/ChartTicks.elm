@@ -241,8 +241,15 @@ createMajorTick model mt =
         ox =
             chartStart model.flags
 
+        mtStr =
+            String.fromFloat mt
+
+        tlto =
+            toFloat (String.length mtStr) * 13.0
+
         textX =
-            doX model.chartScalings ox - 40
+            doX model.chartScalings
+                (ox - 0.0 - 60.0 * tlto)
 
         textY =
             doY model.chartScalings mt
@@ -259,7 +266,7 @@ createMajorTick model mt =
                 , x (String.fromFloat textX)
                 , y (String.fromFloat textY)
                 ]
-                [ text (String.fromFloat mt) ]
+                [ text mtStr ]
     in
     Svg.g []
         [ Svg.lineSegment2d
@@ -293,6 +300,9 @@ majorYticks model =
 
         all_ticks =
             findTicks axis_y.max lowerBoundary axis_y.step
+
+        boo =
+            Debug.log ("major ticks " ++ Debug.toString all_ticks) 1
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 
@@ -314,6 +324,9 @@ minorYticks model =
 
         all_ticks =
             findTicks axis_y.max lowerBoundary tickStep
+
+        boo =
+            Debug.log ("major ticks " ++ Debug.toString all_ticks) 1
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 
