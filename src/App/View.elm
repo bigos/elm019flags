@@ -265,7 +265,7 @@ combinedViewPart model =
                 StageAnalyteConfirmation ->
                     div []
                         [ div [] [ text "analyte confirmation" ]
-                        , a [ href (newIdsLink model) ] [ text ("Add analyute " ++ Debug.toString model.combinedAdditionAnalyte) ]
+                        , a [ href (newIdsLink model) ] [ button [ class "btn btn-primary" ] [ text "Add me" ] ]
                         ]
 
                 StageAnalyte ->
