@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, DataStats, Datum, Flags, Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -32,6 +32,7 @@ type alias Model =
     , combinedAdditionMachine : Maybe Int
     , combinedAdditionSample : Maybe Int
     , combinedAdditionAnalyte : Maybe Int
+    , legend : List LegendElement
     }
 
 
@@ -49,14 +50,7 @@ type AdditionStage
 
 
 type alias Flags =
-    { analytes :
-        List
-            { id : Int
-            , analyte : String
-            , sample : String
-            , machine : String
-            , eid : Int
-            }
+    { analytes : List AnalyteRecord
     , chart_type : String
     , host : String
     , date_from : String
@@ -67,6 +61,15 @@ type alias Flags =
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
     , qcresults : List AnalyteResults
+    }
+
+
+type alias AnalyteRecord =
+    { id : Int
+    , analyte : String
+    , sample : String
+    , machine : String
+    , eid : Int
     }
 
 
@@ -155,6 +158,25 @@ type alias ChartRecord =
     , by : String
     , comment : String
     }
+
+
+type alias LegendElement =
+    { shape : LegendShape, description : String }
+
+
+type LegendShape
+    = LegendDataPoint (List String) (List AnalyteRecord)
+    | LegendMaintenanceLog
+    | LegendChartReview
+    | LegendTheoreticalLine
+    | LegendLimitRed
+    | LegendLimitOrange
+
+
+
+-- not implemented yet Legend shapes
+-- | LegendAboveVisible
+-- | LegendBelowVisible
 
 
 type TooltipData
@@ -248,9 +270,113 @@ init flags =
       , combinedAdditionMachine = Nothing
       , combinedAdditionSample = Nothing
       , combinedAdditionAnalyte = Nothing
+      , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes)
       }
     , Cmd.none
     )
+
+
+dataPointColours : List String
+dataPointColours =
+    [ "blue", "red", "black", "green", "yellow", "pink" ]
+
+
+legendData flags acc nextShape =
+    let
+        a =
+            1
+    in
+    case nextShape of
+        LegendDataPoint colours analytes ->
+            if List.length analytes > 1 then
+                let
+                    newAcc =
+                        1
+                in
+                legendData flags
+                    (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 analytes))
+                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes)).analyte
+                        :: acc
+                    )
+                    (LegendDataPoint (Maybe.withDefault [] (List.tail colours))
+                        (Maybe.withDefault [] (List.tail analytes))
+                    )
+
+            else
+                let
+                    newAcc =
+                        1
+                in
+                legendData flags
+                    (LegendElement
+                        (LegendDataPoint (List.take 1 colours)
+                            (List.take 1 analytes)
+                        )
+                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes)).analyte
+                        :: acc
+                    )
+                    LegendMaintenanceLog
+
+        LegendMaintenanceLog ->
+            let
+                newAcc =
+                    if List.isEmpty flags.maintenance_logs then
+                        acc
+
+                    else
+                        LegendElement LegendMaintenanceLog "maintenance log"
+                            :: acc
+            in
+            legendData flags newAcc LegendChartReview
+
+        LegendChartReview ->
+            let
+                newAcc =
+                    if List.isEmpty flags.reviews then
+                        acc
+
+                    else
+                        LegendElement LegendChartReview "chart review"
+                            :: acc
+            in
+            legendData flags newAcc LegendTheoreticalLine
+
+        LegendTheoreticalLine ->
+            let
+                newAcc =
+                    if flags.chart_type == "combined" then
+                        acc
+
+                    else
+                        LegendElement LegendTheoreticalLine "theoretical line"
+                            :: acc
+            in
+            legendData flags newAcc LegendLimitRed
+
+        LegendLimitRed ->
+            let
+                newAcc =
+                    if flags.chart_type == "combined" then
+                        acc
+
+                    else
+                        LegendElement LegendLimitRed "static SD limits"
+                            :: acc
+            in
+            legendData flags newAcc LegendLimitOrange
+
+        LegendLimitOrange ->
+            let
+                newAcc =
+                    if flags.chart_type /= "combined" then
+                        acc
+
+                    else
+                        LegendElement LegendLimitOrange "calculated SD limits"
+                            :: acc
+            in
+            --last item so just reverse the list
+            List.reverse newAcc
 
 
 findStatForTime : List StatsData -> Int -> Maybe StatsData
