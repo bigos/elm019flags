@@ -4,14 +4,97 @@ import App.Chart exposing (..)
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
 import App.Utilities exposing (..)
+import Axis2d exposing (Axis2d)
+import Direction2d exposing (Direction2d)
+import Frame2d exposing (Frame2d)
+import Geometry.Svg as Svg
 import Html exposing (Html, a, br, button, div, h3, hr, i, span, text)
 import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onClick)
 import ISO8601
+import LineSegment2d exposing (LineSegment2d)
+import Point2d exposing (Point2d)
+import Polygon2d exposing (Polygon2d)
 import Selectize
 import String.Interpolate exposing (interpolate)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
+
+
+drawLegendLimitOrange model shape =
+    Svg.lineSegment2d
+        [ Attributes.stroke "orange"
+        , Attributes.strokeWidth "2.4"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( -100, 50 )
+            , Point2d.fromCoordinates
+                ( 100, 50 )
+            )
+        )
+
+
+drawLegendLimitRed model shape =
+    Svg.lineSegment2d
+        [ Attributes.stroke "red"
+        , Attributes.strokeWidth "2.4"
+        ]
+        (LineSegment2d.fromEndpoints
+            ( Point2d.fromCoordinates
+                ( -100, 50 )
+            , Point2d.fromCoordinates
+                ( 100, 50 )
+            )
+        )
+
+
+drawLegendDataPoint model =
+    Svg.polygon2d
+        [ Attributes.fill "green"
+        , Attributes.stroke "black"
+        , Attributes.strokeWidth "0.25"
+        ]
+        (Polygon2d.singleLoop (shape (Point2d.fromCoordinates ( -50, 50 ))))
+
+
+drawLegendShape : Model -> LegendShape -> List (Svg Msg)
+drawLegendShape model shape =
+    case shape of
+        LegendDataPoint strings analytes ->
+            [ Svg.placeIn frameLegend (drawLegendDataPoint model) ]
+
+        LegendLimitOrange ->
+            [ Svg.placeIn frameLegend (drawLegendLimitOrange model shape) ]
+
+        LegendLimitRed ->
+            [ Svg.placeIn frameLegend (drawLegendLimitRed model shape) ]
+
+        _ ->
+            [ div [] [ text "*" ]
+            ]
+
+
+showLegend : Model -> Html Msg
+showLegend model =
+    div []
+        (List.map
+            (\ld ->
+                div
+                    [ style "border: solid red 1px; width:40% " ]
+                    [ Svg.svg
+                        [ height "100"
+                        , viewBox "0 0 100 100"
+                        , style "border: solid blue 1px;"
+                        ]
+                        [ Svg.g [] (drawLegendShape model ld.shape) ]
+                    , div []
+                        [ text ld.description
+                        ]
+                    ]
+            )
+            model.legend
+        )
 
 
 showTheTooltip : Model -> Html Msg
@@ -207,7 +290,7 @@ view model =
             ]
         , div [ style "height:1em;" ] []
         , hr [] []
-        , div [] [ text "The legend will go here" ]
+        , showLegend model
         , hr [] []
         , if model.chartType == "default" then
             div [] []

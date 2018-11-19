@@ -79,7 +79,7 @@ frameAxisY =
 frameLegend : Frame2d
 frameLegend =
     Frame2d.atPoint
-        (Point2d.fromCoordinates ( 500, 100 ))
+        (Point2d.fromCoordinates ( 100, 100 ))
         |> Frame2d.reverseY
 
 
@@ -92,6 +92,10 @@ createQcShape model point fill =
 
             else
                 DataCombinedPoint point
+
+        boo =
+            Debug.log ("point debugging " ++ Debug.toString point)
+                1
     in
     Svg.polygon2d
         [ Attributes.fill fill

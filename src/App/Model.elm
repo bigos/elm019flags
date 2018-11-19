@@ -7,6 +7,7 @@ import ISO8601
 import List.Extra
 import Point2d exposing (Point2d)
 import Selectize
+import String.Interpolate exposing (interpolate)
 
 
 
@@ -281,6 +282,16 @@ dataPointColours =
     [ "blue", "red", "black", "green", "yellow", "pink" ]
 
 
+analyteFullName : AnalyteRecord -> String
+analyteFullName analyte =
+    interpolate "{0} - {1} - {2} - {3}"
+        [ analyte.analyte
+        , analyte.sample
+        , analyte.machine
+        , String.fromInt analyte.eid
+        ]
+
+
 legendData flags acc nextShape =
     let
         a =
@@ -295,7 +306,9 @@ legendData flags acc nextShape =
                 in
                 legendData flags
                     (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 analytes))
-                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes)).analyte
+                        (analyteFullName
+                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes))
+                        )
                         :: acc
                     )
                     (LegendDataPoint (Maybe.withDefault [] (List.tail colours))
@@ -312,7 +325,9 @@ legendData flags acc nextShape =
                         (LegendDataPoint (List.take 1 colours)
                             (List.take 1 analytes)
                         )
-                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes)).analyte
+                        (analyteFullName
+                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes))
+                        )
                         :: acc
                     )
                     LegendMaintenanceLog
