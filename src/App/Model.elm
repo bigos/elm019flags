@@ -295,7 +295,7 @@ legendData flags acc nextShape =
                 in
                 legendData flags
                     (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 analytes))
-                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes))
+                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes)).analyte
                         :: acc
                     )
                     (LegendDataPoint (Maybe.withDefault [] (List.tail colours))
@@ -312,7 +312,7 @@ legendData flags acc nextShape =
                         (LegendDataPoint (List.take 1 colours)
                             (List.take 1 analytes)
                         )
-                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes))
+                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes)).analyte
                         :: acc
                     )
                     LegendMaintenanceLog
