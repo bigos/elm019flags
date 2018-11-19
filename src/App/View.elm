@@ -207,6 +207,8 @@ view model =
             ]
         , div [ style "height:1em;" ] []
         , hr [] []
+        , div [] [ text "The legend will go here" ]
+        , hr [] []
         , if model.chartType == "default" then
             div [] []
 
@@ -257,7 +259,7 @@ combinedViewPart model =
                 [ div []
                     [ text "no particular addition at the moment"
                     ]
-                , button [ onClick GetMachines ] [ text "Add Analyte - first step - machines" ]
+                , button [ onClick GetMachines, class "btn btn-warning" ] [ text "Add Analyte - first step - machines" ]
                 ]
 
         Just stage ->
