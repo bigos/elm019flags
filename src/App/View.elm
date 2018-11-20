@@ -21,7 +21,7 @@ import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 
 
-drawLegendLimitOrange model shape =
+drawLegendLimitOrange =
     Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
         2.0
         (Svg.lineSegment2d
@@ -38,7 +38,7 @@ drawLegendLimitOrange model shape =
         )
 
 
-drawLegendLimitRed model shape =
+drawLegendLimitRed =
     Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
         2.0
         (Svg.lineSegment2d
@@ -55,7 +55,7 @@ drawLegendLimitRed model shape =
         )
 
 
-drawLegendTheoreticalLine model shape =
+drawLegendTheoreticalLine =
     Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
         2.0
         (Svg.lineSegment2d
@@ -72,7 +72,7 @@ drawLegendTheoreticalLine model shape =
         )
 
 
-drawLegendDataPoint model colours =
+drawLegendDataPoint colours =
     let
         fillColour =
             case List.head colours of
@@ -96,7 +96,7 @@ drawLegendDataPoint model colours =
         )
 
 
-drawLegendMaintenanceLog model colours =
+drawLegendMaintenanceLog =
     let
         fillColour =
             "red"
@@ -115,7 +115,7 @@ drawLegendMaintenanceLog model colours =
         )
 
 
-drawLegendChartReview model colours =
+drawLegendChartReview =
     let
         fillColour =
             "blue"
@@ -138,22 +138,22 @@ drawLegendShape : Model -> LegendShape -> List (Svg Msg)
 drawLegendShape model shape =
     case shape of
         LegendDataPoint colours analytes ->
-            [ Svg.placeIn frameLegend (drawLegendDataPoint model colours) ]
+            [ Svg.placeIn frameLegend (drawLegendDataPoint colours) ]
 
         LegendLimitOrange ->
-            [ Svg.placeIn frameLegend (drawLegendLimitOrange model shape) ]
+            [ Svg.placeIn frameLegend drawLegendLimitOrange ]
 
         LegendLimitRed ->
-            [ Svg.placeIn frameLegend (drawLegendLimitRed model shape) ]
+            [ Svg.placeIn frameLegend drawLegendLimitRed ]
 
         LegendTheoreticalLine ->
-            [ Svg.placeIn frameLegend (drawLegendTheoreticalLine model shape) ]
+            [ Svg.placeIn frameLegend drawLegendTheoreticalLine ]
 
         LegendMaintenanceLog ->
-            [ Svg.placeIn frameLegend (drawLegendMaintenanceLog model shape) ]
+            [ Svg.placeIn frameLegend drawLegendMaintenanceLog ]
 
         LegendChartReview ->
-            [ Svg.placeIn frameLegend (drawLegendChartReview model shape) ]
+            [ Svg.placeIn frameLegend drawLegendChartReview ]
 
 
 showLegend : Model -> Html Msg
