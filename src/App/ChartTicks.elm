@@ -315,20 +315,22 @@ majorYticks model =
 minorYticks : Model -> List Float
 minorYticks model =
     let
-        axis_y =
-            model.flags.axes.axis_y
+        majors =
+            majorYticks model
 
-        upperBoundary =
-            model.chartScalings.upperBoundary
+        lmin =
+            Maybe.withDefault 0
+                (List.minimum majors)
 
-        lowerBoundary =
-            model.flags.axes.axis_y.min
+        lmax =
+            Maybe.withDefault 500
+                (List.maximum majors)
 
-        tickStep =
-            axis_y.step / 5.0
+        step =
+            model.flags.axes.axis_y.step
 
         all_ticks =
-            findTicks axis_y.max lowerBoundary tickStep
+            findTicks lmax lmin ((lmax - lmin) / step / 5.0)
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 
