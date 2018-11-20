@@ -22,47 +22,123 @@ import Svg.Attributes as Attributes exposing (..)
 
 
 drawLegendLimitOrange model shape =
-    Svg.lineSegment2d
-        [ Attributes.stroke "orange"
-        , Attributes.strokeWidth "2.4"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( -100, 50 )
-            , Point2d.fromCoordinates
-                ( 100, 50 )
+    Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
+        2.0
+        (Svg.lineSegment2d
+            [ Attributes.stroke "orange"
+            , Attributes.strokeWidth "1.2"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( -100, 50 )
+                , Point2d.fromCoordinates
+                    ( 100, 50 )
+                )
             )
         )
 
 
 drawLegendLimitRed model shape =
-    Svg.lineSegment2d
-        [ Attributes.stroke "red"
-        , Attributes.strokeWidth "2.4"
-        ]
-        (LineSegment2d.fromEndpoints
-            ( Point2d.fromCoordinates
-                ( -100, 50 )
-            , Point2d.fromCoordinates
-                ( 100, 50 )
+    Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
+        2.0
+        (Svg.lineSegment2d
+            [ Attributes.stroke "red"
+            , Attributes.strokeWidth "1.2"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( -100, 50 )
+                , Point2d.fromCoordinates
+                    ( 100, 50 )
+                )
             )
         )
 
 
-drawLegendDataPoint model =
-    Svg.polygon2d
-        [ Attributes.fill "green"
-        , Attributes.stroke "black"
-        , Attributes.strokeWidth "0.25"
-        ]
-        (Polygon2d.singleLoop (shape (Point2d.fromCoordinates ( -50, 50 ))))
+drawLegendTheoreticalLine model shape =
+    Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
+        2.0
+        (Svg.lineSegment2d
+            [ Attributes.stroke "grey"
+            , Attributes.strokeWidth "1.2"
+            ]
+            (LineSegment2d.fromEndpoints
+                ( Point2d.fromCoordinates
+                    ( -100, 50 )
+                , Point2d.fromCoordinates
+                    ( 100, 50 )
+                )
+            )
+        )
+
+
+drawLegendDataPoint model colours =
+    let
+        fillColour =
+            case List.head colours of
+                Nothing ->
+                    "pink"
+
+                Just col ->
+                    col
+
+        referencePoint =
+            ( -50, 50 )
+    in
+    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
+        2.0
+        (Svg.polygon2d
+            [ Attributes.fill fillColour
+            , Attributes.stroke "black"
+            , Attributes.strokeWidth "0.25"
+            ]
+            (Polygon2d.singleLoop (shape (Point2d.fromCoordinates referencePoint)))
+        )
+
+
+drawLegendMaintenanceLog model colours =
+    let
+        fillColour =
+            "red"
+
+        referencePoint =
+            ( -50, 50 )
+    in
+    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
+        2.0
+        (Svg.polygon2d
+            [ Attributes.fill fillColour
+            , Attributes.stroke "blue"
+            , Attributes.strokeWidth "1.0"
+            ]
+            (Polygon2d.singleLoop (maintenanceShape (Point2d.fromCoordinates referencePoint)))
+        )
+
+
+drawLegendChartReview model colours =
+    let
+        fillColour =
+            "blue"
+
+        referencePoint =
+            ( -50, 50 )
+    in
+    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
+        2.0
+        (Svg.polygon2d
+            [ Attributes.fill fillColour
+            , Attributes.stroke "black"
+            , Attributes.strokeWidth "0.25"
+            ]
+            (Polygon2d.singleLoop (reviewShape (Point2d.fromCoordinates referencePoint)))
+        )
 
 
 drawLegendShape : Model -> LegendShape -> List (Svg Msg)
 drawLegendShape model shape =
     case shape of
-        LegendDataPoint strings analytes ->
-            [ Svg.placeIn frameLegend (drawLegendDataPoint model) ]
+        LegendDataPoint colours analytes ->
+            [ Svg.placeIn frameLegend (drawLegendDataPoint model colours) ]
 
         LegendLimitOrange ->
             [ Svg.placeIn frameLegend (drawLegendLimitOrange model shape) ]
@@ -70,9 +146,14 @@ drawLegendShape model shape =
         LegendLimitRed ->
             [ Svg.placeIn frameLegend (drawLegendLimitRed model shape) ]
 
-        _ ->
-            [ div [] [ text "*" ]
-            ]
+        LegendTheoreticalLine ->
+            [ Svg.placeIn frameLegend (drawLegendTheoreticalLine model shape) ]
+
+        LegendMaintenanceLog ->
+            [ Svg.placeIn frameLegend (drawLegendMaintenanceLog model shape) ]
+
+        LegendChartReview ->
+            [ Svg.placeIn frameLegend (drawLegendChartReview model shape) ]
 
 
 showLegend : Model -> Html Msg
