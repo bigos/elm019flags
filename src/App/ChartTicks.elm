@@ -288,6 +288,7 @@ createMajorTick model mt =
 
 majorYticks : Model -> List Float
 majorYticks model =
+    -- major and minor y ticks are calculated separately, need find a way to unite them
     let
         axis_y =
             model.flags.axes.axis_y
