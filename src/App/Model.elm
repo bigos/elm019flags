@@ -625,7 +625,7 @@ deviations model x fn =
         calc =
             fn devs
     in
-    Maybe.withDefault 0.0 calc
+    Maybe.withDefault 1.0 calc
 
 
 hidev =

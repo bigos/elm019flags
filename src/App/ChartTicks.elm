@@ -298,11 +298,15 @@ majorYticks model =
         lowerBoundary =
             chartBottom model - axis_y.step
 
-        all_ticks =
+        the_ticks =
             findTicks axis_y.max lowerBoundary axis_y.step
 
-        boo =
-            Debug.log ("major ticks " ++ Debug.toString all_ticks) 1
+        all_ticks =
+            if List.length the_ticks < 50 then
+                the_ticks
+
+            else
+                findTicks axis_y.max lowerBoundary (axis_y.step * 5)
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 
@@ -324,9 +328,6 @@ minorYticks model =
 
         all_ticks =
             findTicks axis_y.max lowerBoundary tickStep
-
-        boo =
-            Debug.log ("major ticks " ++ Debug.toString all_ticks) 1
     in
     List.filter (\t -> (t >= deviations model lodev List.minimum) && (t <= deviations model hidev List.maximum)) all_ticks
 

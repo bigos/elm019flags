@@ -79,6 +79,8 @@ frameAxisY =
 frameLegend : Frame2d
 frameLegend =
     Frame2d.atPoint
+        -- that would explain the strange problems with coordinates
+        -- the coordinates origin was not where expected
         (Point2d.fromCoordinates ( 100, 100 ))
         |> Frame2d.reverseY
 
