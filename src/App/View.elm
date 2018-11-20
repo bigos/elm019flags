@@ -21,11 +21,11 @@ import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 
 
-drawLegendLimitOrange =
+drawLegendLineSegment colour =
     Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
         2.0
         (Svg.lineSegment2d
-            [ Attributes.stroke "orange"
+            [ Attributes.stroke colour
             , Attributes.strokeWidth "1.2"
             ]
             (LineSegment2d.fromEndpoints
@@ -36,39 +36,33 @@ drawLegendLimitOrange =
                 )
             )
         )
+
+
+drawLegendLimitOrange =
+    drawLegendLineSegment "orange"
 
 
 drawLegendLimitRed =
-    Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
-        2.0
-        (Svg.lineSegment2d
-            [ Attributes.stroke "red"
-            , Attributes.strokeWidth "1.2"
-            ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( -100, 50 )
-                , Point2d.fromCoordinates
-                    ( 100, 50 )
-                )
-            )
-        )
+    drawLegendLineSegment "red"
 
 
 drawLegendTheoreticalLine =
-    Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
+    drawLegendLineSegment "grey"
+
+
+drawLegendShapeGeneric fillColour strokeColour strokeWidth shapeFn =
+    let
+        referencePoint =
+            ( -50, 50 )
+    in
+    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
         2.0
-        (Svg.lineSegment2d
-            [ Attributes.stroke "grey"
-            , Attributes.strokeWidth "1.2"
+        (Svg.polygon2d
+            [ Attributes.fill fillColour
+            , Attributes.stroke strokeColour
+            , Attributes.strokeWidth strokeWidth
             ]
-            (LineSegment2d.fromEndpoints
-                ( Point2d.fromCoordinates
-                    ( -100, 50 )
-                , Point2d.fromCoordinates
-                    ( 100, 50 )
-                )
-            )
+            (Polygon2d.singleLoop (shapeFn (Point2d.fromCoordinates referencePoint)))
         )
 
 
@@ -81,57 +75,16 @@ drawLegendDataPoint colours =
 
                 Just col ->
                     col
-
-        referencePoint =
-            ( -50, 50 )
     in
-    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
-        2.0
-        (Svg.polygon2d
-            [ Attributes.fill fillColour
-            , Attributes.stroke "black"
-            , Attributes.strokeWidth "0.25"
-            ]
-            (Polygon2d.singleLoop (shape (Point2d.fromCoordinates referencePoint)))
-        )
+    drawLegendShapeGeneric fillColour "black" "0.25" shape
 
 
 drawLegendMaintenanceLog =
-    let
-        fillColour =
-            "red"
-
-        referencePoint =
-            ( -50, 50 )
-    in
-    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
-        2.0
-        (Svg.polygon2d
-            [ Attributes.fill fillColour
-            , Attributes.stroke "blue"
-            , Attributes.strokeWidth "1.0"
-            ]
-            (Polygon2d.singleLoop (maintenanceShape (Point2d.fromCoordinates referencePoint)))
-        )
+    drawLegendShapeGeneric "red" "blue" "1.0" maintenanceShape
 
 
 drawLegendChartReview =
-    let
-        fillColour =
-            "blue"
-
-        referencePoint =
-            ( -50, 50 )
-    in
-    Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
-        2.0
-        (Svg.polygon2d
-            [ Attributes.fill fillColour
-            , Attributes.stroke "black"
-            , Attributes.strokeWidth "0.25"
-            ]
-            (Polygon2d.singleLoop (reviewShape (Point2d.fromCoordinates referencePoint)))
-        )
+    drawLegendShapeGeneric "blue" "black" "0.25" reviewShape
 
 
 drawLegendShape : Model -> LegendShape -> List (Svg Msg)
