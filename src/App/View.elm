@@ -341,19 +341,18 @@ view model =
             [ pdfLink model
             ]
         , div [ style "height:1em;" ] []
-        , hr [] []
         , showLegend model
-        , hr [] []
         , if model.chartType == "default" then
             div [] []
 
           else
             combinedViewPart model
-        , div [] [ text ("stage" ++ Debug.toString model.combinedAdditionStage) ]
-        , div [] [ text ("machine" ++ Debug.toString model.combinedAdditionMachine) ]
-        , div [] [ text ("sample" ++ Debug.toString model.combinedAdditionSample) ]
-        , div [] [ text ("analyte" ++ Debug.toString model.combinedAdditionAnalyte) ]
-        , div [] [ text (Debug.toString model.legend) ]
+
+        -- , div [] [ text ("stage" ++ Debug.toString model.combinedAdditionStage) ]
+        -- , div [] [ text ("machine" ++ Debug.toString model.combinedAdditionMachine) ]
+        -- , div [] [ text ("sample" ++ Debug.toString model.combinedAdditionSample) ]
+        -- , div [] [ text ("analyte" ++ Debug.toString model.combinedAdditionAnalyte) ]
+        -- , div [] [ text (Debug.toString model.legend) ]
         ]
 
 
