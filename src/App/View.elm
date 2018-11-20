@@ -115,33 +115,36 @@ drawLegendShape model shape =
 
 showLegend : Model -> Html Msg
 showLegend model =
-    div
-        [ class "container" ]
-        [ div [ class "row justify-content-center" ]
-            [ h3 []
+    div []
+        [ div [ class "container" ]
+            [ h3 [ class "center" ]
                 [ text "Legend" ]
-            , div
-                [ class "w-100" ]
-                []
-            , div [ class "row" ]
-                (List.map
-                    (\ld ->
-                        div [ class "col-md-4", style "margin: 1em 0em 1em 0em;" ]
-                            [ span []
-                                [ Svg.svg
-                                    [ height "25"
-                                    , viewBox "0 0 25 25"
+            ]
+        , div [ class "" ]
+            [ div
+                [ class "container" ]
+                [ div [ class "row" ]
+                    (List.map
+                        (\ld ->
+                            div [ class "col-md-6" ]
+                                [ div [ class "row", style "margin-bottom:1.5em" ]
+                                    [ div [ class "col-md-1" ]
+                                        [ Svg.svg
+                                            [ height "25"
+                                            , viewBox "0 0 25 25"
+                                            ]
+                                            [ Svg.g [] (drawLegendShape model ld.shape) ]
+                                        ]
+                                    , div
+                                        [ class "col-md-5" ]
+                                        [ text ld.description
+                                        ]
                                     ]
-                                    [ Svg.g [] (drawLegendShape model ld.shape) ]
                                 ]
-                            , span
-                                [ style "margin-left:1em;" ]
-                                [ text ld.description
-                                ]
-                            ]
+                        )
+                        model.legend
                     )
-                    model.legend
-                )
+                ]
             ]
         ]
 
