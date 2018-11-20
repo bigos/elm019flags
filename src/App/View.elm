@@ -22,7 +22,11 @@ import Svg.Attributes as Attributes exposing (..)
 
 
 drawLegendLineSegment colour =
-    Svg.scaleAbout (Point2d.fromCoordinates ( -50, 50 ))
+    let
+        cy =
+            87.5
+    in
+    Svg.scaleAbout (Point2d.fromCoordinates ( -75, cy ))
         2.0
         (Svg.lineSegment2d
             [ Attributes.stroke colour
@@ -30,9 +34,9 @@ drawLegendLineSegment colour =
             ]
             (LineSegment2d.fromEndpoints
                 ( Point2d.fromCoordinates
-                    ( -100, 50 )
+                    ( -90, cy )
                 , Point2d.fromCoordinates
-                    ( 100, 50 )
+                    ( -75, cy )
                 )
             )
         )
@@ -53,10 +57,10 @@ drawLegendTheoreticalLine =
 drawLegendShapeGeneric fillColour strokeColour strokeWidth shapeFn =
     let
         referencePoint =
-            ( -50, 50 )
+            ( -87, 87 )
     in
     Svg.scaleAbout (Point2d.fromCoordinates referencePoint)
-        2.0
+        1.5
         (Svg.polygon2d
             [ Attributes.fill fillColour
             , Attributes.stroke strokeColour
@@ -112,23 +116,25 @@ drawLegendShape model shape =
 showLegend : Model -> Html Msg
 showLegend model =
     div []
-        (List.map
+        [ List.map
             (\ld ->
-                div
-                    [ style "border: solid red 1px; width:40% " ]
-                    [ Svg.svg
-                        [ height "100"
-                        , viewBox "0 0 100 100"
-                        , style "border: solid blue 1px;"
+                div [ class "container" ]
+                    [ div [ class "col-1 col-sm-1" ]
+                        [ Svg.svg
+                            [ height "25"
+                            , viewBox "0 0 25 25"
+                            ]
+                            [ Svg.g [] (drawLegendShape model ld.shape) ]
                         ]
-                        [ Svg.g [] (drawLegendShape model ld.shape) ]
-                    , div []
+                    , div
+                        [ class "legend-description"
+                        ]
                         [ text ld.description
                         ]
                     ]
             )
             model.legend
-        )
+        ]
 
 
 showTheTooltip : Model -> Html Msg
