@@ -284,7 +284,7 @@ dataPointColours =
 
 analyteFullName : AnalyteRecord -> String
 analyteFullName analyte =
-    interpolate "{0} - {1} - {2} - {3}"
+    interpolate "{0} - {1} - {2} - EID: {3}"
         [ analyte.analyte
         , analyte.sample
         , analyte.machine
@@ -339,7 +339,7 @@ legendData flags acc nextShape =
                         acc
 
                     else
-                        LegendElement LegendMaintenanceLog "maintenance log"
+                        LegendElement LegendMaintenanceLog "Maintenance log"
                             :: acc
             in
             legendData flags newAcc LegendChartReview
@@ -351,7 +351,7 @@ legendData flags acc nextShape =
                         acc
 
                     else
-                        LegendElement LegendChartReview "chart review"
+                        LegendElement LegendChartReview "Chart review"
                             :: acc
             in
             legendData flags newAcc LegendTheoreticalLine
@@ -363,7 +363,7 @@ legendData flags acc nextShape =
                         acc
 
                     else
-                        LegendElement LegendTheoreticalLine "theoretical line"
+                        LegendElement LegendTheoreticalLine "Theoretical line"
                             :: acc
             in
             legendData flags newAcc LegendLimitRed
@@ -375,7 +375,7 @@ legendData flags acc nextShape =
                         acc
 
                     else
-                        LegendElement LegendLimitRed "static SD limits"
+                        LegendElement LegendLimitRed "Static SD limits"
                             :: acc
             in
             legendData flags newAcc LegendLimitOrange
@@ -387,7 +387,7 @@ legendData flags acc nextShape =
                         acc
 
                     else
-                        LegendElement LegendLimitOrange "calculated SD limits"
+                        LegendElement LegendLimitOrange "Calculated SD limits"
                             :: acc
             in
             --last item so just reverse the list

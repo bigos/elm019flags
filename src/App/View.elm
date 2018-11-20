@@ -115,25 +115,34 @@ drawLegendShape model shape =
 
 showLegend : Model -> Html Msg
 showLegend model =
-    div []
-        [ List.map
-            (\ld ->
-                div [ class "container" ]
-                    [ div [ class "col-1 col-sm-1" ]
-                        [ Svg.svg
-                            [ height "25"
-                            , viewBox "0 0 25 25"
+    div
+        [ class "container" ]
+        [ div [ class "row justify-content-center" ]
+            [ h3 []
+                [ text "Legend" ]
+            , div
+                [ class "w-100" ]
+                []
+            , div [ class "row" ]
+                (List.map
+                    (\ld ->
+                        div [ class "col-md-4", style "margin: 1em 0em 1em 0em;" ]
+                            [ span []
+                                [ Svg.svg
+                                    [ height "25"
+                                    , viewBox "0 0 25 25"
+                                    ]
+                                    [ Svg.g [] (drawLegendShape model ld.shape) ]
+                                ]
+                            , span
+                                [ style "margin-left:1em;" ]
+                                [ text ld.description
+                                ]
                             ]
-                            [ Svg.g [] (drawLegendShape model ld.shape) ]
-                        ]
-                    , div
-                        [ class "legend-description"
-                        ]
-                        [ text ld.description
-                        ]
-                    ]
-            )
-            model.legend
+                    )
+                    model.legend
+                )
+            ]
         ]
 
 
