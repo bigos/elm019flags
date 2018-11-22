@@ -62,6 +62,7 @@ type alias Flags =
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
     , qcresults : List AnalyteResults
+    , boundaries : { above : Float, below : Float, bottom : Float }
     , classified_qcresults : List ClassifiedSection
     }
 
