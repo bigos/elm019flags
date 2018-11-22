@@ -569,6 +569,13 @@ chartElements model =
         ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine 2.0 model s)) orangeStats
         ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine -2.0 model s)) orangeStats
         ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdLine -3.0 model s)) orangeStats
+        -- axis ticks
+        ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
+        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
+        ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
+        ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
+        ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
+        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
         -- data points
         ++ flatten
             (List.map2
@@ -580,9 +587,3 @@ chartElements model =
                 model.scaledPoints
                 dataPointColours
             )
-        ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
-        ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
