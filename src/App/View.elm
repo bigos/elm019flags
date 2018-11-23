@@ -351,8 +351,8 @@ view model =
         -- , div [] [ text ("stage" ++ Debug.toString model.combinedAdditionStage) ]
         -- , div [] [ text ("machine" ++ Debug.toString model.combinedAdditionMachine) ]
         -- , div [] [ text ("sample" ++ Debug.toString model.combinedAdditionSample) ]
-        -- , div [] [ text ("analyte" ++ Debug.toString model.combinedAdditionAnalyte) ]
-        , div [] [ text (Debug.toString model.flags) ]
+        , div [] [ text ("analyte" ++ Debug.toString model.chartBoundingBox) ]
+        , div [] [ text (Debug.toString model.chartScalings) ]
         ]
 
 
