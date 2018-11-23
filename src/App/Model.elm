@@ -465,9 +465,10 @@ flatten lst =
     List.concatMap identity lst
 
 
-singleResults : Flags -> AnalyteResults
+singleResults : Flags -> List RawCid
 singleResults flags =
-    flatten flags.classified_qcresults.values.valid
+    flatten
+        (List.map (\q -> q.values.valid) flags.classified_qcresults)
 
 
 singleAnalyteId : Model -> Int
