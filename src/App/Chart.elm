@@ -223,8 +223,8 @@ createMaintenanceShape model ml =
     in
     Svg.polygon2d
         [ Attributes.fill "red"
-        , Attributes.stroke "blue"
-        , Attributes.strokeWidth "1.0"
+        , Attributes.stroke "black"
+        , Attributes.strokeWidth "0.5"
         , M.onEnter (\event -> TooltipMouseEnter (DataChartRecord ml) event.pagePos (Just "Maintnance Log"))
         , M.onLeave (\event -> TooltipMouseLeave)
         ]

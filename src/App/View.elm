@@ -84,7 +84,7 @@ drawLegendDataPoint colours =
 
 
 drawLegendMaintenanceLog =
-    drawLegendShapeGeneric "red" "blue" "1.0" maintenanceShape
+    drawLegendShapeGeneric "red" "black" "0.5" maintenanceShape
 
 
 drawLegendChartReview =

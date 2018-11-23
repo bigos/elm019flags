@@ -11,7 +11,11 @@ import String.Interpolate exposing (interpolate)
 
 
 
--- TODO we need to change our assumptions about fixed limits charts
+{-
+   good example of a problem with the existing approach
+   http://localhost:3000/analytes/combined/dating_from/2013-06-26/dating_to/2013-07-17/analyte_ids/19682,19552,19551,19550
+
+-}
 
 
 type alias Model =
@@ -22,7 +26,6 @@ type alias Model =
     , dateFrom : Maybe ISO8601.Time
     , dateTo : Maybe ISO8601.Time
     , flags : Flags
-    , points : List (List Point2d)
     , scaledPoints : List (List ScaledPoint)
     , tooltip : Maybe Tooltip
     , textfieldSelection : Maybe Tree
@@ -271,7 +274,6 @@ init flags =
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to
       , flags = flags
-      , points = points
       , scaledPoints = scaleXY flags data chartBoundingBox
       , tooltip = Nothing
       , textfieldSelection = Nothing
