@@ -467,6 +467,8 @@ flatten lst =
 
 singleResults : Flags -> List RawCid
 singleResults flags =
+    -- was
+    -- flatten flags.qcresults
     flatten
         (List.map (\q -> q.values.valid) flags.classified_qcresults)
 
