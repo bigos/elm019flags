@@ -824,28 +824,14 @@ setChartScalings flags boundingBox =
         offsetY =
             0 - lowerBoundary
     in
-    Debug.log
-        (Debug.toString
-            { sizeX = dx
-            , sizeY = dy
-            , distX = distX
-            , distY = distY
-            , scaleX = scaleX
-            , scaleY = scaleY
-            , offsetX = offsetX
-            , offsetY = offsetY
-            , upperBoundary = upperBoundary
-            , lowerBoundary = lowerBoundary
-            }
-        )
-        { sizeX = dx
-        , sizeY = dy
-        , distX = distX
-        , distY = distY
-        , scaleX = scaleX
-        , scaleY = scaleY
-        , offsetX = offsetX
-        , offsetY = offsetY
-        , upperBoundary = upperBoundary
-        , lowerBoundary = lowerBoundary
-        }
+    { sizeX = dx
+    , sizeY = dy
+    , distX = distX
+    , distY = distY
+    , scaleX = scaleX
+    , scaleY = scaleY
+    , offsetX = offsetX
+    , offsetY = offsetY
+    , upperBoundary = upperBoundary
+    , lowerBoundary = lowerBoundary
+    }
