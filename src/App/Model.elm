@@ -22,7 +22,6 @@ type alias Model =
     { chartBoundingBox : Maybe BoundingBox2d
     , chartScalings : ChartScalings
     , chartType : String
-    , data : List (List Datum)
     , dateFrom : Maybe ISO8601.Time
     , dateTo : Maybe ISO8601.Time
     , flags : Flags
@@ -257,20 +256,11 @@ init flags =
     let
         data =
             readCombinedData flags
-
-        points =
-            toPoints data
-
-        flattenedPoints =
-            List.concatMap identity points
-
-        chartBoundingBox =
-            BoundingBox2d.containingPoints flattenedPoints
     in
-    ( { chartBoundingBox = chartBoundingBox
+    ( { chartBoundingBox =
+            BoundingBox2d.containingPoints (List.concatMap identity (toPoints data))
       , chartScalings = setChartScalings flags chartBoundingBox
       , chartType = flags.chart_type
-      , data = [] -- data
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to
       , flags = flags
