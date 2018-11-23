@@ -467,7 +467,7 @@ flatten lst =
 
 singleResults : Flags -> AnalyteResults
 singleResults flags =
-    flatten flags.qcresults
+    flatten flags.classified_qcresults.values.valid
 
 
 singleAnalyteId : Model -> Int
@@ -776,6 +776,7 @@ largestDeviation flags =
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
+    -- fix that with the new boundaries
     let
         mean =
             averageMean flags
