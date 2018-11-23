@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readValidData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -256,9 +256,20 @@ init flags =
     let
         data =
             readCombinedData flags
-    in
-    ( { chartBoundingBox =
+
+        dataValid =
+            readValidData flags
+
+        dataAbove =
+            readInvalidData flags "above"
+
+        dataBelow =
+            readInvalidData flags "below"
+
+        chartBoundingBox =
             BoundingBox2d.containingPoints (List.concatMap identity (toPoints data))
+    in
+    ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
       , chartType = flags.chart_type
       , dateFrom = prepareTime flags.date_from
@@ -505,6 +516,57 @@ readCombinedData flags =
                         )
                 )
                 singleDataList
+        )
+        combinedData
+
+
+readValidData : Flags -> List (List Datum)
+readValidData flags =
+    let
+        combinedData =
+            flags.classified_qcresults
+    in
+    List.map
+        (\classifiedSection ->
+            List.map
+                (\d ->
+                    Datum
+                        (toFloat (timify d.d))
+                        d.c
+                        (Maybe.withDefault
+                            0
+                            d.aid
+                        )
+                )
+                classifiedSection.values.valid
+        )
+        combinedData
+
+
+readInvalidData : Flags -> String -> List (List Datum)
+readInvalidData flags selector =
+    let
+        combinedData =
+            flags.classified_qcresults
+    in
+    List.map
+        (\classifiedSection ->
+            List.map
+                (\d ->
+                    Datum
+                        (toFloat (timify d.d))
+                        d.c
+                        (Maybe.withDefault
+                            0
+                            d.aid
+                        )
+                )
+                (if selector == "above" then
+                    classifiedSection.values.above_valid
+
+                 else
+                    classifiedSection.values.below_valid
+                )
         )
         combinedData
 
