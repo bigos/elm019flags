@@ -16,6 +16,7 @@ import String.Interpolate exposing (interpolate)
    http://localhost:3000/analytes/combined/dating_from/2013-06-26/dating_to/2013-07-17/analyte_ids/19682,19552,19551,19550
 
 -}
+-- we have a problem with bounding box calculation that results in x coordinate being way off the chart
 
 
 type alias Model =
