@@ -352,8 +352,7 @@ view model =
         -- , div [] [ text ("machine" ++ Debug.toString model.combinedAdditionMachine) ]
         -- , div [] [ text ("sample" ++ Debug.toString model.combinedAdditionSample) ]
         -- , div [] [ text ("analyte" ++ Debug.toString model.combinedAdditionAnalyte) ]
-        , div [] [ text (Debug.toString model.flags.boundaries) ]
-        , div [] [ text (Debug.toString model.flags.classified_qcresults) ]
+        , div [] [ text (Debug.toString model.flags) ]
         ]
 
 

@@ -254,9 +254,6 @@ type Msg
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        data =
-            readCombinedData flags
-
         dataValid =
             readValidData flags
 
@@ -267,7 +264,7 @@ init flags =
             readInvalidData flags "below"
 
         chartBoundingBox =
-            BoundingBox2d.containingPoints (List.concatMap identity (toPoints data))
+            BoundingBox2d.containingPoints (List.concatMap identity (toPoints dataValid))
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
@@ -275,7 +272,7 @@ init flags =
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to
       , flags = flags
-      , scaledPoints = scaleXY flags data chartBoundingBox
+      , scaledPoints = scaleXY flags dataValid chartBoundingBox
       , tooltip = Nothing
       , textfieldSelection = Nothing
       , textfieldMenu =
