@@ -92,6 +92,9 @@ createQcShape model point fill =
 
             else
                 DataCombinedPoint point
+
+        boo =
+            Debug.log (Debug.toString point) 1
     in
     Svg.polygon2d
         [ Attributes.fill fill
