@@ -248,18 +248,6 @@ type Msg
     | SelectTextfieldOption (Maybe Tree)
 
 
-
--- INIT
--- data =
---     readCombinedData flags
--- points =
---     toPoints data
--- flattenedPoints =
---     List.concatMap identity points
--- chartBoundingBox =
---     BoundingBox2d.containingPoints flattenedPoints
-
-
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
@@ -480,10 +468,12 @@ flatten lst =
     List.concatMap identity lst
 
 
+
+-- TODO: rename function
+
+
 singleResults : Flags -> List RawCid
 singleResults flags =
-    -- was
-    -- flatten flags.qcresults
     flatten
         (List.map (\q -> q.values.valid) flags.classified_qcresults)
 
