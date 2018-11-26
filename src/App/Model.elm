@@ -267,6 +267,9 @@ init flags =
 
         chartBoundingBox =
             BoundingBox2d.containingPoints flattenedPoints
+
+        hasInvalid =
+            not (List.empty dataAbove && List.empty dataBelow)
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
@@ -290,7 +293,7 @@ init flags =
       , combinedAdditionMachine = Nothing
       , combinedAdditionSample = Nothing
       , combinedAdditionAnalyte = Nothing
-      , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes)
+      , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes hasInvalid) dataAbove dataBelow
       }
     , Cmd.none
     )
@@ -313,40 +316,36 @@ analyteFullName analyte =
 
 legendData flags acc nextShape =
     case nextShape of
-        LegendDataPoint colours analytes ->
-            if List.length analytes > 1 then
+        LegendDataPoint colours validAnalytes hasInvalid ->
+            if List.length validAnalytes > 1 then
                 legendData flags
-                    (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 analytes))
+                    (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 validAnalytes))
                         (analyteFullName
-                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes))
+                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
                         )
                         :: acc
                     )
                     (LegendDataPoint (Maybe.withDefault [] (List.tail colours))
-                        (Maybe.withDefault [] (List.tail analytes))
+                        (Maybe.withDefault [] (List.tail validAnalytes))
                     )
 
             else
                 legendData flags
                     (LegendElement
                         (LegendDataPoint (List.take 1 colours)
-                            (List.take 1 analytes)
+                            (List.take 1 validAnalytes)
                         )
                         (analyteFullName
-                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head analytes))
+                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
                         )
                         :: acc
                     )
-                    LegendOutsideValid
+                    (LegendOutsideValid hasInvalid)
 
-        LegendOutsideValid ->
+        LegendOutsideValid hasInvalid ->
             let
                 newAcc =
-                    if
-                        True
-                        -- List.isEmpty flags.scaledAbovePoints
-                        --     && List.isEmpty flags.scaledBelowPoints
-                    then
+                    if not hasInvalid then
                         acc
 
                     else

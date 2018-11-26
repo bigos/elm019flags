@@ -1,4 +1,4 @@
-module App.Chart exposing (axisX, axisY, calcEt, chartElements, createAboveQcShape, createBelowQcShape, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape, shapeOutsideValid)
+module App.Chart exposing (axisX, axisY, calcEt, chartElements, createInvalidQcShape, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape, shapeOutsideValid)
 
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
@@ -103,8 +103,8 @@ createValidQcShape model point fill =
         (Polygon2d.singleLoop (shape point.point2d))
 
 
-createAboveQcShape : Model -> ScaledPoint -> String -> Svg Msg
-createAboveQcShape model point fill =
+createInvalidQcShape : Model -> ScaledPoint -> String -> Svg Msg
+createInvalidQcShape model point fill =
     let
         boo =
             Debug.log (" creating below qc shape " ++ Debug.toString point)
@@ -120,30 +120,6 @@ createAboveQcShape model point fill =
     Svg.polygon2d
         [ Attributes.fill fill
         , Attributes.stroke "red"
-        , Attributes.strokeWidth "2.75"
-        , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
-        , M.onLeave (\event -> TooltipMouseLeave)
-        ]
-        (Polygon2d.singleLoop (shapeOutsideValid point.point2d))
-
-
-createBelowQcShape : Model -> ScaledPoint -> String -> Svg Msg
-createBelowQcShape model point fill =
-    let
-        boo =
-            Debug.log (" creating below qc shape " ++ Debug.toString point)
-                1
-
-        myToolTip =
-            if model.chartType == "default" then
-                DataScaledPoint point
-
-            else
-                DataCombinedPoint point
-    in
-    Svg.polygon2d
-        [ Attributes.fill fill
-        , Attributes.stroke "yellow"
         , Attributes.strokeWidth "0.75"
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
@@ -190,7 +166,7 @@ shape point =
 shapeOutsideValid : Point2d -> List Point2d
 shapeOutsideValid point =
     -- draw triangle
-    genericShape point 4.5 [ ( 0.0, 2.0 ), ( 1.0, -0.5 ), ( -1.0, -0.5 ) ]
+    genericShape point 4.5 [ ( 0.0, 4.0 ), ( 2.0, -1.0 ), ( -2.0, -1.0 ) ]
 
 
 maintenanceShape : Point2d -> List Point2d
@@ -635,7 +611,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createAboveQcShape model p "red"))
+                        (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
                         pl
                 )
                 model.scaledAbovePoints
@@ -655,7 +631,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createBelowQcShape model p "red"))
+                        (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
                         pl
                 )
                 model.scaledBelowPoints

@@ -92,7 +92,7 @@ drawLegendChartReview =
 
 
 drawLegendOutsideValid =
-    drawLegendShapeGeneric "red" "yellow" "0.75" shapeOutsideValid
+    drawLegendShapeGeneric "yellow" "red" "0.75" shapeOutsideValid
 
 
 drawLegendShape : Model -> LegendShape -> List (Svg Msg)
