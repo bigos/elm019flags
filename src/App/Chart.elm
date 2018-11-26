@@ -124,7 +124,7 @@ createAboveQcShape model point fill =
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
-        (Polygon2d.singleLoop (shape point.point2d))
+        (Polygon2d.singleLoop (shapeOutsideValid point.point2d))
 
 
 createBelowQcShape : Model -> ScaledPoint -> String -> Svg Msg
@@ -148,7 +148,7 @@ createBelowQcShape model point fill =
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
-        (Polygon2d.singleLoop (shape point.point2d))
+        (Polygon2d.singleLoop (shapeOutsideValid point.point2d))
 
 
 genericShape : Point2d -> Float -> List ( Float, Float ) -> List Point2d
@@ -185,6 +185,12 @@ shape : Point2d -> List Point2d
 shape point =
     -- draw tilted square around point coordinates
     genericShape point 4.5 [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
+
+
+shapeOutsideValid : Point2d -> List Point2d
+shapeOutsideValid point =
+    -- draw triangle
+    genericShape point 4.5 [ ( 0.0, 2.0 ), ( 1.0, -0.5 ), ( -1.0, -0.5 ) ]
 
 
 maintenanceShape : Point2d -> List Point2d

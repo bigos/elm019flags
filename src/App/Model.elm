@@ -197,12 +197,7 @@ type LegendShape
     | LegendTheoreticalLine
     | LegendLimitRed
     | LegendLimitOrange
-
-
-
--- not implemented yet Legend shapes
--- | LegendAboveVisible
--- | LegendBelowVisible
+    | LegendOutsideValid
 
 
 type TooltipData
@@ -316,18 +311,15 @@ analyteFullName analyte =
         ]
 
 
-legendData flags acc nextShape =
+legendData : Flags -> Int -> Int -> List LegendElement
+legendData model acc nextShape =
     let
-        a =
-            1
+        flags =
+            model.flags
     in
     case nextShape of
         LegendDataPoint colours analytes ->
             if List.length analytes > 1 then
-                let
-                    newAcc =
-                        1
-                in
                 legendData flags
                     (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 analytes))
                         (analyteFullName
@@ -340,10 +332,6 @@ legendData flags acc nextShape =
                     )
 
             else
-                let
-                    newAcc =
-                        1
-                in
                 legendData flags
                     (LegendElement
                         (LegendDataPoint (List.take 1 colours)
@@ -354,7 +342,22 @@ legendData flags acc nextShape =
                         )
                         :: acc
                     )
-                    LegendMaintenanceLog
+                    LegendOutsideValid
+
+        LegendOutsideValid ->
+            let
+                newAcc =
+                    if
+                        List.isEmpty flags.scaledAbovePoints
+                            && List.isEmpty flags.scaledBelowPoints
+                    then
+                        acc
+
+                    else
+                        LegendElement LegendOutsideValid "Results outside valid range"
+                            :: acc
+            in
+            legendData flags newAcc LegendMaintenanceLog
 
         LegendMaintenanceLog ->
             let
