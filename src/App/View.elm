@@ -91,6 +91,10 @@ drawLegendChartReview =
     drawLegendShapeGeneric "blue" "black" "0.25" reviewShape
 
 
+drawLegendOutsideValid =
+    drawLegendShapeGeneric "red" "yellow" "0.75" shapeOutsideValid
+
+
 drawLegendShape : Model -> LegendShape -> List (Svg Msg)
 drawLegendShape model shape =
     case shape of
@@ -111,6 +115,9 @@ drawLegendShape model shape =
 
         LegendChartReview ->
             [ Svg.placeIn frameLegend drawLegendChartReview ]
+
+        LegendOutsideValid ->
+            [ Svg.placeIn frameLegend drawLegendOutsideValid ]
 
 
 showLegend : Model -> Html Msg

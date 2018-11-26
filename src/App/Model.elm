@@ -343,8 +343,9 @@ legendData flags acc nextShape =
             let
                 newAcc =
                     if
-                        List.isEmpty flags.scaledAbovePoints
-                            && List.isEmpty flags.scaledBelowPoints
+                        True
+                        -- List.isEmpty flags.scaledAbovePoints
+                        --     && List.isEmpty flags.scaledBelowPoints
                     then
                         acc
 

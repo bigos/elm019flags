@@ -1,4 +1,4 @@
-module App.Chart exposing (axisX, axisY, calcEt, chartElements, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape)
+module App.Chart exposing (axisX, axisY, calcEt, chartElements, createAboveQcShape, createBelowQcShape, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape, shapeOutsideValid)
 
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
@@ -143,8 +143,8 @@ createBelowQcShape model point fill =
     in
     Svg.polygon2d
         [ Attributes.fill fill
-        , Attributes.stroke "red"
-        , Attributes.strokeWidth "2.75"
+        , Attributes.stroke "yellow"
+        , Attributes.strokeWidth "0.75"
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
@@ -635,7 +635,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createAboveQcShape model p c))
+                        (\p -> Svg.placeIn frameChart (createAboveQcShape model p "red"))
                         pl
                 )
                 model.scaledAbovePoints
@@ -655,7 +655,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createBelowQcShape model p c))
+                        (\p -> Svg.placeIn frameChart (createBelowQcShape model p "red"))
                         pl
                 )
                 model.scaledBelowPoints
