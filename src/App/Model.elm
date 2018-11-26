@@ -250,6 +250,14 @@ type Msg
 
 
 -- INIT
+-- data =
+--     readCombinedData flags
+-- points =
+--     toPoints data
+-- flattenedPoints =
+--     List.concatMap identity points
+-- chartBoundingBox =
+--     BoundingBox2d.containingPoints flattenedPoints
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -264,11 +272,24 @@ init flags =
         dataBelow =
             readInvalidData flags "below"
 
+        points =
+            toPoints dataValid
+
+        flattenedPoints =
+            List.concatMap identity points
+
         chartBoundingBox =
-            BoundingBox2d.containingPoints (List.concatMap identity (toPoints dataValid))
+            BoundingBox2d.containingPoints flattenedPoints
 
         boo =
-            Debug.log (Debug.toString { a = dataValid, b = chartBoundingBox })
+            Debug.log
+                (Debug.toString
+                    { a = dataValid
+                    , b = points
+                    , c = flattenedPoints
+                    , d = chartBoundingBox
+                    }
+                )
                 1
     in
     ( { chartBoundingBox = chartBoundingBox
@@ -574,6 +595,10 @@ readInvalidData flags selector =
                 )
         )
         combinedData
+
+
+
+-- this function gives zeros on x values
 
 
 toPoints : List (List Datum) -> List (List Point2d)
