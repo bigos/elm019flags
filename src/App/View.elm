@@ -98,7 +98,7 @@ drawLegendOutsideValid =
 drawLegendShape : Model -> LegendShape -> List (Svg Msg)
 drawLegendShape model shape =
     case shape of
-        LegendDataPoint colours analytes ->
+        LegendDataPoint colours analytes _ ->
             [ Svg.placeIn frameLegend (drawLegendDataPoint colours) ]
 
         LegendLimitOrange ->
@@ -116,7 +116,7 @@ drawLegendShape model shape =
         LegendChartReview ->
             [ Svg.placeIn frameLegend drawLegendChartReview ]
 
-        LegendOutsideValid ->
+        LegendOutsideValid _ ->
             [ Svg.placeIn frameLegend drawLegendOutsideValid ]
 
 

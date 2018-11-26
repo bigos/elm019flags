@@ -191,13 +191,13 @@ type alias LegendElement =
 
 
 type LegendShape
-    = LegendDataPoint (List String) (List AnalyteRecord)
+    = LegendDataPoint (List String) (List AnalyteRecord) Bool
     | LegendMaintenanceLog
     | LegendChartReview
     | LegendTheoreticalLine
     | LegendLimitRed
     | LegendLimitOrange
-    | LegendOutsideValid
+    | LegendOutsideValid Bool
 
 
 type TooltipData
@@ -269,7 +269,7 @@ init flags =
             BoundingBox2d.containingPoints flattenedPoints
 
         hasInvalid =
-            not (List.empty dataAbove && List.empty dataBelow)
+            not (List.isEmpty dataAbove && List.isEmpty dataBelow)
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
@@ -293,7 +293,7 @@ init flags =
       , combinedAdditionMachine = Nothing
       , combinedAdditionSample = Nothing
       , combinedAdditionAnalyte = Nothing
-      , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes hasInvalid) dataAbove dataBelow
+      , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes hasInvalid)
       }
     , Cmd.none
     )
@@ -319,7 +319,11 @@ legendData flags acc nextShape =
         LegendDataPoint colours validAnalytes hasInvalid ->
             if List.length validAnalytes > 1 then
                 legendData flags
-                    (LegendElement (LegendDataPoint (List.take 1 colours) (List.take 1 validAnalytes))
+                    (LegendElement
+                        (LegendDataPoint (List.take 1 colours)
+                            (List.take 1 validAnalytes)
+                            hasInvalid
+                        )
                         (analyteFullName
                             (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
                         )
@@ -327,6 +331,7 @@ legendData flags acc nextShape =
                     )
                     (LegendDataPoint (Maybe.withDefault [] (List.tail colours))
                         (Maybe.withDefault [] (List.tail validAnalytes))
+                        hasInvalid
                     )
 
             else
@@ -334,6 +339,7 @@ legendData flags acc nextShape =
                     (LegendElement
                         (LegendDataPoint (List.take 1 colours)
                             (List.take 1 validAnalytes)
+                            hasInvalid
                         )
                         (analyteFullName
                             (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
@@ -349,7 +355,7 @@ legendData flags acc nextShape =
                         acc
 
                     else
-                        LegendElement LegendOutsideValid "Results outside valid range"
+                        LegendElement (LegendOutsideValid hasInvalid) "Results outside valid range"
                             :: acc
             in
             legendData flags newAcc LegendMaintenanceLog
