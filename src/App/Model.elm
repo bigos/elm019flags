@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readValidData, scaleXY, setChartScalings, singleAnalyteId, singleResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readValidData, scaleXY, setChartScalings, singleAnalyteId, singleValidResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -472,8 +472,8 @@ flatten lst =
 -- TODO: rename function
 
 
-singleResults : Flags -> List RawCid
-singleResults flags =
+singleValidResults : Flags -> List RawCid
+singleValidResults flags =
     flatten
         (List.map (\q -> q.values.valid) flags.classified_qcresults)
 
@@ -633,7 +633,7 @@ dataStats : Model -> DataStats
 dataStats model =
     let
         values =
-            List.map (\qr -> qr.c) (singleResults model.flags)
+            List.map (\qr -> qr.c) (singleValidResults model.flags)
 
         mean =
             List.foldl (+) 0.0 values / toFloat (List.length values)
@@ -657,7 +657,7 @@ deviations model x fn =
             if List.length stats == 0 then
                 let
                     values =
-                        List.map (\qr -> qr.c) (singleResults model.flags)
+                        List.map (\qr -> qr.c) (singleValidResults model.flags)
 
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
@@ -726,7 +726,7 @@ averageMean flags =
     if List.length meanValues == 0 then
         let
             qcvalues =
-                singleResults flags
+                singleValidResults flags
         in
         if List.length qcvalues == 0 then
             250.0
@@ -743,7 +743,7 @@ standardDeviation : Flags -> Float
 standardDeviation flags =
     let
         values =
-            List.map (\qc -> qc.c) (singleResults flags)
+            List.map (\qc -> qc.c) (singleValidResults flags)
 
         mean =
             List.foldl (+) 0.0 values / toFloat (List.length values)
