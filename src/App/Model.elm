@@ -266,6 +266,10 @@ init flags =
 
         chartBoundingBox =
             BoundingBox2d.containingPoints (List.concatMap identity (toPoints dataValid))
+
+        boo =
+            Debug.log (Debug.toString { a = dataValid, b = chartBoundingBox })
+                1
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
