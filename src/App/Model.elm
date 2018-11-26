@@ -311,12 +311,7 @@ analyteFullName analyte =
         ]
 
 
-legendData : Flags -> Int -> Int -> List LegendElement
-legendData model acc nextShape =
-    let
-        flags =
-            model.flags
-    in
+legendData flags acc nextShape =
     case nextShape of
         LegendDataPoint colours analytes ->
             if List.length analytes > 1 then
