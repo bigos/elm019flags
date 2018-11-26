@@ -1,4 +1,4 @@
-module App.Chart exposing (axisX, axisY, calcEt, chartElements, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createQcShape, createReviewLine, createReviewShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape)
+module App.Chart exposing (axisX, axisY, calcEt, chartElements, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape)
 
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
@@ -83,8 +83,8 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-createQcShape : Model -> ScaledPoint -> String -> Svg Msg
-createQcShape model point fill =
+createValidQcShape : Model -> ScaledPoint -> String -> Svg Msg
+createValidQcShape model point fill =
     let
         myToolTip =
             if model.chartType == "default" then
@@ -97,6 +97,30 @@ createQcShape model point fill =
         [ Attributes.fill fill
         , Attributes.stroke "black"
         , Attributes.strokeWidth "0.25"
+        , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
+        , M.onLeave (\event -> TooltipMouseLeave)
+        ]
+        (Polygon2d.singleLoop (shape point.point2d))
+
+
+createBelowQcShape : Model -> ScaledPoint -> String -> Svg Msg
+createBelowQcShape model point fill =
+    let
+        boo =
+            Debug.log (" creating below qc shape " ++ Debug.toString point)
+                1
+
+        myToolTip =
+            if model.chartType == "default" then
+                DataScaledPoint point
+
+            else
+                DataCombinedPoint point
+    in
+    Svg.polygon2d
+        [ Attributes.fill fill
+        , Attributes.stroke "red"
+        , Attributes.strokeWidth "0.75"
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
@@ -581,9 +605,19 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createQcShape model p c))
+                        (\p -> Svg.placeIn frameChart (createValidQcShape model p c))
                         pl
                 )
-                model.scaledPoints
+                model.scaledValidPoints
+                dataPointColours
+            )
+        ++ flatten
+            (List.map2
+                (\pl c ->
+                    List.map
+                        (\p -> Svg.placeIn frameChart (createValidQcShape model p c))
+                        pl
+                )
+                model.scaledBelowPoints
                 dataPointColours
             )

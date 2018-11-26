@@ -26,7 +26,9 @@ type alias Model =
     , dateFrom : Maybe ISO8601.Time
     , dateTo : Maybe ISO8601.Time
     , flags : Flags
-    , scaledPoints : List (List ScaledPoint)
+    , scaledAbovePoints : List (List ScaledPoint)
+    , scaledValidPoints : List (List ScaledPoint)
+    , scaledBelowPoints : List (List ScaledPoint)
     , tooltip : Maybe Tooltip
     , textfieldSelection : Maybe Tree
     , textfieldMenu : Selectize.State Tree
@@ -80,6 +82,12 @@ type alias ClassifiedSection =
         , below_valid : List RawCid
         }
     }
+
+
+type ValuesClassification
+    = ValuesValid
+    | ValuesAbove
+    | ValuesBelow
 
 
 type alias AnalyteRecord =
@@ -259,11 +267,8 @@ init flags =
         dataBelow =
             readInvalidData flags "below"
 
-        points =
-            toPoints dataValid
-
         flattenedPoints =
-            List.concatMap identity points
+            List.concatMap identity (toPoints dataValid)
 
         chartBoundingBox =
             BoundingBox2d.containingPoints flattenedPoints
@@ -274,7 +279,9 @@ init flags =
       , dateFrom = prepareTime flags.date_from
       , dateTo = prepareTime flags.date_to
       , flags = flags
-      , scaledPoints = scaleXY flags dataValid chartBoundingBox
+      , scaledAbovePoints = scaleXY flags dataValid chartBoundingBox ValuesAbove
+      , scaledValidPoints = scaleXY flags dataValid chartBoundingBox ValuesValid
+      , scaledBelowPoints = scaleXY flags dataValid chartBoundingBox ValuesBelow
       , tooltip = Nothing
       , textfieldSelection = Nothing
       , textfieldMenu =
@@ -586,8 +593,8 @@ prepareTime s =
             Just d
 
 
-scaleXY : Flags -> List (List Datum) -> Maybe BoundingBox2d -> List (List ScaledPoint)
-scaleXY flags combinedData boundingBox =
+scaleXY : Flags -> List (List Datum) -> Maybe BoundingBox2d -> ValuesClassification -> List (List ScaledPoint)
+scaleXY flags combinedData boundingBox valuesClassification =
     let
         cs =
             setChartScalings flags boundingBox
@@ -599,7 +606,22 @@ scaleXY flags combinedData boundingBox =
         (\data ->
             List.map
                 (\d ->
-                    { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs d.value )
+                    let
+                        boo =
+                            1
+
+                        yValue =
+                            case valuesClassification of
+                                ValuesValid ->
+                                    d.value
+
+                                ValuesAbove ->
+                                    flags.boundaries.above
+
+                                ValuesBelow ->
+                                    flags.boundaries.below
+                    in
+                    { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs yValue )
                     , datum = d
                     }
                 )
