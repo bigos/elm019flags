@@ -272,10 +272,6 @@ init flags =
         dataBelow =
             readInvalidData flags "below"
 
-        boo =
-            Debug.log ("read data?Valid" ++ Debug.toString dataValid)
-                1
-
         points =
             toPoints dataValid
 
@@ -541,45 +537,25 @@ readCombinedData flags =
 
 readValidData : Flags -> List (List Datum)
 readValidData flags =
-    let
-        combinedData =
-            flags.classified_qcresults
-    in
     List.map
         (\classifiedSection ->
             List.map
                 (\d ->
-                    let
-                        boo =
-                            Debug.log ("lambda d " ++ Debug.toString d)
-                                1
-
-                        res =
-                            Datum
-                                (toFloat (timify d.d))
-                                d.c
-                                (Maybe.withDefault
-                                    0
-                                    d.aid
-                                )
-
-                        baa =
-                            Debug.log ("the res " ++ Debug.toString res)
-                                1
-                    in
-                    res
+                    Datum
+                        (toFloat (timify d.d))
+                        d.c
+                        (Maybe.withDefault
+                            0
+                            d.aid
+                        )
                 )
                 classifiedSection.values.valid
         )
-        combinedData
+        flags.classified_qcresults
 
 
 readInvalidData : Flags -> String -> List (List Datum)
 readInvalidData flags selector =
-    let
-        combinedData =
-            flags.classified_qcresults
-    in
     List.map
         (\classifiedSection ->
             List.map
@@ -599,22 +575,14 @@ readInvalidData flags selector =
                     classifiedSection.values.below_valid
                 )
         )
-        combinedData
-
-
-
--- this function gives zeros on x values
-
-
-toPoints2 data =
-    List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+        flags.classified_qcresults
 
 
 toPoints : List (List Datum) -> List (List Point2d)
 toPoints combinedData =
     List.map
         (\data ->
-            toPoints2 data
+            List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
         )
         combinedData
 
