@@ -268,8 +268,12 @@ init flags =
         chartBoundingBox =
             BoundingBox2d.containingPoints flattenedPoints
 
+        boo =
+            Debug.log ("invalid data " ++ Debug.toString { above = dataAbove, below = dataBelow })
+                1
+
         hasInvalid =
-            not (List.isEmpty dataAbove && List.isEmpty dataBelow)
+            not ((dataAbove == [ [] ]) && (dataBelow == [ [] ]))
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox

@@ -166,7 +166,7 @@ shape point =
 shapeOutsideValid : Point2d -> List Point2d
 shapeOutsideValid point =
     -- draw triangle
-    genericShape point 4.5 [ ( 0.0, 4.0 ), ( 2.0, -1.0 ), ( -2.0, -1.0 ) ]
+    genericShape point 4.5 [ ( 0.0, 3.0 ), ( 2.0, -1.0 ), ( -2.0, -1.0 ) ]
 
 
 maintenanceShape : Point2d -> List Point2d
