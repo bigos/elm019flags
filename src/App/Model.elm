@@ -273,7 +273,7 @@ init flags =
                 1
 
         hasInvalid =
-            not ((dataAbove == [ [] ]) && (dataBelow == [ [] ]))
+            not (List.all List.isEmpty dataAbove && List.all List.isEmpty dataBelow)
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
