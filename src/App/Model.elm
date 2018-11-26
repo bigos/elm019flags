@@ -64,7 +64,6 @@ type alias Flags =
     , stats : List StatsData
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
-    , qcresults : List AnalyteResults
     , boundaries : { above : Float, below : Float, bottom : Float }
     , classified_qcresults : List ClassifiedSection
     }
@@ -506,7 +505,7 @@ readCombinedData : Flags -> List (List Datum)
 readCombinedData flags =
     let
         combinedData =
-            flags.qcresults
+            flags.classified_qcresults
     in
     List.map
         (\singleDataList ->
@@ -520,7 +519,7 @@ readCombinedData flags =
                             d.aid
                         )
                 )
-                singleDataList
+                singleDataList.values.valid
         )
         combinedData
 
