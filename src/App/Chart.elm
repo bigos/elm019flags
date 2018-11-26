@@ -103,6 +103,30 @@ createValidQcShape model point fill =
         (Polygon2d.singleLoop (shape point.point2d))
 
 
+createAboveQcShape : Model -> ScaledPoint -> String -> Svg Msg
+createAboveQcShape model point fill =
+    let
+        boo =
+            Debug.log (" creating below qc shape " ++ Debug.toString point)
+                1
+
+        myToolTip =
+            if model.chartType == "default" then
+                DataScaledPoint point
+
+            else
+                DataCombinedPoint point
+    in
+    Svg.polygon2d
+        [ Attributes.fill fill
+        , Attributes.stroke "red"
+        , Attributes.strokeWidth "2.75"
+        , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
+        , M.onLeave (\event -> TooltipMouseLeave)
+        ]
+        (Polygon2d.singleLoop (shape point.point2d))
+
+
 createBelowQcShape : Model -> ScaledPoint -> String -> Svg Msg
 createBelowQcShape model point fill =
     let
@@ -120,7 +144,7 @@ createBelowQcShape model point fill =
     Svg.polygon2d
         [ Attributes.fill fill
         , Attributes.stroke "red"
-        , Attributes.strokeWidth "0.75"
+        , Attributes.strokeWidth "2.75"
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
@@ -605,6 +629,16 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
+                        (\p -> Svg.placeIn frameChart (createAboveQcShape model p c))
+                        pl
+                )
+                model.scaledAbovePoints
+                dataPointColours
+            )
+        ++ flatten
+            (List.map2
+                (\pl c ->
+                    List.map
                         (\p -> Svg.placeIn frameChart (createValidQcShape model p c))
                         pl
                 )
@@ -615,7 +649,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createValidQcShape model p c))
+                        (\p -> Svg.placeIn frameChart (createBelowQcShape model p c))
                         pl
                 )
                 model.scaledBelowPoints
