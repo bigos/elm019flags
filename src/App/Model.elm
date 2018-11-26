@@ -272,6 +272,10 @@ init flags =
         dataBelow =
             readInvalidData flags "below"
 
+        boo =
+            Debug.log ("read data?Valid" ++ Debug.toString dataValid)
+                1
+
         points =
             toPoints dataValid
 
@@ -280,17 +284,6 @@ init flags =
 
         chartBoundingBox =
             BoundingBox2d.containingPoints flattenedPoints
-
-        boo =
-            Debug.log
-                (Debug.toString
-                    { a = dataValid
-                    , b = points
-                    , c = flattenedPoints
-                    , d = chartBoundingBox
-                    }
-                )
-                1
     in
     ( { chartBoundingBox = chartBoundingBox
       , chartScalings = setChartScalings flags chartBoundingBox
@@ -556,13 +549,25 @@ readValidData flags =
         (\classifiedSection ->
             List.map
                 (\d ->
-                    Datum
-                        (toFloat (timify d.d))
-                        d.c
-                        (Maybe.withDefault
-                            0
-                            d.aid
-                        )
+                    let
+                        boo =
+                            Debug.log ("lambda d " ++ Debug.toString d)
+                                1
+
+                        res =
+                            Datum
+                                (toFloat (timify d.d))
+                                d.c
+                                (Maybe.withDefault
+                                    0
+                                    d.aid
+                                )
+
+                        baa =
+                            Debug.log ("the res " ++ Debug.toString res)
+                                1
+                    in
+                    res
                 )
                 classifiedSection.values.valid
         )
@@ -601,11 +606,15 @@ readInvalidData flags selector =
 -- this function gives zeros on x values
 
 
+toPoints2 data =
+    List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+
+
 toPoints : List (List Datum) -> List (List Point2d)
 toPoints combinedData =
     List.map
         (\data ->
-            List.map (\d -> Point2d.fromCoordinates ( d.time, d.value )) data
+            toPoints2 data
         )
         combinedData
 

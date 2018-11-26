@@ -92,9 +92,6 @@ createQcShape model point fill =
 
             else
                 DataCombinedPoint point
-
-        boo =
-            Debug.log (Debug.toString point) 1
     in
     Svg.polygon2d
         [ Attributes.fill fill
@@ -547,13 +544,6 @@ chartElements model =
 
             else
                 []
-
-        boo =
-            Debug.log
-                (Debug.toString
-                    model.scaledPoints
-                )
-                1
     in
     [ Svg.placeIn frameChart (axisX model)
     , Svg.placeIn frameChart (axisY model)
