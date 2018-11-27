@@ -1,4 +1,4 @@
-module App.View exposing (pdfLink, showTheTooltip, view)
+module App.View exposing (view)
 
 import App.Chart exposing (..)
 import App.ChartLegend exposing (..)
@@ -20,6 +20,22 @@ import Selectize
 import String.Interpolate exposing (interpolate)
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
+
+
+findTime : ScaledPoint -> List String
+findTime d =
+    let
+        t2 =
+            ISO8601.toString <|
+                ISO8601.fromTime (floor d.datum.time)
+
+        t3 =
+            List.head (String.split "Z" t2)
+
+        t4 =
+            String.split "T" (Maybe.withDefault "" t3)
+    in
+    t4
 
 
 showTheTooltip : Model -> Html Msg
@@ -56,15 +72,8 @@ showTheTooltip model =
 
                     DataScaledPoint d ->
                         let
-                            t2 =
-                                ISO8601.toString <|
-                                    ISO8601.fromTime (floor d.datum.time)
-
-                            t3 =
-                                List.head (String.split "Z" t2)
-
                             t4 =
-                                String.split "T" (Maybe.withDefault "" t3)
+                                findTime d
 
                             dx =
                                 List.head t4
@@ -94,15 +103,8 @@ showTheTooltip model =
 
                     DataCombinedPoint d ->
                         let
-                            t2 =
-                                ISO8601.toString <|
-                                    ISO8601.fromTime (floor d.datum.time)
-
-                            t3 =
-                                List.head (String.split "Z" t2)
-
                             t4 =
-                                String.split "T" (Maybe.withDefault "" t3)
+                                findTime d
 
                             dx =
                                 List.head t4
