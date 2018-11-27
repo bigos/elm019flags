@@ -106,10 +106,6 @@ createValidQcShape model point fill =
 createInvalidQcShape : Model -> ScaledPoint -> String -> Svg Msg
 createInvalidQcShape model point fill =
     let
-        boo =
-            Debug.log (" creating below qc shape " ++ Debug.toString point)
-                1
-
         myToolTip =
             if model.chartType == "default" then
                 DataScaledPoint point

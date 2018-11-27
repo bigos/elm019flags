@@ -268,10 +268,6 @@ init flags =
         chartBoundingBox =
             BoundingBox2d.containingPoints flattenedPoints
 
-        boo =
-            Debug.log ("invalid data " ++ Debug.toString { above = dataAbove, below = dataBelow })
-                1
-
         hasInvalid =
             not (List.all List.isEmpty dataAbove && List.all List.isEmpty dataBelow)
     in
