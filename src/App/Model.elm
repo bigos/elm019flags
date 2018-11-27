@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readValidData, scaleXY, setChartScalings, singleAnalyteId, singleValidResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, ValuesClassification(..), analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readInvalidData, readValidData, scaleXY, setChartScalings, singleAnalyteId, singleValidResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -42,19 +42,6 @@ type alias Model =
     }
 
 
-type alias Tree =
-    { id : String
-    , name : String
-    }
-
-
-type AdditionStage
-    = StageMachine
-    | StageSample
-    | StageAnalyte
-    | StageAnalyteConfirmation
-
-
 type alias Flags =
     { analytes : List AnalyteRecord
     , chart_type : String
@@ -71,23 +58,11 @@ type alias Flags =
     }
 
 
-type alias ClassifiedSection =
-    { stats : String
-    , above_invalid : Float
-    , below_invalid : Float
-    , chart_bottom : Float
-    , values :
-        { above_valid : List RawCid
-        , valid : List RawCid
-        , below_valid : List RawCid
-        }
-    }
-
-
-type ValuesClassification
-    = ValuesValid
-    | ValuesAbove
-    | ValuesBelow
+type AdditionStage
+    = StageMachine
+    | StageSample
+    | StageAnalyte
+    | StageAnalyteConfirmation
 
 
 type alias AnalyteRecord =
@@ -122,6 +97,17 @@ type alias AxisY =
     }
 
 
+type alias AnalyteResults =
+    List RawCid
+
+
+type alias ChartRecord =
+    { on : String
+    , by : String
+    , comment : String
+    }
+
+
 type alias ChartScalings =
     { sizeX : Float
     , sizeY : Float
@@ -136,10 +122,16 @@ type alias ChartScalings =
     }
 
 
-type alias Datum =
-    { time : Float
-    , value : Float
-    , aid : Int
+type alias ClassifiedSection =
+    { stats : String
+    , above_invalid : Float
+    , below_invalid : Float
+    , chart_bottom : Float
+    , values :
+        { above_valid : List RawCid
+        , valid : List RawCid
+        , below_valid : List RawCid
+        }
     }
 
 
@@ -147,42 +139,10 @@ type alias DataStats =
     { mean : Float, sd : Float }
 
 
-type alias SectionData =
-    { start : Int, fixed : Bool }
-
-
-type alias StatsData =
-    { start_date : String
-    , deviation : Float
-    , mean : Float
-    , nominal : Float
-    , min : Maybe Float
-    , max : Maybe Float
-    }
-
-
-type alias AnalyteResults =
-    List RawCid
-
-
-type alias RawCid =
-    { id : Int
-    , c : Float
-    , d : String
-    , aid : Maybe Int
-    }
-
-
-type alias ScaledPoint =
-    { point2d : Point2d
-    , datum : Datum
-    }
-
-
-type alias ChartRecord =
-    { on : String
-    , by : String
-    , comment : String
+type alias Datum =
+    { time : Float
+    , value : Float
+    , aid : Int
     }
 
 
@@ -200,10 +160,32 @@ type LegendShape
     | LegendOutsideValid Bool
 
 
-type TooltipData
-    = DataChartRecord ChartRecord
-    | DataScaledPoint ScaledPoint
-    | DataCombinedPoint ScaledPoint
+type alias RawCid =
+    { id : Int
+    , c : Float
+    , d : String
+    , aid : Maybe Int
+    }
+
+
+type alias ScaledPoint =
+    { point2d : Point2d
+    , datum : Datum
+    }
+
+
+type alias SectionData =
+    { start : Int, fixed : Bool }
+
+
+type alias StatsData =
+    { start_date : String
+    , deviation : Float
+    , mean : Float
+    , nominal : Float
+    , min : Maybe Float
+    , max : Maybe Float
+    }
 
 
 type alias Tooltip =
@@ -213,8 +195,32 @@ type alias Tooltip =
     }
 
 
+type TooltipData
+    = DataChartRecord ChartRecord
+    | DataScaledPoint ScaledPoint
+    | DataCombinedPoint ScaledPoint
+
+
+type alias Tree =
+    { id : String
+    , name : String
+    }
+
+
+type ValuesClassification
+    = ValuesValid
+    | ValuesAbove
+    | ValuesBelow
+
+
 
 -- API types
+
+
+type alias Analyte =
+    { analyteid : Int
+    , name : String
+    }
 
 
 type alias Machine =
@@ -225,12 +231,6 @@ type alias Machine =
 
 type alias Sample =
     { sampleid : Int
-    , name : String
-    }
-
-
-type alias Analyte =
-    { analyteid : Int
     , name : String
     }
 
