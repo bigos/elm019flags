@@ -21,6 +21,18 @@ update msg model =
             , Cmd.none
             )
 
+        ResetCombinedAddition ->
+            ( { model
+                | textfieldMenuOptions = Nothing
+                , textfieldMenuPlaceholder = "Waiting for Command"
+                , combinedAdditionStage = Nothing
+                , combinedAdditionMachine = Nothing
+                , combinedAdditionSample = Nothing
+                , combinedAdditionAnalyte = Nothing
+              }
+            , Cmd.none
+            )
+
         GetMachines ->
             ( { model | textfieldMenuPlaceholder = "Select Machine" }, getMachines model )
 

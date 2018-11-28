@@ -248,6 +248,7 @@ type Msg
     | RequestedAnalytes (Result Http.Error (List Analyte))
     | TextfieldMenuMsg (Selectize.Msg Tree)
     | SelectTextfieldOption (Maybe Tree)
+    | ResetCombinedAddition
 
 
 init : Flags -> ( Model, Cmd Msg )

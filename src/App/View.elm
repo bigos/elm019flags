@@ -9,7 +9,7 @@ import Axis2d exposing (Axis2d)
 import Direction2d exposing (Direction2d)
 import Frame2d exposing (Frame2d)
 import Geometry.Svg as Svg
-import Html exposing (Html, a, br, button, div, h3, hr, i, span, text)
+import Html exposing (Html, a, br, button, div, h3, hr, i, input, span, text)
 import Html.Attributes exposing (classList, href)
 import Html.Events exposing (onClick)
 import ISO8601
@@ -276,7 +276,10 @@ combinedViewPart model =
             case stage of
                 StageAnalyteConfirmation ->
                     div []
-                        [ div [] [ text "analyte confirmation" ]
+                        [ div []
+                            [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
+                            ]
+                        , div [] [ text "analyte confirmation" ]
                         , a [ href (newIdsLink model) ] [ button [ class "btn btn-primary" ] [ text "Add me" ] ]
                         ]
 
@@ -287,7 +290,10 @@ combinedViewPart model =
                             [ style "display: flex"
                             , style "flex-flow: column"
                             ]
-                            [ div
+                            [ div []
+                                [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
+                                ]
+                            , div
                                 [ class "container" ]
                                 [ div []
                                     [ Html.map TextfieldMenuMsg <|
@@ -309,7 +315,10 @@ combinedViewPart model =
                             [ style "display: flex"
                             , style "flex-flow: column"
                             ]
-                            [ div
+                            [ div []
+                                [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
+                                ]
+                            , div
                                 [ class "container" ]
                                 [ div []
                                     [ Html.map TextfieldMenuMsg <|
@@ -331,7 +340,10 @@ combinedViewPart model =
                             [ style "display: flex"
                             , style "flex-flow: column"
                             ]
-                            [ div
+                            [ div []
+                                [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
+                                ]
+                            , div
                                 [ class "container" ]
                                 [ div []
                                     [ Html.map TextfieldMenuMsg <|
