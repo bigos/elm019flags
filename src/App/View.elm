@@ -276,87 +276,70 @@ combinedViewPart model =
             case stage of
                 StageAnalyteConfirmation ->
                     div []
-                        [ div []
-                            [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
-                            ]
-                        , div [] [ text "analyte confirmation" ]
-                        , a [ href (newIdsLink model) ] [ button [ class "btn btn-primary" ] [ text "Add me" ] ]
+                        [ div [] [ text "analyte confirmation" ]
+                        , button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
+                        , a [ href (newIdsLink model) ] [ button [ class "btn btn-primary btn-warning" ] [ text "Add me" ] ]
                         ]
 
                 StageAnalyte ->
-                    div []
-                        [ div [] [ text "analyte stage" ]
-                        , div
-                            [ style "display: flex"
-                            , style "flex-flow: column"
-                            ]
-                            [ div []
-                                [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
-                                ]
-                            , div
-                                [ class "container" ]
-                                [ div []
-                                    [ Html.map TextfieldMenuMsg <|
-                                        Selectize.view
-                                            (viewConfigTextfield
-                                                model
-                                            )
-                                            model.textfieldSelection
-                                            model.textfieldMenu
-                                    ]
-                                ]
-                            ]
-                        ]
+                    menuStagePart "analyte stage"
+                        (Html.map
+                            TextfieldMenuMsg
+                         <|
+                            Selectize.view
+                                (viewConfigTextfield
+                                    model
+                                )
+                                model.textfieldSelection
+                                model.textfieldMenu
+                        )
 
                 StageSample ->
-                    div []
-                        [ div [] [ text "sample stage" ]
-                        , div
-                            [ style "display: flex"
-                            , style "flex-flow: column"
-                            ]
-                            [ div []
-                                [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
-                                ]
-                            , div
-                                [ class "container" ]
-                                [ div []
-                                    [ Html.map TextfieldMenuMsg <|
-                                        Selectize.view
-                                            (viewConfigTextfield
-                                                model
-                                            )
-                                            model.textfieldSelection
-                                            model.textfieldMenu
-                                    ]
-                                ]
-                            ]
-                        ]
+                    menuStagePart "sample stage"
+                        (Html.map
+                            TextfieldMenuMsg
+                         <|
+                            Selectize.view
+                                (viewConfigTextfield
+                                    model
+                                )
+                                model.textfieldSelection
+                                model.textfieldMenu
+                        )
 
                 StageMachine ->
-                    div []
-                        [ div [] [ text "machine stage" ]
-                        , div
-                            [ style "display: flex"
-                            , style "flex-flow: column"
-                            ]
-                            [ div []
-                                [ button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
-                                ]
-                            , div
-                                [ class "container" ]
-                                [ div []
-                                    [ Html.map TextfieldMenuMsg <|
-                                        Selectize.view
-                                            (viewConfigTextfield
-                                                model
-                                            )
-                                            model.textfieldSelection
-                                            model.textfieldMenu
-                                    ]
-                                ]
-                            ]
-                        ]
+                    menuStagePart "machine stage"
+                        (Html.map
+                            TextfieldMenuMsg
+                         <|
+                            Selectize.view
+                                (viewConfigTextfield
+                                    model
+                                )
+                                model.textfieldSelection
+                                model.textfieldMenu
+                        )
+
+
+menuStagePart : String -> Html Msg -> Html Msg
+menuStagePart stageText selectizePart =
+    div []
+        [ div [] [ text "sample stage" ]
+        , div
+            [ style "display: flex"
+            , style "flex-flow: column"
+            ]
+            [ div [ class "input-group" ]
+                [ div
+                    [ class "input-group-prepend" ]
+                    [ button
+                        [ onClick ResetCombinedAddition, class "btn btn-primary" ]
+                        [ text "Cancel" ]
+                    , selectizePart
+                    ]
+                ]
+            ]
+        ]
 
 
 
