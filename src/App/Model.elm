@@ -611,9 +611,6 @@ scaleXY flags combinedData boundingBox valuesClassification =
             List.map
                 (\d ->
                     let
-                        boo =
-                            1
-
                         yValue =
                             case valuesClassification of
                                 ValuesValid ->
