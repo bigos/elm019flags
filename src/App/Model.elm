@@ -684,9 +684,6 @@ deviations model x fn =
 
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
-
-                    boo =
-                        Debug.log ("components " ++ Debug.toString { values = values, mean = mean }) 1
                 in
                 if List.length values == 0 then
                     [ { start_date = ""
@@ -701,8 +698,8 @@ deviations model x fn =
                 else if List.length values == 1 then
                     [ { start_date = ""
                       , deviation = 0.25
-                      , mean = 25.0
-                      , nominal = 250.0
+                      , mean = mean
+                      , nominal = mean
                       , min = Nothing
                       , max = Nothing
                       }
@@ -726,20 +723,9 @@ deviations model x fn =
                 (List.map (\s -> s.mean + s.deviation * x) stats2)
 
         calc =
-            Debug.log ("debugging devs" ++ Debug.toString devs)
-                (fn devs)
+            fn devs
     in
-    case calc of
-        Nothing ->
-            0.1
-
-        Just v ->
-            if isNaN v then
-                0.75
-                -- this value is reflected in Y coordinate of vertical lines
-
-            else
-                v
+    Maybe.withDefault 0.1 calc
 
 
 hidev =
