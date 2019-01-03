@@ -676,7 +676,6 @@ deviations model x fn =
         stats =
             model.flags.stats
 
-        --it works strange with no stats and one point
         stats2 =
             if List.length stats == 0 then
                 let
