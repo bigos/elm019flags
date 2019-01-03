@@ -804,8 +804,15 @@ setChartScalings flags boundingBox =
         mean =
             averageMean flags
 
-        deviation =
+        deviation1 =
             largestDeviation flags
+
+        deviation =
+            if isNaN deviation1 then
+                0.1
+
+            else
+                deviation1
 
         scalingFactor =
             -- greater number = smaller chart
