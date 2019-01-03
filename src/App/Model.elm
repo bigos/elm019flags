@@ -684,11 +684,24 @@ deviations model x fn =
 
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
+
+                    boo =
+                        Debug.log ("components " ++ Debug.toString { values = values, mean = mean }) 1
                 in
                 if List.length values == 0 then
                     [ { start_date = ""
                       , deviation = 25.0
                       , mean = 250.0
+                      , nominal = 250.0
+                      , min = Nothing
+                      , max = Nothing
+                      }
+                    ]
+
+                else if List.length values == 1 then
+                    [ { start_date = ""
+                      , deviation = 25.0
+                      , mean = 25.0
                       , nominal = 250.0
                       , min = Nothing
                       , max = Nothing
@@ -709,7 +722,8 @@ deviations model x fn =
                 stats
 
         devs =
-            List.map (\s -> s.mean + s.deviation * x) stats2
+            Debug.log ("stats2 " ++ Debug.toString stats2)
+                (List.map (\s -> s.mean + s.deviation * x) stats2)
 
         calc =
             Debug.log ("debugging devs" ++ Debug.toString devs)
