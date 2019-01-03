@@ -716,11 +716,12 @@ deviations model x fn =
     in
     case calc of
         Nothing ->
-            0.0
+            0.1
 
         Just v ->
             if isNaN v then
-                0.25
+                0.75
+                -- this value is reflected in Y coordinate of vertical lines
 
             else
                 v
