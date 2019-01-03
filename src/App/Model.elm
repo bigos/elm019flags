@@ -714,7 +714,16 @@ deviations model x fn =
         calc =
             fn devs
     in
-    Maybe.withDefault 0.0 calc
+    case calc of
+        Nothing ->
+            0.0
+
+        Just v ->
+            if isNaN v then
+                0.25
+
+            else
+                v
 
 
 hidev =
@@ -809,7 +818,7 @@ setChartScalings flags boundingBox =
 
         deviation =
             if isNaN deviation1 then
-                0.1
+                0.25
 
             else
                 deviation1
