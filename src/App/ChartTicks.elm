@@ -293,10 +293,12 @@ majorYticks model =
             model.flags.axes.axis_y
 
         upperBoundary =
-            deviations model 6.7 List.maximum
+            -- deviations model 6.7 List.maximum
+            axis_y.max
 
         lowerBoundary =
-            chartBottom model - axis_y.step
+            -- chartBottom model - axis_y.step
+            axis_y.min
 
         all_ticks =
             findTicks axis_y.max lowerBoundary axis_y.step
