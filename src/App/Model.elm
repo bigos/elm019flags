@@ -700,7 +700,7 @@ deviations model x fn =
 
                 else if List.length values == 1 then
                     [ { start_date = ""
-                      , deviation = 25.0
+                      , deviation = 0.25
                       , mean = 25.0
                       , nominal = 250.0
                       , min = Nothing
