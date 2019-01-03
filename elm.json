@@ -14,7 +14,7 @@
             "elm/json": "1.0.0",
             "elm/svg": "1.0.1",
             "elm-community/list-extra": "8.0.0",
-            "ianmackenzie/elm-geometry": "1.1.0",
+            "ianmackenzie/elm-geometry": "1.2.1",
             "ianmackenzie/elm-geometry-svg": "1.0.2",
             "jweir/elm-iso8601": "5.0.1",
             "kirchner/elm-selectize": "2.0.7",
