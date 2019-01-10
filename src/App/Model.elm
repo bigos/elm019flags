@@ -38,6 +38,7 @@ type alias Model =
     , combinedAdditionMachine : Maybe Int
     , combinedAdditionSample : Maybe Int
     , combinedAdditionAnalyte : Maybe Int
+    , combinedAdditionAnalyteName : Maybe String
     , legend : List LegendElement
     }
 
@@ -294,6 +295,7 @@ init flags =
       , combinedAdditionMachine = Nothing
       , combinedAdditionSample = Nothing
       , combinedAdditionAnalyte = Nothing
+      , combinedAdditionAnalyteName = Nothing
       , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes hasInvalid)
       }
     , Cmd.none

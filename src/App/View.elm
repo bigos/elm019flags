@@ -268,18 +268,24 @@ combinedViewPart model =
             div []
                 [ div []
                     []
-                , button [ onClick GetMachines, class "btn btn-warning" ] [ text "Add Analyte - first step - machines" ]
+                , button [ onClick GetMachines, class "btn btn-warning" ] [ text "Add Analyte - selecting the machine first" ]
                 ]
 
         Just stage ->
             case stage of
                 StageAnalyteConfirmation ->
                     div []
-                        [ div [] [ text "analyte confirmation" ]
+                        [ div [] []
                         , button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
                         , a [ href (newIdsLink model) ]
                             [ button [ class "btn btn-primary btn-warning" ]
-                                [ text ("Add me " ++ Debug.toString model.combinedAdditionAnalyte) ]
+                                [ text
+                                    ("Add "
+                                        ++ Maybe.withDefault
+                                            "IT SHOULD NOT BE EMPTY"
+                                            model.combinedAdditionAnalyteName
+                                    )
+                                ]
                             ]
                         ]
 
@@ -326,7 +332,7 @@ combinedViewPart model =
 menuStagePart : String -> Html Msg -> Html Msg
 menuStagePart stageText selectizePart =
     div []
-        [ div [] [ text "menu stage" ]
+        [ div [] []
         , div
             [ style "display: flex"
             , style "flex-flow: column"

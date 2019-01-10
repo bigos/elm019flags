@@ -190,11 +190,15 @@ update msg model =
 
                                 Just ns ->
                                     let
+                                        boo =
+                                            Debug.log ("zzzzzzzzzzzzzz " ++ Debug.toString ns) 1
+
                                         mid =
                                             String.toInt ns.id
                                     in
                                     ( { model
                                         | combinedAdditionAnalyte = mid
+                                        , combinedAdditionAnalyteName = Just ns.name
                                         , combinedAdditionStage = Just StageAnalyteConfirmation
                                         , textfieldMenuPlaceholder = ""
                                         , textfieldSelection = Nothing
