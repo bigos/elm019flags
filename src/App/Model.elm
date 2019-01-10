@@ -719,8 +719,7 @@ deviations model x fn =
                 stats
 
         devs =
-            Debug.log ("stats2 " ++ Debug.toString stats2)
-                (List.map (\s -> s.mean + s.deviation * x) stats2)
+            List.map (\s -> s.mean + s.deviation * x) stats2
 
         calc =
             fn devs

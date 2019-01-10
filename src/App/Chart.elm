@@ -196,10 +196,6 @@ createMaintenanceLine model ml =
 
         ud =
             deviations model 4.7 List.maximum
-
-        foo =
-            -- need to dig in deviations
-            Debug.log ("zzzzz " ++ Debug.toString { ld = ld, ud = ud }) 1
     in
     Svg.lineSegment2d
         [ Attributes.stroke "grey"
