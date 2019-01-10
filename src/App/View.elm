@@ -203,7 +203,12 @@ pdfLink model =
 view : Model -> Html Msg
 view model =
     div [ style "border: solid yellow 1px;" ]
-        [ div [ style "margin: auto ; width:700px" ]
+        [ if model.chartType == "default" then
+            div [] []
+
+          else
+            combinedViewPart model
+        , div [ style "margin: auto ; width:700px" ]
             [ Svg.svg
                 [ height "400"
                 , viewBox "0 0 700 400"
@@ -217,17 +222,12 @@ view model =
             ]
         , div [ style "height:1em;" ] []
         , showLegend model
-        , if model.chartType == "default" then
-            div [] []
-
-          else
-            combinedViewPart model
 
         -- , div [] [ text ("stage" ++ Debug.toString model.combinedAdditionStage) ]
         -- , div [] [ text ("machine" ++ Debug.toString model.combinedAdditionMachine) ]
         -- , div [] [ text ("sample" ++ Debug.toString model.combinedAdditionSample) ]
-        , div [] [ text ("analyte" ++ Debug.toString model.chartBoundingBox) ]
-        , div [] [ text (Debug.toString model.chartScalings) ]
+        -- , div [] [ text ("analyte" ++ Debug.toString model.chartBoundingBox) ]
+        -- , div [] [ text (Debug.toString model.chartScalings) ]
         ]
 
 
@@ -267,8 +267,7 @@ combinedViewPart model =
         Nothing ->
             div []
                 [ div []
-                    [ text "no particular addition at the moment"
-                    ]
+                    []
                 , button [ onClick GetMachines, class "btn btn-warning" ] [ text "Add Analyte - first step - machines" ]
                 ]
 
@@ -278,7 +277,10 @@ combinedViewPart model =
                     div []
                         [ div [] [ text "analyte confirmation" ]
                         , button [ onClick ResetCombinedAddition, class "btn btn-primary" ] [ text "Cancel" ]
-                        , a [ href (newIdsLink model) ] [ button [ class "btn btn-primary btn-warning" ] [ text "Add me" ] ]
+                        , a [ href (newIdsLink model) ]
+                            [ button [ class "btn btn-primary btn-warning" ]
+                                [ text ("Add me " ++ Debug.toString model.combinedAdditionAnalyte) ]
+                            ]
                         ]
 
                 StageAnalyte ->
@@ -324,7 +326,7 @@ combinedViewPart model =
 menuStagePart : String -> Html Msg -> Html Msg
 menuStagePart stageText selectizePart =
     div []
-        [ div [] [ text "sample stage" ]
+        [ div [] [ text "menu stage" ]
         , div
             [ style "display: flex"
             , style "flex-flow: column"
