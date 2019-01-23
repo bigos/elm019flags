@@ -265,7 +265,7 @@ newIdsLink model =
 combinedViewPart model =
     case model.combinedAdditionStage of
         Nothing ->
-            div []
+            div [ style "margin-bottom:1em;" ]
                 [ div []
                     []
                 , button [ onClick GetMachines, class "btn btn-warning" ] [ text "Add Analyte - selecting the machine first" ]

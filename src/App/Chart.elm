@@ -621,7 +621,13 @@ chartElements model =
                         pl
                 )
                 model.scaledValidPoints
-                dataPointColours
+                (if model.chartType == "combined" then
+                    dataPointColours
+
+                 else
+                    -- create a list as long as dataPointColours but filled with "blue"
+                    List.repeat (List.length dataPointColours) "blue"
+                )
             )
         ++ flatten
             (List.map2
