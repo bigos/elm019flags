@@ -86,14 +86,11 @@ frameLegend =
 colorForPoint : Model -> ScaledPoint -> String
 colorForPoint model point =
     let
-        colours =
-            [ "blue", "red", "black", "green", "yellow", "pink" ]
-
         analyte_ids =
             List.map (\a -> a.id) model.flags.analytes
 
         id_colours =
-            List.map2 (\c -> \id -> ( id, c )) colours analyte_ids
+            List.map2 (\c -> \id -> ( id, c )) dataPointColours analyte_ids
 
         filtered =
             List.filter (\p -> Tuple.first p == point.datum.aid) id_colours
@@ -654,12 +651,6 @@ chartElements model =
                         pl
                 )
                 model.scaledValidPoints
-             -- (if model.chartType == "combined" then
-             --     dataPointColours
-             --  else
-             --     -- create a list as long as dataPointColours but filled with "blue"
-             --     List.repeat (List.length dataPointColours) "blue"
-             -- )
             )
         ++ flatten
             (List.map
