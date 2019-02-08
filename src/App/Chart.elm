@@ -615,14 +615,13 @@ chartElements model =
         ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
         -- data points
         ++ flatten
-            (List.map2
-                (\pl c ->
+            (List.map
+                (\pl ->
                     List.map
                         (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
                         pl
                 )
                 model.scaledAbovePoints
-                dataPointColours
             )
         ++ flatten
             (List.map2
@@ -641,12 +640,11 @@ chartElements model =
                 )
             )
         ++ flatten
-            (List.map2
-                (\pl c ->
+            (List.map
+                (\pl ->
                     List.map
                         (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
                         pl
                 )
                 model.scaledBelowPoints
-                dataPointColours
             )
