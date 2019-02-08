@@ -13,10 +13,7 @@ update msg model =
     case msg of
         TooltipMouseEnter tooltipData coordinates title ->
             ( { model
-                | tooltip =
-                    Debug.log (Debug.toString tooltipData)
-                        Just
-                        (Tooltip tooltipData coordinates title)
+                | tooltip = Just (Tooltip tooltipData coordinates title)
               }
             , Cmd.none
             )
@@ -195,9 +192,6 @@ update msg model =
 
                                 Just ns ->
                                     let
-                                        boo =
-                                            Debug.log ("zzzzzzzzzzzzzz " ++ Debug.toString ns) 1
-
                                         mid =
                                             String.toInt ns.id
                                     in
