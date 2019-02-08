@@ -144,6 +144,7 @@ type alias Datum =
     { time : Float
     , value : Float
     , aid : Int
+    , errs : List String
     }
 
 
@@ -166,6 +167,7 @@ type alias RawCid =
     , c : Float
     , d : String
     , aid : Maybe Int
+    , errs : List String
     }
 
 
@@ -532,6 +534,7 @@ readCombinedData flags =
                             0
                             d.aid
                         )
+                        d.errs
                 )
                 singleDataList.values.valid
         )
@@ -551,6 +554,7 @@ readValidData flags =
                             0
                             d.aid
                         )
+                        d.errs
                 )
                 classifiedSection.values.valid
         )
@@ -570,6 +574,7 @@ readInvalidData flags selector =
                             0
                             d.aid
                         )
+                        d.errs
                 )
                 (if selector == "above" then
                     classifiedSection.values.above_valid
