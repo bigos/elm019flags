@@ -100,7 +100,12 @@ createValidQcShape model point fill =
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
         ]
-        (Polygon2d.singleLoop (shape point.point2d))
+        (if List.length point.datum.errs > 0 then
+            Polygon2d.singleLoop (shapeError point.point2d)
+
+         else
+            Polygon2d.singleLoop (shape point.point2d)
+        )
 
 
 createInvalidQcShape : Model -> ScaledPoint -> String -> Svg Msg
@@ -157,6 +162,12 @@ shape : Point2d -> List Point2d
 shape point =
     -- draw tilted square around point coordinates
     genericShape point 4.5 [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( -1.0, 0.0 ) ]
+
+
+shapeError : Point2d -> List Point2d
+shapeError point =
+    -- draw tilted square around point coordinates
+    genericShape point 8.5 [ ( 0.0, 1.0 ), ( 1.0, 0.0 ), ( 0.0, -1.0 ), ( 0, 0.0 ) ]
 
 
 shapeOutsideValid : Point2d -> List Point2d
