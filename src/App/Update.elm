@@ -12,7 +12,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         TooltipMouseEnter tooltipData coordinates title ->
-            ( { model | tooltip = Just (Tooltip tooltipData coordinates title) }
+            ( { model
+                | tooltip =
+                    Debug.log (Debug.toString tooltipData)
+                        Just
+                        (Tooltip tooltipData coordinates title)
+              }
             , Cmd.none
             )
 

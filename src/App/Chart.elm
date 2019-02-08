@@ -1,4 +1,4 @@
-module App.Chart exposing (axisX, axisY, calcEt, chartElements, createInvalidQcShape, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape, shapeOutsideValid)
+module App.Chart exposing (axisX, axisY, calcEt, chartElements, createInvalidQcShape, createMaintenanceLine, createMaintenanceShape, createMaxLine, createMeanLine, createMinLine, createNominalLine, createOrangeMeanLine, createOrangeXsdLine, createReviewLine, createReviewShape, createValidQcOrErrorShape, createXsdLine, frameAxisX, frameAxisY, frameChart, frameLegend, genericShape, maintenanceShape, reviewShape, shape, shapeError, shapeOutsideValid)
 
 import App.ChartTicks exposing (..)
 import App.Model exposing (..)
@@ -83,8 +83,8 @@ frameLegend =
         |> Frame2d.reverseY
 
 
-createValidQcShape : Model -> ScaledPoint -> String -> Svg Msg
-createValidQcShape model point fill =
+createValidQcOrErrorShape : Model -> ScaledPoint -> String -> Svg Msg
+createValidQcOrErrorShape model point fill =
     let
         myToolTip =
             if model.chartType == "default" then
@@ -628,7 +628,7 @@ chartElements model =
             (List.map2
                 (\pl c ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createValidQcShape model p c))
+                        (\p -> Svg.placeIn frameChart (createValidQcOrErrorShape model p c))
                         pl
                 )
                 model.scaledValidPoints

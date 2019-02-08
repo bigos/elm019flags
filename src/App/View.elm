@@ -85,6 +85,9 @@ showTheTooltip model =
 
                                     Just s ->
                                         Maybe.withDefault "" (List.head s)
+
+                            boo =
+                                Debug.log (Debug.toString d) 1
                         in
                         [ span
                             [ class "tool-tip-title" ]
@@ -99,6 +102,12 @@ showTheTooltip model =
                         , span
                             []
                             [ text (String.fromFloat d.datum.value) ]
+                        , br [] []
+                        , span [ class "tool-tip-title" ]
+                            [ text "Failures: " ]
+                        , span
+                            []
+                            [ text (Debug.toString d.datum.errs) ]
                         ]
 
                     DataCombinedPoint d ->
