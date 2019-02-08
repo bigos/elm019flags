@@ -83,6 +83,29 @@ frameLegend =
         |> Frame2d.reverseY
 
 
+colorForPoint : Model -> ScaledPoint -> String
+colorForPoint model point =
+    let
+        colours =
+            [ "blue", "red", "black", "green", "yellow", "pink" ]
+
+        analyte_ids =
+            List.map (\a -> a.id) model.flags.analytes
+
+        id_colours =
+            List.map2 (\c -> \id -> ( id, c )) colours analyte_ids
+
+        filtered =
+            List.filter (\p -> Tuple.first p == point.datum.aid) id_colours
+    in
+    case List.head filtered of
+        Just p ->
+            Tuple.second p
+
+        Nothing ->
+            "blue"
+
+
 createValidQcOrErrorShape : Model -> ScaledPoint -> String -> Svg Msg
 createValidQcOrErrorShape model point fill =
     let
@@ -624,20 +647,19 @@ chartElements model =
                 model.scaledAbovePoints
             )
         ++ flatten
-            (List.map2
-                (\pl c ->
+            (List.map
+                (\pl ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createValidQcOrErrorShape model p c))
+                        (\p -> Svg.placeIn frameChart (createValidQcOrErrorShape model p (colorForPoint model p)))
                         pl
                 )
                 model.scaledValidPoints
-                (if model.chartType == "combined" then
-                    dataPointColours
-
-                 else
-                    -- create a list as long as dataPointColours but filled with "blue"
-                    List.repeat (List.length dataPointColours) "blue"
-                )
+             -- (if model.chartType == "combined" then
+             --     dataPointColours
+             --  else
+             --     -- create a list as long as dataPointColours but filled with "blue"
+             --     List.repeat (List.length dataPointColours) "blue"
+             -- )
             )
         ++ flatten
             (List.map
