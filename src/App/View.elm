@@ -40,13 +40,42 @@ findTime d =
 
 showTheTooltip : Model -> Html Msg
 showTheTooltip model =
+    let
+        -- boo =
+        --     Debug.log ("zzzzzzzzzzzzzz " ++ Debug.toString model.tooltip) 1
+        errors =
+            case model.tooltip of
+                Nothing ->
+                    []
+
+                Just tt ->
+                    case tt.data of
+                        DataScaledPoint d ->
+                            d.datum.errs
+
+                        DataCombinedPoint d ->
+                            d.datum.errs
+
+                        _ ->
+                            []
+
+        hasErrors =
+            List.length errors > 0
+
+        logRecordClass =
+            if hasErrors then
+                "failed-log-record-tooltip"
+
+            else
+                "log-record-tooltip"
+    in
     case model.tooltip of
         Nothing ->
             div [] []
 
         Just tt ->
             div
-                [ class "log-record-tooltip"
+                [ class logRecordClass
                 , style
                     ("left: "
                         ++ String.fromFloat (10 + Tuple.first tt.coordinates)
