@@ -580,13 +580,7 @@ scaleXY flags combinedData boundingBox valuesClassification =
             setChartScalings flags boundingBox
 
         points =
-            Debug.log
-                ("found chart scalings "
-                    ++ Debug.toString cs
-                    ++ " flags lower bound "
-                    ++ Debug.toString flags.boundaries.below
-                )
-                (toPoints combinedData)
+            toPoints combinedData
     in
     List.map
         (\data ->
@@ -602,7 +596,10 @@ scaleXY flags combinedData boundingBox valuesClassification =
                                     flags.boundaries.above
 
                                 ValuesBelow ->
-                                    flags.boundaries.below
+                                    -- flags.boundaries.below
+                                    95
+
+                        --this hardoded value is a fix
                     in
                     { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs yValue )
                     , datum = d
@@ -722,8 +719,7 @@ chartBottom model =
         res =
             doY model.chartScalings (deviations model lodev List.minimum)
     in
-    Debug.log ("bottom res " ++ Debug.toString res)
-        res
+    res
 
 
 chartTop : Model -> Float
@@ -774,8 +770,7 @@ standardDeviation flags =
         25.0
 
     else
-        Debug.log "not hardcoded value"
-            (sqrt (sqrd / toFloat (List.length values - 1)))
+        sqrt (sqrd / toFloat (List.length values - 1))
 
 
 largestDeviation : Flags -> Float
@@ -787,16 +782,13 @@ largestDeviation flags =
     let
         res =
             if List.length flags.stats == 0 then
-                Debug.log "stats empty"
-                    (standardDeviation flags)
+                standardDeviation flags
 
             else if List.length deviationValues == 0 then
-                Debug.log "deviation values empty"
-                    (standardDeviation flags)
+                standardDeviation flags
 
             else
-                Debug.log "maximum dev from the list or maybe 35.0"
-                    (Maybe.withDefault 35.0 (List.maximum deviationValues))
+                Maybe.withDefault 35.0 (List.maximum deviationValues)
     in
     res
 
@@ -816,8 +808,7 @@ setChartScalings flags boundingBox =
                 0.25
 
             else
-                Debug.log "DEVIATION OK"
-                    deviation1
+                deviation1
 
         scalingFactor =
             -- greater number = smaller chart

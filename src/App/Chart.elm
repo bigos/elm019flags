@@ -659,5 +659,11 @@ chartElements model =
                         (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
                         pl
                 )
-                model.scaledBelowPoints
+                (List.map
+                    (\p ->
+                        Debug.log (Debug.toString p ++ " p point")
+                            p
+                    )
+                    model.scaledBelowPoints
+                )
             )
