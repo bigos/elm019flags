@@ -783,7 +783,7 @@ largestDeviation flags =
             else
                 Maybe.withDefault 35.0 (List.maximum deviationValues)
     in
-    Debug.log ("res " ++ Debug.String res)
+    Debug.log ("largest deviation " ++ Debug.toString res ++ " done")
         res
 
 
