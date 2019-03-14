@@ -580,7 +580,13 @@ scaleXY flags combinedData boundingBox valuesClassification =
             setChartScalings flags boundingBox
 
         points =
-            toPoints combinedData
+            Debug.log
+                ("found chart scalings "
+                    ++ Debug.toString cs
+                    ++ " flags lower bound "
+                    ++ Debug.toString flags.boundaries.below
+                )
+                (toPoints combinedData)
     in
     List.map
         (\data ->
@@ -712,7 +718,12 @@ lodev =
 
 chartBottom : Model -> Float
 chartBottom model =
-    doY model.chartScalings (deviations model lodev List.minimum)
+    let
+        res =
+            doY model.chartScalings (deviations model lodev List.minimum)
+    in
+    Debug.log ("bottom res " ++ Debug.toString res)
+        res
 
 
 chartTop : Model -> Float
@@ -763,7 +774,8 @@ standardDeviation flags =
         25.0
 
     else
-        sqrt (sqrd / toFloat (List.length values - 1))
+        Debug.log "not hardcoded value"
+            (sqrt (sqrd / toFloat (List.length values - 1)))
 
 
 largestDeviation : Flags -> Float
@@ -775,16 +787,18 @@ largestDeviation flags =
     let
         res =
             if List.length flags.stats == 0 then
-                standardDeviation flags
+                Debug.log "stats empty"
+                    (standardDeviation flags)
 
             else if List.length deviationValues == 0 then
-                standardDeviation flags
+                Debug.log "deviation values empty"
+                    (standardDeviation flags)
 
             else
-                Maybe.withDefault 35.0 (List.maximum deviationValues)
+                Debug.log "maximum dev from the list or maybe 35.0"
+                    (Maybe.withDefault 35.0 (List.maximum deviationValues))
     in
-    Debug.log ("largest deviation " ++ Debug.toString res ++ " done")
-        res
+    res
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -799,8 +813,7 @@ setChartScalings flags boundingBox =
 
         deviation =
             if isNaN deviation1 then
-                Debug.log "nan deviation"
-                    0.25
+                0.25
 
             else
                 Debug.log "DEVIATION OK"
