@@ -319,109 +319,77 @@ analyteFullName analyte =
         ]
 
 
+appendUnless : List LegendElement -> LegendElement -> Bool -> List LegendElement
+appendUnless lst appended thenTest =
+    if thenTest then
+        lst
+
+    else
+        appended :: lst
+
+
 legendData flags acc nextShape =
     case nextShape of
         LegendDataPoint colours validAnalytes hasInvalid ->
-            if List.length validAnalytes > 1 then
-                legendData flags
-                    (LegendElement
-                        (LegendDataPoint (List.take 1 colours)
-                            (List.take 1 validAnalytes)
-                            hasInvalid
-                        )
-                        (analyteFullName
-                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
-                        )
-                        :: acc
-                    )
-                    (LegendDataPoint (Maybe.withDefault [] (List.tail colours))
-                        (Maybe.withDefault [] (List.tail validAnalytes))
+            legendData flags
+                (LegendElement
+                    (LegendDataPoint (List.take 1 colours)
+                        (List.take 1 validAnalytes)
                         hasInvalid
                     )
-
-            else
-                legendData flags
-                    (LegendElement
-                        (LegendDataPoint (List.take 1 colours)
-                            (List.take 1 validAnalytes)
-                            hasInvalid
-                        )
-                        (analyteFullName
-                            (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
-                        )
-                        :: acc
+                    (analyteFullName
+                        (Maybe.withDefault (AnalyteRecord 0 "error" "" "" 0) (List.head validAnalytes))
                     )
-                    (LegendOutsideValid hasInvalid)
+                    :: acc
+                )
+                (if List.length validAnalytes > 1 then
+                    LegendDataPoint (Maybe.withDefault [] (List.tail colours))
+                        (Maybe.withDefault [] (List.tail validAnalytes))
+                        hasInvalid
+
+                 else
+                    LegendOutsideValid hasInvalid
+                )
 
         LegendOutsideValid hasInvalid ->
             let
                 newAcc =
-                    if not hasInvalid then
-                        acc
-
-                    else
-                        LegendElement (LegendOutsideValid hasInvalid) "Results outside valid range"
-                            :: acc
+                    appendUnless acc (LegendElement (LegendOutsideValid hasInvalid) "Results outside valid range") (not hasInvalid)
             in
             legendData flags newAcc LegendMaintenanceLog
 
         LegendMaintenanceLog ->
             let
                 newAcc =
-                    if List.isEmpty flags.maintenance_logs then
-                        acc
-
-                    else
-                        LegendElement LegendMaintenanceLog "Maintenance log"
-                            :: acc
+                    appendUnless acc (LegendElement LegendMaintenanceLog "Maintenance log") (List.isEmpty flags.maintenance_logs)
             in
             legendData flags newAcc LegendChartReview
 
         LegendChartReview ->
             let
                 newAcc =
-                    if List.isEmpty flags.reviews then
-                        acc
-
-                    else
-                        LegendElement LegendChartReview "Chart review"
-                            :: acc
+                    appendUnless acc (LegendElement LegendChartReview "Chart review") (List.isEmpty flags.reviews)
             in
             legendData flags newAcc LegendTheoreticalLine
 
         LegendTheoreticalLine ->
             let
                 newAcc =
-                    if flags.chart_type == "combined" then
-                        acc
-
-                    else
-                        LegendElement LegendTheoreticalLine "Theoretical line"
-                            :: acc
+                    appendUnless acc (LegendElement LegendTheoreticalLine "Theoretical line") (flags.chart_type == "combined")
             in
             legendData flags newAcc LegendLimitRed
 
         LegendLimitRed ->
             let
                 newAcc =
-                    if flags.chart_type == "combined" then
-                        acc
-
-                    else
-                        LegendElement LegendLimitRed "Static SD limits"
-                            :: acc
+                    appendUnless acc (LegendElement LegendLimitRed "Static SD limits") (flags.chart_type == "combined")
             in
             legendData flags newAcc LegendLimitOrange
 
         LegendLimitOrange ->
             let
                 newAcc =
-                    if flags.chart_type /= "combined" then
-                        acc
-
-                    else
-                        LegendElement LegendLimitOrange "Calculated SD limits"
-                            :: acc
+                    appendUnless acc (LegendElement LegendLimitOrange "Calculated SD limits") (flags.chart_type /= "combined")
             in
             --last item so just reverse the list
             List.reverse newAcc
