@@ -772,14 +772,19 @@ largestDeviation flags =
         deviationValues =
             List.map (\s -> s.deviation) flags.stats
     in
-    if List.length flags.stats == 0 then
-        standardDeviation flags
+    let
+        res =
+            if List.length flags.stats == 0 then
+                standardDeviation flags
 
-    else if List.length deviationValues == 0 then
-        standardDeviation flags
+            else if List.length deviationValues == 0 then
+                standardDeviation flags
 
-    else
-        Maybe.withDefault 35.0 (List.maximum deviationValues)
+            else
+                Maybe.withDefault 35.0 (List.maximum deviationValues)
+    in
+    Debug.log ("res " ++ Debug.String res)
+        res
 
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
@@ -794,10 +799,12 @@ setChartScalings flags boundingBox =
 
         deviation =
             if isNaN deviation1 then
-                0.25
+                Debug.log "nan deviation"
+                    0.25
 
             else
-                deviation1
+                Debug.log "DEVIATION OK"
+                    deviation1
 
         scalingFactor =
             -- greater number = smaller chart
