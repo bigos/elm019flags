@@ -8,6 +8,7 @@ import List.Extra
 import Point2d exposing (Point2d)
 import Selectize
 import String.Interpolate exposing (interpolate)
+import Task
 
 
 
@@ -274,32 +275,44 @@ init flags =
 
         hasInvalid =
             not (List.all List.isEmpty dataAbove && List.all List.isEmpty dataBelow)
+
+        proto_model =
+            { chartBoundingBox = chartBoundingBox
+            , chartScalings = setChartScalings flags chartBoundingBox
+            , chartType = flags.chart_type
+            , dateFrom = prepareTime flags.date_from
+            , dateTo = prepareTime flags.date_to
+            , flags = flags
+            , scaledAbovePoints = []
+            , scaledValidPoints = []
+            , scaledBelowPoints = []
+            , tooltip = Nothing
+            , textfieldSelection = Nothing
+            , textfieldMenu =
+                Selectize.closed
+                    "textfield-menu"
+                    (\tree -> tree.id ++ " - " ++ tree.name)
+                    []
+            , textfieldMenuOptions = Nothing
+            , textfieldMenuPlaceholder = "Waiting for Command"
+            , combinedAdditionStage = Nothing
+            , combinedAdditionMachine = Nothing
+            , combinedAdditionSample = Nothing
+            , combinedAdditionAnalyte = Nothing
+            , combinedAdditionAnalyteName = Nothing
+            , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes hasInvalid)
+            }
+
+        -- i had a problem where code started to diverge because some functions did not have access to model structure
+        -- this way allows you to initilise model in stages
+        ancestor_model =
+            { proto_model
+                | scaledAbovePoints = scaleXY flags dataAbove chartBoundingBox ValuesAbove
+                , scaledValidPoints = scaleXY flags dataValid chartBoundingBox ValuesValid
+                , scaledBelowPoints = scaleXY flags dataBelow chartBoundingBox ValuesBelow
+            }
     in
-    ( { chartBoundingBox = chartBoundingBox
-      , chartScalings = setChartScalings flags chartBoundingBox
-      , chartType = flags.chart_type
-      , dateFrom = prepareTime flags.date_from
-      , dateTo = prepareTime flags.date_to
-      , flags = flags
-      , scaledAbovePoints = scaleXY flags dataAbove chartBoundingBox ValuesAbove
-      , scaledValidPoints = scaleXY flags dataValid chartBoundingBox ValuesValid
-      , scaledBelowPoints = scaleXY flags dataBelow chartBoundingBox ValuesBelow
-      , tooltip = Nothing
-      , textfieldSelection = Nothing
-      , textfieldMenu =
-            Selectize.closed
-                "textfield-menu"
-                (\tree -> tree.id ++ " - " ++ tree.name)
-                []
-      , textfieldMenuOptions = Nothing
-      , textfieldMenuPlaceholder = "Waiting for Command"
-      , combinedAdditionStage = Nothing
-      , combinedAdditionMachine = Nothing
-      , combinedAdditionSample = Nothing
-      , combinedAdditionAnalyte = Nothing
-      , combinedAdditionAnalyteName = Nothing
-      , legend = legendData flags [] (LegendDataPoint dataPointColours flags.analytes hasInvalid)
-      }
+    ( ancestor_model
     , Cmd.none
     )
 
@@ -596,10 +609,7 @@ scaleXY flags combinedData boundingBox valuesClassification =
                                     flags.boundaries.above
 
                                 ValuesBelow ->
-                                    -- flags.boundaries.below
-                                    95
-
-                        --this hardoded value is a fix
+                                    flags.boundaries.below
                     in
                     { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs yValue )
                     , datum = d
