@@ -304,7 +304,7 @@ init flags =
             }
 
         -- i had a problem where code started to diverge because some functions did not have access to model structure
-        -- this way allows you to initilise model in stages
+        -- this way allows you to initialise model in stages
         ancestor_model =
             { proto_model
                 | scaledAbovePoints = scaleXY flags dataAbove chartBoundingBox ValuesAbove
