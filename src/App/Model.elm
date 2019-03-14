@@ -307,9 +307,9 @@ init flags =
         -- this way allows you to initialise model in stages
         ancestor_model =
             { proto_model
-                | scaledAbovePoints = scaleXY flags dataAbove chartBoundingBox ValuesAbove
-                , scaledValidPoints = scaleXY flags dataValid chartBoundingBox ValuesValid
-                , scaledBelowPoints = scaleXY flags dataBelow chartBoundingBox ValuesBelow
+                | scaledAbovePoints = scaleXY proto_model dataAbove chartBoundingBox ValuesAbove
+                , scaledValidPoints = scaleXY proto_model dataValid chartBoundingBox ValuesValid
+                , scaledBelowPoints = scaleXY proto_model dataBelow chartBoundingBox ValuesBelow
             }
     in
     ( ancestor_model
@@ -586,9 +586,12 @@ prepareTime s =
             Just d
 
 
-scaleXY : Flags -> List (List Datum) -> Maybe BoundingBox2d -> ValuesClassification -> List (List ScaledPoint)
-scaleXY flags combinedData boundingBox valuesClassification =
+scaleXY : Model -> List (List Datum) -> Maybe BoundingBox2d -> ValuesClassification -> List (List ScaledPoint)
+scaleXY model combinedData boundingBox valuesClassification =
     let
+        flags =
+            model.flags
+
         cs =
             setChartScalings flags boundingBox
 
