@@ -55,7 +55,6 @@ type alias Flags =
     , stats : List StatsData
     , maintenance_logs : List ChartRecord
     , reviews : List ChartRecord
-    , boundaries : { above : Float, below : Float, bottom : Float }
     , classified_qcresults : List ClassifiedSection
     }
 
@@ -819,8 +818,6 @@ setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
     -- part of the problem is the fact we define upperboundary and lowerboundary
     -- but in some place use use chartBottom and chartTop
-    -- -
-    -- fix that with the new boundaries
     let
         mean =
             averageMean flags
