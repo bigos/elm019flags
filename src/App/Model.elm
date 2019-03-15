@@ -603,32 +603,25 @@ scaleXY model combinedData boundingBox valuesClassification =
             List.map
                 (\d ->
                     let
-                        newPoint =
+                        yVal =
                             case valuesClassification of
                                 ValuesValid ->
-                                    Point2d.fromCoordinates
-                                        ( doX cs d.time
-                                        , doY cs
-                                            d.value
-                                        )
+                                    d.value
 
                                 ValuesAbove ->
-                                    Point2d.fromCoordinates
-                                        ( doX cs d.time
-                                        , doY cs
-                                            flags.boundaries.above
-                                        )
+                                    unscaledTop model
 
                                 ValuesBelow ->
-                                    Point2d.fromCoordinates
-                                        ( doX cs d.time
-                                        , doY cs
-                                            -- flags.boundaries.below
-                                            -- (chartBottom model)
-                                            (deviations model lodev List.minimum)
-                                        )
+                                    unscaledBottom model
                     in
-                    { point2d = newPoint, datum = d }
+                    { point2d =
+                        Point2d.fromCoordinates
+                            ( doX cs d.time
+                            , doY cs
+                                yVal
+                            )
+                    , datum = d
+                    }
                 )
                 data
         )
@@ -738,18 +731,22 @@ lodev =
     -4.5
 
 
+unscaledBottom model =
+    deviations model lodev List.minimum
+
+
 chartBottom : Model -> Float
 chartBottom model =
-    let
-        res =
-            doY model.chartScalings (deviations model lodev List.minimum)
-    in
-    res
+    doY model.chartScalings (unscaledBottom model)
+
+
+unscaledTop model =
+    deviations model hidev List.maximum
 
 
 chartTop : Model -> Float
 chartTop model =
-    doY model.chartScalings (deviations model hidev List.maximum)
+    doY model.chartScalings (unscaledTop model)
 
 
 tickBottom : Model -> Float
