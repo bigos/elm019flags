@@ -603,20 +603,32 @@ scaleXY model combinedData boundingBox valuesClassification =
             List.map
                 (\d ->
                     let
-                        yValue =
+                        newPoint =
                             case valuesClassification of
                                 ValuesValid ->
-                                    d.value
+                                    Point2d.fromCoordinates
+                                        ( doX cs d.time
+                                        , doY cs
+                                            d.value
+                                        )
 
                                 ValuesAbove ->
-                                    flags.boundaries.above
+                                    Point2d.fromCoordinates
+                                        ( doX cs d.time
+                                        , doY cs
+                                            flags.boundaries.above
+                                        )
 
                                 ValuesBelow ->
-                                    flags.boundaries.below
+                                    Point2d.fromCoordinates
+                                        ( doX cs d.time
+                                        , doY cs
+                                            -- flags.boundaries.below
+                                            -- (chartBottom model)
+                                            (deviations model lodev List.minimum)
+                                        )
                     in
-                    { point2d = Point2d.fromCoordinates ( doX cs d.time, doY cs yValue )
-                    , datum = d
-                    }
+                    { point2d = newPoint, datum = d }
                 )
                 data
         )
