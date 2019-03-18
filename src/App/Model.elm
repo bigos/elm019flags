@@ -1,4 +1,4 @@
-module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, ValuesClassification(..), analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readInvalidData, readValidData, scaleXY, setChartScalings, singleAnalyteId, singleValidResults, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
+module App.Model exposing (AdditionStage(..), Analyte, AnalyteRecord, AnalyteResults, AxisData, AxisX, AxisY, ChartRecord, ChartScalings, ClassifiedSection, DataStats, Datum, Flags, LegendElement, LegendShape(..), Machine, Model, Msg(..), RawCid, Sample, ScaledPoint, SectionData, StatsData, Tooltip, TooltipData(..), Tree, ValuesClassification(..), analyteFullName, averageMean, chartBottom, chartEnd, chartStart, chartTop, combinedValidResults, dataPointColours, dataStats, defaultAnalyteData, deviations, doX, doY, findStatForTime, fixedFlagCheck, flatten, hidev, init, largestDeviation, legendData, lodev, prepareTime, readCombinedData, readInvalidData, readValidData, scaleXY, setChartScalings, singleAnalyteId, standardDeviation, statStartTimes, statStartTuples, tickBottom, toPoints, tupleize, tupleizeHelper)
 
 import App.Utilities exposing (..)
 import BoundingBox2d exposing (BoundingBox2d)
@@ -467,8 +467,8 @@ flatten lst =
 -- TODO: rename function
 
 
-singleValidResults : Flags -> List RawCid
-singleValidResults flags =
+combinedValidResults : Flags -> List RawCid
+combinedValidResults flags =
     flatten
         (List.map (\q -> q.values.valid) flags.classified_qcresults)
 
@@ -596,18 +596,18 @@ scaleXY model combinedData boundingBox valuesClassification =
 
         points =
             toPoints combinedData
+
+        chartMax =
+            unscaledTop model
+
+        chartMin =
+            unscaledBottom model
     in
     List.map
         (\data ->
             List.map
                 (\d ->
                     let
-                        chartMax =
-                            unscaledTop model
-
-                        chartMin =
-                            unscaledBottom model
-
                         yVal =
                             case valuesClassification of
                                 ValuesValid ->
@@ -664,7 +664,7 @@ dataStats : Model -> DataStats
 dataStats model =
     let
         values =
-            List.map (\qr -> qr.c) (singleValidResults model.flags)
+            List.map (\qr -> qr.c) (combinedValidResults model.flags)
 
         mean =
             List.foldl (+) 0.0 values / toFloat (List.length values)
@@ -688,7 +688,7 @@ deviations model x fn =
             if List.length stats == 0 then
                 let
                     values =
-                        List.map (\qr -> qr.c) (singleValidResults model.flags)
+                        List.map (\qr -> qr.c) (combinedValidResults model.flags)
 
                     mean =
                         List.foldl (+) 0.0 values / toFloat (List.length values)
@@ -775,7 +775,7 @@ averageMean flags =
     if List.length meanValues == 0 then
         let
             qcvalues =
-                singleValidResults flags
+                combinedValidResults flags
         in
         if List.length qcvalues == 0 then
             250.0
@@ -792,7 +792,7 @@ standardDeviation : Flags -> Float
 standardDeviation flags =
     let
         values =
-            List.map (\qc -> qc.c) (singleValidResults flags)
+            List.map (\qc -> qc.c) (combinedValidResults flags)
 
         mean =
             List.foldl (+) 0.0 values / toFloat (List.length values)
@@ -829,8 +829,6 @@ largestDeviation flags =
 
 setChartScalings : Flags -> Maybe BoundingBox2d -> ChartScalings
 setChartScalings flags boundingBox =
-    -- part of the problem is the fact we define upperboundary and lowerboundary
-    -- but in some place use use chartBottom and chartTop
     let
         mean =
             averageMean flags
