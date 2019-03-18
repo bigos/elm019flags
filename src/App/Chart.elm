@@ -226,7 +226,7 @@ createMaintenanceLine model ml =
             deviations model lodev List.minimum
 
         ud =
-            deviations model 4.7 List.maximum
+            deviations model 4.9 List.maximum
     in
     Svg.lineSegment2d
         [ Attributes.stroke "grey"
@@ -251,7 +251,7 @@ createReviewLine model ml =
             deviations model lodev List.minimum
 
         ud =
-            deviations model 4.5 List.maximum
+            deviations model 4.7 List.maximum
     in
     Svg.lineSegment2d
         [ Attributes.stroke "green"
@@ -273,7 +273,7 @@ createMaintenanceShape model ml =
             toFloat (timify ml.on)
 
         ud =
-            deviations model 4.7 List.maximum
+            deviations model 4.9 List.maximum
 
         point =
             Point2d.fromCoordinates ( doX model.chartScalings oni, doY model.chartScalings ud )
@@ -295,7 +295,7 @@ createReviewShape model r =
             toFloat (timify r.on)
 
         ud =
-            deviations model 4.5 List.maximum
+            deviations model 4.7 List.maximum
 
         point =
             Point2d.fromCoordinates ( doX model.chartScalings oni, doY model.chartScalings ud )
