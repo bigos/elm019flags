@@ -602,16 +602,29 @@ scaleXY model combinedData boundingBox valuesClassification =
             List.map
                 (\d ->
                     let
+                        chartMax =
+                            unscaledTop model
+
+                        chartMin =
+                            unscaledBottom model
+
                         yVal =
                             case valuesClassification of
                                 ValuesValid ->
-                                    d.value
+                                    if d.value > chartMax then
+                                        chartMax
+
+                                    else if d.value < chartMin then
+                                        chartMin
+
+                                    else
+                                        d.value
 
                                 ValuesAbove ->
-                                    unscaledTop model
+                                    chartMax
 
                                 ValuesBelow ->
-                                    unscaledBottom model
+                                    chartMin
                     in
                     { point2d =
                         Point2d.fromCoordinates
