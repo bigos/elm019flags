@@ -128,8 +128,8 @@ createValidQcOrErrorShape model point fill =
         )
 
 
-createInvalidQcShape : Model -> ScaledPoint -> String -> Svg Msg
-createInvalidQcShape model point fill =
+createInvalidQcShape : Model -> ScaledPoint -> String -> String -> Svg Msg
+createInvalidQcShape model point fill rim =
     let
         myToolTip =
             if model.chartType == "default" then
@@ -140,7 +140,7 @@ createInvalidQcShape model point fill =
     in
     Svg.polygon2d
         [ Attributes.fill fill
-        , Attributes.stroke "red"
+        , Attributes.stroke rim
         , Attributes.strokeWidth "0.75"
         , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
         , M.onLeave (\event -> TooltipMouseLeave)
@@ -638,7 +638,7 @@ chartElements model =
             (List.map
                 (\pl ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
+                        (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow" (colorForPoint model p)))
                         pl
                 )
                 model.scaledAbovePoints
@@ -656,7 +656,10 @@ chartElements model =
             (List.map
                 (\pl ->
                     List.map
-                        (\p -> Svg.placeIn frameChart (createInvalidQcShape model p "yellow"))
+                        (\p ->
+                            Svg.placeIn frameChart
+                                (createInvalidQcShape model p "yellow" (colorForPoint model p))
+                        )
                         pl
                 )
                 (List.map
