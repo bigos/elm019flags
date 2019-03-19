@@ -255,7 +255,7 @@ pdfLink model =
 
 view : Model -> Html Msg
 view model =
-    div [ style "border: solid yellow 1px;" ]
+    div []
         [ if model.chartType == "default" then
             div [] []
 
