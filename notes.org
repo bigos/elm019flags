@@ -1,7 +1,7 @@
 * Notes
 ** compiling and deploying to dev
 #+BEGIN_EXAMPLE
-$ elm make src/Main.elm --output=chart.js --debug
+$ elm make src/Main.elm --output=chart.js
 Success! Compiled 1 module.
 $ cp ./chart.js ~/code/qc_charts/public/chart.js
 #+END_EXAMPLE
