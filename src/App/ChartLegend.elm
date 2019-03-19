@@ -3,7 +3,7 @@ module App.ChartLegend exposing (drawLegendChartReview, drawLegendDataPoint, dra
 import App.Chart exposing (..)
 import App.Model exposing (..)
 import Geometry.Svg as Svg
-import Html exposing (Html, a, br, button, div, h3, hr, i, span, text)
+import Html exposing (Html, a, br, button, div, h3, hr, i, span, table, td, text, tr)
 import Html.Attributes exposing (classList, href)
 import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
@@ -116,32 +116,31 @@ showLegend : Model -> Html Msg
 showLegend model =
     div []
         [ div [ class "container" ]
-            [ h3 [ class "center" ]
+            [ h3 [ class "center", style "text-align: center;" ]
                 [ text "Legend" ]
             ]
         , div [ class "" ]
             [ div
                 [ class "container" ]
-                [ div [ class "row" ]
-                    (List.map
-                        (\ld ->
-                            div [ class "col-md-6" ]
-                                [ div [ class "row", style "margin-bottom:1.5em" ]
-                                    [ div [ class "col-md-1" ]
+                [ table
+                    [ class "center" ]
+                    (List.concat
+                        (List.map
+                            (\ld ->
+                                [ tr []
+                                    [ td [ style "width: 50px" ]
                                         [ Svg.svg
                                             [ height "25"
                                             , viewBox "0 0 25 25"
                                             ]
                                             [ Svg.g [] (drawLegendShape model ld.shape) ]
                                         ]
-                                    , div
-                                        [ class "col-md-5" ]
-                                        [ text ld.description
-                                        ]
+                                    , td [] [ text ld.description ]
                                     ]
                                 ]
+                            )
+                            model.legend
                         )
-                        model.legend
                     )
                 ]
             ]
