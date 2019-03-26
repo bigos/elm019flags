@@ -242,8 +242,22 @@ createMajorTick model mt =
         ox =
             chartStart model.flags
 
+        wholeLen =
+            String.length (String.fromInt (Round.truncate mt))
+
+        fullLen =
+            String.length
+                (String.fromFloat mt)
+
+        decimalLen =
+            fullLen - wholeLen - 1
+
         mtStr =
-            String.fromFloat mt
+            if decimalLen > 10 then
+                Round.round (fullLen - wholeLen - 4) mt
+
+            else
+                String.fromFloat mt
 
         labelOffset =
             toFloat (String.length mtStr) * 8.0 + 15
