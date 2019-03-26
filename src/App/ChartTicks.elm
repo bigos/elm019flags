@@ -242,28 +242,8 @@ createMajorTick model mt =
         ox =
             chartStart model.flags
 
-        numLenMax =
-            -- TODO all number rounding code deserves a separate function
-            String.length
-                (String.fromFloat model.flags.axes.axis_y.max)
-
-        numLenMin =
-            String.length
-                (String.fromFloat model.flags.axes.axis_y.min)
-
-        roundLenMax =
-            numLenMax - String.length (Round.round 0 mt)
-
-        roundLenMin =
-            numLenMin - String.length (Round.round 0 mt)
-
-        roundLen =
-            -- remove 1 for comma
-            Basics.min roundLenMin roundLenMax
-                - 1
-
         mtStr =
-            Round.round roundLen mt
+            String.fromFloat mt
 
         labelOffset =
             toFloat (String.length mtStr) * 8.0 + 15
