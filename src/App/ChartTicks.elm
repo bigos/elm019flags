@@ -249,7 +249,6 @@ createMajorTick model mt =
         mtStr =
             Round.round numLen mt
 
-        --            String.fromFloat mt
         labelOffset =
             toFloat (String.length mtStr) * 8.0 + 15
 
