@@ -243,6 +243,7 @@ createMajorTick model mt =
             chartStart model.flags
 
         numLenMax =
+            -- TODO all number rounding code deserves a separate function
             String.length
                 (String.fromFloat model.flags.axes.axis_y.max)
 
