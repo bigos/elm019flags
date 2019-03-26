@@ -12,6 +12,7 @@ import ISO8601
 import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
 import Polygon2d exposing (Polygon2d)
+import Round
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 import Svg.Events as Events exposing (..)

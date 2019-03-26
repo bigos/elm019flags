@@ -20,6 +20,7 @@
             "kirchner/elm-selectize": "2.0.7",
             "lukewestby/elm-string-interpolate": "1.0.3",
             "mpizenberg/elm-pointer-events": "3.0.0",
+            "myrho/elm-round": "1.0.4",
             "rtfeldman/elm-css": "15.1.0"
         },
         "indirect": {

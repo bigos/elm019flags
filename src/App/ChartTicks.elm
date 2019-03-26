@@ -10,6 +10,7 @@ import Html exposing (text)
 import ISO8601
 import LineSegment2d exposing (LineSegment2d)
 import Point2d exposing (Point2d)
+import Round
 import Svg exposing (Svg)
 import Svg.Attributes as Attributes exposing (..)
 
