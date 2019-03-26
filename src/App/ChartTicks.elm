@@ -242,9 +242,14 @@ createMajorTick model mt =
         ox =
             chartStart model.flags
 
-        mtStr =
-            String.fromFloat mt
+        numLen =
+            String.length
+                (String.fromFloat model.flags.axes.axis_y.max)
 
+        mtStr =
+            Round.round numLen mt
+
+        --            String.fromFloat mt
         labelOffset =
             toFloat (String.length mtStr) * 8.0 + 15
 
