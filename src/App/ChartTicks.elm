@@ -236,28 +236,75 @@ dayTickVals model =
         []
 
 
+removeZeros : List Char -> List Char
+removeZeros lc =
+    let
+        doesNotStartWithZero =
+            case List.head lc of
+                Nothing ->
+                    True
+
+                Just val ->
+                    val /= '0'
+    in
+    if doesNotStartWithZero then
+        lc
+
+    else
+        removeZeros
+            (Maybe.withDefault []
+                (List.tail lc)
+            )
+
+
+removeTrailingZeros : String -> String
+removeTrailingZeros n =
+    let
+        rev =
+            List.reverse (String.toList n)
+    in
+    String.fromList
+        (List.reverse
+            (removeZeros
+                rev
+            )
+        )
+
+
+rounder : Float -> String
+rounder n =
+    let
+        wholePartLen =
+            String.length
+                (Round.round 0 n)
+
+        fullStr =
+            String.fromFloat n
+
+        fullLen =
+            String.length fullStr
+
+        decLen =
+            fullLen - wholePartLen - 1
+
+        rounded =
+            if decLen > 10 then
+                Round.round (decLen - 2) n
+
+            else
+                fullStr
+    in
+    removeTrailingZeros rounded
+
+
 createMajorTick : Model -> Float -> Svg msg
 createMajorTick model mt =
     let
         ox =
             chartStart model.flags
 
-        wholeLen =
-            String.length (String.fromInt (Round.truncate mt))
-
-        fullLen =
-            String.length
-                (String.fromFloat mt)
-
-        decimalLen =
-            fullLen - wholeLen - 1
-
         mtStr =
-            if decimalLen > 10 then
-                Round.round (fullLen - wholeLen - 4) mt
-
-            else
-                String.fromFloat mt
+            rounder mt
 
         labelOffset =
             toFloat (String.length mtStr) * 8.0 + 15
