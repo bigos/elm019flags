@@ -92,15 +92,22 @@ createQcShape model point fill =
 
             else
                 DataCombinedPoint point
+
+        referencePoint =
+            Point2d.fromCoordinates
+                ( 0, 0 )
     in
-    Svg.polygon2d
-        [ Attributes.fill fill
-        , Attributes.stroke "black"
-        , Attributes.strokeWidth "0.25"
-        , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
-        , M.onLeave (\event -> TooltipMouseLeave)
-        ]
-        (Polygon2d.singleLoop (shape point.point2d))
+    Svg.scaleAbout referencePoint
+        1.5
+        (Svg.polygon2d
+            [ Attributes.fill fill
+            , Attributes.stroke "black"
+            , Attributes.strokeWidth "0.25"
+            , M.onEnter (\event -> TooltipMouseEnter myToolTip event.pagePos Nothing)
+            , M.onLeave (\event -> TooltipMouseLeave)
+            ]
+            (Polygon2d.singleLoop (shape point.point2d))
+        )
 
 
 genericShape : Point2d -> Float -> List ( Float, Float ) -> List Point2d
