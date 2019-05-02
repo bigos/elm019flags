@@ -447,42 +447,47 @@ chartElements model =
 
             else
                 []
+
+        refererence_point =
+            Point2d.fromCoordinates ( 0, 0 )
     in
-    [ Svg.placeIn frameChart (axisX model)
-    , Svg.placeIn frameChart (axisY model)
-    ]
-        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceLine model ml)) model.flags.maintenance_logs
-        ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShape model ml)) model.flags.maintenance_logs
-        ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
-        ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
-        -- functions using statStartTuples work with single analyte charts
-        ++ List.map (\s -> Svg.placeIn frameChart (createNominalLine model s)) statsDateRanges
-        -- red stats lines
-        ++ List.map (\s -> Svg.placeIn frameChart (createMeanLine model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 3.0 model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 2.0 model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) statsDateRanges
-        ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) statsDateRanges
-        -- orange stats lines will go here
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeMeanLine model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 3.0 model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 2.0 model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -2.0 model s)) orangeStats
-        ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -3.0 model s)) orangeStats
-        -- data points
-        ++ flatten
-            (List.map2
-                (\pl c ->
-                    List.map
-                        (\p -> Svg.placeIn frameChart (createQcShape model p c))
-                        pl
+    List.map (\el -> Svg.scaleAbout refererence_point 1.5 el)
+        ([ Svg.placeIn frameChart (axisX model)
+         , Svg.placeIn frameChart (axisY model)
+         ]
+            ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceLine model ml)) model.flags.maintenance_logs
+            ++ List.map (\ml -> Svg.placeIn frameChart (createMaintenanceShape model ml)) model.flags.maintenance_logs
+            ++ List.map (\r -> Svg.placeIn frameChart (createReviewLine model r)) model.flags.reviews
+            ++ List.map (\r -> Svg.placeIn frameChart (createReviewShape model r)) model.flags.reviews
+            -- functions using statStartTuples work with single analyte charts
+            ++ List.map (\s -> Svg.placeIn frameChart (createNominalLine model s)) statsDateRanges
+            -- red stats lines
+            ++ List.map (\s -> Svg.placeIn frameChart (createMeanLine model s)) statsDateRanges
+            ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 3.0 model s)) statsDateRanges
+            ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine 2.0 model s)) statsDateRanges
+            ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -2.0 model s)) statsDateRanges
+            ++ List.map (\s -> Svg.placeIn frameChart (createXsdlLine -3.0 model s)) statsDateRanges
+            -- orange stats lines will go here
+            ++ List.map (\s -> Svg.placeIn frameChart (createOrangeMeanLine model s)) orangeStats
+            ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 3.0 model s)) orangeStats
+            ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine 2.0 model s)) orangeStats
+            ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -2.0 model s)) orangeStats
+            ++ List.map (\s -> Svg.placeIn frameChart (createOrangeXsdlLine -3.0 model s)) orangeStats
+            -- data points
+            ++ flatten
+                (List.map2
+                    (\pl c ->
+                        List.map
+                            (\p -> Svg.placeIn frameChart (createQcShape model p c))
+                            pl
+                    )
+                    model.scaledPoints
+                    [ "blue", "red", "black", "green", "yellow", "pink" ]
                 )
-                model.scaledPoints
-                [ "blue", "red", "black", "green", "yellow", "pink" ]
-            )
-        ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
-        ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
-        ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
-        ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
+            ++ List.map (\ys -> Svg.placeIn frameChart (createYearTicks model ys)) model.flags.axes.axis_x.year_starts
+            ++ List.map (\ms -> Svg.placeIn frameChart (createMonthTicks model ms)) model.flags.axes.axis_x.month_starts
+            ++ List.map (\ms -> Svg.placeIn frameChart (createWeekTicks model ms)) (weekTickVals model)
+            ++ List.map (\ms -> Svg.placeIn frameChart (createDayTicks model ms)) (dayTickVals model)
+            ++ List.map (\mt -> Svg.placeIn frameChart (createMajorTick model mt)) (majorYticks model)
+            ++ List.map (\mt -> Svg.placeIn frameChart (createMinorTick model mt)) (minorYticks model)
+        )

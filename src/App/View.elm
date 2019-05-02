@@ -192,11 +192,18 @@ pdfLink model =
 
 view : Model -> Html Msg
 view model =
+    let
+        widthStr =
+            "1200"
+
+        heightStr =
+            "800"
+    in
     div [ style "border: solid yellow 1px;" ]
-        [ div [ style "margin: auto ; width:700px" ]
+        [ div [ style ("margin: auto ; width:" ++ widthStr ++ "px") ]
             [ Svg.svg
-                [ height "400"
-                , viewBox "0 0 700 400"
+                [ height heightStr
+                , viewBox ("0 0 " ++ widthStr ++ " " ++ heightStr)
                 , style "border: solid #abc 1px;"
                 ]
                 [ Svg.g [] (chartElements model) ]
